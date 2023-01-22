@@ -67,6 +67,7 @@ const WalletDropDown = () => {
       disconnect();
     } else {
       connect(walletV.value);
+      window.localStorage.setItem("connectedWallet", String(walletV.value).toLowerCase());
     }
   };
 

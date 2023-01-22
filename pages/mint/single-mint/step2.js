@@ -23,7 +23,7 @@ const SingleMintStep2 = () => {
   const [loading, setLoading] = React.useState(false);
   const [imgHash, setImgHash] = React.useState();
   const [metadata, setMetadata] = React.useState({
-    image: `ipfs://${imgHash}`,
+    image: `ipfs://${typeof window !== "undefined" && window.localStorage.getItem("img")}`,
     mediaType: "image/jpg",
     description: "",
     item_name: "",
@@ -32,66 +32,33 @@ const SingleMintStep2 = () => {
     item_link: "",
   });
 
-  useEffect(() => {
-    let img = JSON.parse(
-      typeof window !== "undefined" && window.localStorage.getItem("img")
-    );
-    setImgHash(img.path);
-  }, []);
-
   const onInputChange = (e) => {
     setMetadata({ ...metadata, [e.target.name]: e.target.value });
   };
+
   const onInputRangeChange = (e) => {
     setMetadata({ ...metadata, [e.target.name]: e.target.value });
     setRangeValue(e.target.value);
   };
+
   const onNextButton = async () => {
     setLoading(true);
-    let name = metadata.name;
-    if (!metadata.name || name === null || name === "") {
+    if (!metadata.item_name || metadata.item_name === null || metadata.item_name === "") {
       Toast("error", "Name is invalid.");
       setLoading(false);
       return;
     }
-    if (imgHash && connected) {
-      const recipientAddress = await wallet.getChangeAddress();
-      const utxos = await wallet.getUtxos();
-      const { maskedTx, originalMetadata } = await createTransaction(
-        recipientAddress,
-        utxos,
-        imgHash,
-        metadata
-      );
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("txHash", String(maskedTx));
-        window.localStorage.setItem("metadata", JSON.stringify(metadata));
-        window.localStorage.setItem("original", String(originalMetadata));
-      }
+    else {
+      window.localStorage.setItem("item_name", metadata.item_name);
+      window.localStorage.setItem("item_description", metadata.item_description);
       setLoading(false);
       router.push(mintSingleStep3);
-    } else {
-      Toast("error", "WALLET IS NOT CONNECTED");
-      setLoading(false);
     }
   };
+
   return (
     <SingleMintStep2Styled>
       <Container>
-        {/* {connected ? (
-          <></>
-        ) : (
-          // <button
-          //   type="button"
-          //   onClick={(e) => startMining(e)}
-          //   disabled={loading}
-          // >
-          //   {loading ? "Creating transaction..." : "Mint Mesh Token"}
-          // </button>
-          <></>
-          // <CardanoWallet />
-        )} */}
-
         <Box sx={{ pt: 15, pb: 3 }} className="text_white">
           <Typography variant="h5" className="bold">
             Add metadata
@@ -111,7 +78,7 @@ const SingleMintStep2 = () => {
             <>
               <TextField
                 placeholder="Name your item"
-                name="name"
+                name="item_name"
                 onChange={(e) => onInputChange(e)}
                 fullWidth
                 sx={{
@@ -261,13 +228,6 @@ const SingleMintStep2 = () => {
                     * We collect a 2.55 royalty fee each tome your NFT sells,
                     click here for more information
                   </Typography>
-                  {/* <Box
-                    sx={{ display: "flex", justifyContent: "center", pt: 10 }}
-                  >
-                    <Button className="btn" onClick={(e) => onNextButton(e)}>
-                      Next
-                    </Button>
-                  </Box> */}
                   <Box
                     sx={{ display: "flex", justifyContent: "center", py: 3 }}
                   >

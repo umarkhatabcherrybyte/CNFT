@@ -61,7 +61,8 @@ const SingleMint = () => {
           if (typeof window !== "undefined") {
             Toast("success", "Uploading succeed.");
             setIsUploading(false);
-            window.localStorage.setItem("img", JSON.stringify(uploaded_image));
+            window.localStorage.setItem("img", uploaded_image.path);
+            window.localStorage.setItem("file_mimeType", mintFile.type);
             router.push(mintSingleStep2);
           }
         }
