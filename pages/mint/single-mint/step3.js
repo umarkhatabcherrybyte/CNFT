@@ -19,8 +19,8 @@ import QRCode from "react-qr-code";
 import { Toast } from "../../../components/shared/Toast";
 import Strips from "/components/Design/Strips";
 import Baloon from "/components/Design/Ballon";
-import NamiWalletApi, { Cardano } from "../../../nami-js/nami";
-
+import { useRouter } from "next/router";
+import { singleMintStep1 } from '../../../components/Routes/constants'
 
 const payData = [
   {
@@ -43,196 +43,68 @@ const payData = [
   },
 ];
 
-let nami;
-
 const SingleMintStep3 = () => {
-  const [currentAddr, setCurrentAddr] = useState("");
-  const [imgHash, setImgHash] = React.useState();
-  const [selectedValue, setSelectedValue] = React.useState();
-  const [loading, setLoading] = React.useState(false);
-  const [recipientAddressMain, setRecipientAddressMain] = useState("");
-  const [recipientAddressTest, setRecipientAddressTest] = useState("");
+
+  let router = useRouter()
 
   const { wallet, connected } = useWallet();
-
-  // useEffect(() => {
-  //   let img = JSON.parse(
-  //     typeof window !== "undefined" && window.localStorage.getItem("img")
-  //   );
-  //   setImgHash(img.path);
-  // }, []);
+  const [currentAddr, setCurrentAddr] = useState("");
+  const [selectedValue, setSelectedValue] = React.useState();
 
   const onMint = async () => {
-    let img = typeof window !== "undefined" && window.localStorage.getItem("img")
-    if (selectedValue == undefined || selectedValue == null) {
-      Toast("error", "Please Select an Option for Minting");
-    } else if (img && connected) {
-      if (selectedValue == "a") {
-        Toast("error", "This Option is Currently in Development");
-      } else if (selectedValue == "b") {
-        const signedTx = await wallet.signTx(
-          typeof window !== "undefined" &&
-          window.localStorage.getItem("txHash"),
-          true
-        );
-        const { txHash } = await signTransaction(
-          "nice",
-          signedTx,
-          typeof window !== "undefined" &&
-          window.localStorage.getItem("original")
-        );
-        console.log(txHash, "hasafh3333");
-      } else if (selectedValue == "c") {
-        const utxos = await wallet.getUtxos();
-        const { maskedTx, originalMetadata } = await createTransaction(
-          currentAddr,
-          utxos,
-          imgHash,
-          JSON.parse(
+    try {
+      let img = typeof window !== "undefined" && window.localStorage.getItem("img")
+      if (selectedValue == undefined || selectedValue == null) {
+        Toast("error", "Please Select an Option for Minting");
+      } else if (img && connected) {
+        if (selectedValue == "a") {
+          Toast("error", "This Option is Currently in Development");
+        } else if (selectedValue == "b") {
+          const signedTx = await wallet.signTx(
             typeof window !== "undefined" &&
-            window.localStorage.getItem("metadata")
-          )
-        );
-        const signedTx = await wallet.signTx(maskedTx, true);
-        const { txHash } = await signTransaction(
-          "nice",
-          signedTx,
-          originalMetadata
-        );
-        if (txHash) {
-          Toast("success", "Minted Succesfully");
+            window.localStorage.getItem("txHash"),
+            true
+          );
+          const { txHash } = await signTransaction(
+            "nice",
+            signedTx,
+            typeof window !== "undefined" &&
+            window.localStorage.getItem("original")
+          );
+          console.log(txHash, "hasafh3333");
+          if (txHash) {
+            Toast("success", "Minted Succesfully");
+            router.push(singleMintStep1)
+          }
+        } else if (selectedValue == "c") {
+          const utxos = await wallet.getUtxos();
+          const { maskedTx, originalMetadata } = await createTransaction(
+            currentAddr,
+            utxos,
+            img,
+            JSON.parse(
+              typeof window !== "undefined" &&
+              window.localStorage.getItem("metadata")
+            )
+          );
+          const signedTx = await wallet.signTx(maskedTx, true);
+          const { txHash } = await signTransaction(
+            "nice",
+            signedTx,
+            originalMetadata
+          );
+          if (txHash) {
+            Toast("success", "Minted Succesfully");
+          }
         }
+      } else {
+        Toast("error", "You are not Not Connected");
       }
-    } else {
-      Toast("error", "You are not nonnected");
+    } catch (error) {
+      Toast("error", "Error Occured while Minting");
     }
   };
 
-  const sendFeesAndNFT = async () => {
-
-    try {
-      const mediaType = window.localStorage.getItem("file_mimeType");
-      const item_name = window.localStorage.getItem("item_name");
-      const item_description = window.localStorage.getItem("item_description");
-
-      //await nami.enable();
-      let adaPrice = 0.8;
-      try {
-        const adaInfo = await GetAdaPriceService.getPrice();
-        adaPrice = Number(adaInfo?.data[0]?.current_price);
-      } catch (e) {
-
-      }
-      var myAddress = await nami.getHexAddress();
-
-      let networkId = await nami.getNetworkId();
-      var newPolicy;
-      newPolicy = await nami.createLockingPolicyScript(myAddress, networkId.id, policyExpiration);
-      var complexTrans = complexTransaction;
-      myAddress = await nami.getAddress();
-
-
-      let recipientAddress = recipientAddressMain;
-      if (networkId.id == 0) recipientAddress = recipientAddressTest;
-      //recipients[0] => mint owner
-      complexTrans.recipients[0].address = myAddress;
-      complexTrans.recipients[0].mintedAssets[0].policyId = newPolicy.id;
-      complexTrans.recipients[0].mintedAssets[0].policyScript = newPolicy.script;
-      complexTrans.recipients[0].mintedAssets[0].assetName = item_name;
-      //recipients[1] => mint site Manger
-
-      if (mintingOption === 2) {
-        complexTrans.recipients = [...complexTrans.recipients, {
-          address: recipientAddress,
-          amount: Math.round(4 / adaPrice)
-        }]
-
-      }
-      if (mintingOption === 3) {
-        complexTrans.recipients = [...complexTrans.recipients, {
-          address: recipientAddress,
-          amount: Math.round(4 / adaPrice)
-        }]
-      }
-
-      complexTrans.metadata =
-      {
-        "721":
-        {
-          [newPolicy.id]:
-          {
-            [complexTrans.recipients[0].mintedAssets[0].assetName]:
-            {
-              name: item_name,
-              description: item_description,
-              image: `ipfs://${typeof window !== "undefined" && window.localStorage.getItem("img")}`,
-              mediaType: mediaType
-            }
-          }
-        }
-      };
-      const recipients = complexTrans.recipients
-      const metadataTransaction = complexTrans.metadata
-      let utxos = await nami.getUtxosHex();
-
-      let netId = await nami.getNetworkId();
-      const t = await nami.transaction({
-        PaymentAddress: myAddress,
-        recipients: recipients,
-        metadata: metadataTransaction,
-        utxosRaw: utxos,
-        networkId: netId.id,
-        ttl: 3600,
-        multiSig: null
-      })
-      const signature = await nami.signTx(t)
-      const txHash = await nami.submitTx({
-        transactionRaw: t,
-        witnesses: [signature],
-        networkId: netId.id
-      })
-      console.log("txHash = ", txHash)
-      if (txHash?.status_code == 400) {
-        sendFeesAndNFT();
-        return;
-      }
-      setMintSuccess(true);
-      NotificationManager.success("Minting succeed.");
-    }
-    catch (error) {
-      console.log("error : ", error);
-      if (error.message == "INPUTS_EXHAUSTED") {
-        Toast("error", "Minting failed. You don't have enough ADA in your wallet.")
-      }
-      else {
-        Toast("error", "Minting failed. " + error.message);
-      }
-    }
-  }
-  useEffect(() => {
-    if (connected) {
-      async function t() {
-        // const S = await Cardano();
-        setRecipientAddressMain("addr_test1qqhg0fa30eglhmkg57eh7z2uenthgtzs3pcrqhjmtxw2m73a5fqzs44y203szvnyrtvkdcppa8we6tecc45n4c4j56wsafczlj");
-        setRecipientAddressTest("addr_test1qqhg0fa30eglhmkg57eh7z2uenthgtzs3pcrqhjmtxw2m73a5fqzs44y203szvnyrtvkdcppa8we6tecc45n4c4j56wsafczlj");
-        let Wallet;
-        if (window.localStorage.getItem("connectedWallet") == "nami")
-          Wallet = await window.cardano.nami.enable();
-        else if (window.localStorage.getItem("connectedWallet") == "eternl")
-          Wallet = await window.cardano.eternl.enable();
-        else Wallet = await window.cardano.flint.enable();
-        nami = new NamiWalletApi(
-          S,
-          Wallet,
-          blockfrostApiKey
-        )
-        await nami.getAddress().then((newAddress) => {
-          setCurrentAddr(newAddress)
-        })
-      }
-      t();
-    }
-  }, []);
   return (
     <SingleMintStep3Styled>
       <Strips />
@@ -268,16 +140,6 @@ const SingleMintStep3 = () => {
                       <Typography sx={{ pl: 4 }}>{data.description}</Typography>
                       {data.value === "c" && (
                         <>
-                          {/* <Typography
-                            variant="body"
-                            sx={{ py: 2 }}
-                            component="div"
-                          >
-                            Send 10 ADA for minting. Note: do not use an
-                            exchange, only use the your wallet. Send the
-                            specified amount. You can also use the barcode or
-                            copy the wallet address bellow.
-                          </Typography> */}
                           <Grid container spacing={3} sx={{ py: 2 }}>
                             <Grid item lg={5}>
                               <QRCode value={currentAddr} />

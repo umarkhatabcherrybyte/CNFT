@@ -75,6 +75,7 @@ const SingleMint = () => {
       setIsUploading(false);
     }
   };
+
   return (
     <SingleMintStyled>
       <Container>

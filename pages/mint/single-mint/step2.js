@@ -21,7 +21,6 @@ const SingleMintStep2 = () => {
   const { wallet, connected } = useWallet();
   const [rangeValue, setRangeValue] = React.useState(10);
   const [loading, setLoading] = React.useState(false);
-  const [imgHash, setImgHash] = React.useState();
   const [metadata, setMetadata] = React.useState({
     image: `ipfs://${typeof window !== "undefined" && window.localStorage.getItem("img")}`,
     mediaType: "image/jpg",
@@ -43,18 +42,33 @@ const SingleMintStep2 = () => {
 
   const onNextButton = async () => {
     setLoading(true);
+    let img = typeof window !== "undefined" && window.localStorage.getItem("img")
     if (!metadata.item_name || metadata.item_name === null || metadata.item_name === "") {
       Toast("error", "Name is invalid.");
       setLoading(false);
       return;
     }
-    else {
-      window.localStorage.setItem("item_name", metadata.item_name);
-      window.localStorage.setItem("item_description", metadata.item_description);
+    if (img && connected) {
+      const recipientAddress = await wallet.getChangeAddress();
+      const utxos = await wallet.getUtxos();
+      const { maskedTx, originalMetadata } = await createTransaction(
+        recipientAddress,
+        utxos,
+        img,
+        metadata
+      );
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("txHash", String(maskedTx));
+        window.localStorage.setItem("metadata", JSON.stringify(metadata));
+        window.localStorage.setItem("original", String(originalMetadata));
+      }
       setLoading(false);
       router.push(mintSingleStep3);
+    } else {
+      Toast("error", "Please Connect Your Wallet");
+      setLoading(false);
     }
-  };
+  }
 
   return (
     <SingleMintStep2Styled>
@@ -228,6 +242,13 @@ const SingleMintStep2 = () => {
                     * We collect a 2.55 royalty fee each tome your NFT sells,
                     click here for more information
                   </Typography>
+                  {/* <Box
+                    sx={{ display: "flex", justifyContent: "center", pt: 10 }}
+                  >
+                    <Button className="btn" onClick={(e) => onNextButton(e)}>
+                      Next
+                    </Button>
+                  </Box> */}
                   <Box
                     sx={{ display: "flex", justifyContent: "center", py: 3 }}
                   >
