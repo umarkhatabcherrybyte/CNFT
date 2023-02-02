@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import {
   Table,
@@ -9,74 +9,113 @@ import {
   TableRow,
   Button
 } from "@mui/material";
-import { Add, Minimize, HighlightOff } from "@mui/icons-material";
+import { Add, HighlightOff } from "@mui/icons-material";
 import TextField from '@mui/material/TextField';
+import { Toast } from "../../shared/Toast";
 
 const ExcelSpreadSheet = ({ checked }) => {
 
-  const [metadataObject, setMetadataObject] = useState({
-    "dummy1": ""
-  })
+  const [metadataObjects, setMetadataObjects] = useState([])
 
-  const [metadataObjectProperties, setMetadataObjectProperties] = useState([
-    'dummy'
-  ])
-
-  const [rowsData, setRowsData] = useState([]);
-
-  useEffect(() => {
-    console.log('yo')
-  }, [metadataObject])
+  const [metadataObjectProperties, setMetadataObjectProperties] = useState([])
 
   const addTableRow = () => {
-    const rowsInput = metadataObject
-    setRowsData([...rowsData, rowsInput])
+    const rows = [...metadataObjects]
+    if (rows.length > 0 && Object.keys(rows[0]).length > 0) {
+      let obj = {}
+      Object.keys(rows[0]).map((val) => {
+        obj[val] = ''
+      })
+      setMetadataObjects([...metadataObjects, obj])
+    }
+    else if (metadataObjectProperties.length > 0) {
+      let obj = {}
+      metadataObjectProperties.map((val, index) => {
+        obj['dummy' + index] = ''
+        setMetadataObjects([...metadataObjects, obj])
+      })
+    }
+    else {
+      Toast('error', 'Please Add a Property First')
+    }
   }
 
   const deleteTableRows = (index) => {
-    const rows = [...rowsData];
+    const rows = [...metadataObjects];
     rows.splice(index, 1);
-    setRowsData(rows);
+    setMetadataObjects(rows);
   }
 
   const addTableCol = () => {
-    let x = { ...metadataObject }
-    let length = Object.keys(x).length + 1
-    let name = `dummy` + length
-    x[name] = "value3";
-    setMetadataObject(x)
+    let metadataObjectsClone = [...metadataObjects]
+    for (let index = 0; index < metadataObjectsClone.length; index++) {
+      let length = Object.keys(metadataObjectsClone[index]).length + 1
+      let name = `dummy` + length
+      metadataObjectsClone[index][name] = "";
+    }
+    setMetadataObjects(metadataObjectsClone)
+    let metadata = [...metadataObjectProperties]
+    metadata.push('')
+    setMetadataObjectProperties(metadata)
   }
 
-  const updateTableColName = (oldName, newName) => {
-    console.log(oldName, newName, 'here')
-    let metadata = { ...metadataObject }
-    metadata[oldName] = newName
-    setMetadataObject(metadata)
+  const updateTableColName = (index, value) => {
+    let metadata = [...metadataObjectProperties]
+    metadata[index] = value;
+    setMetadataObjectProperties(metadata)
   }
 
-  const deleteTableCol = (name) => {
-    let x = { ...metadataObject }
-    delete x[name]
-    setMetadataObject(x)
+  const deleteTableCol = (propIndex) => {
+    let metadata = [...metadataObjectProperties]
+    let metadataObjectsClone = [...metadataObjects]
+    if (propIndex !== -1) {
+      metadata.splice(propIndex, 1);
+      setMetadataObjectProperties(metadata)
+    }
+    for (let index = 0; index < metadataObjectsClone.length; index++) {
+      let obj = metadataObjectsClone[index]
+      // console.log(propIndex, obj, 'clone')
+      delete obj['dummy' + propIndex]
+      // console.log(propIndex, obj, 'clone')
+    }
+    // console.log(metadataObjectsClone, metadata, 'clone')
+    if (metadata.length == 0) {
+      setMetadataObjects([])
+    } else {
+      setMetadataObjects(metadataObjectsClone)
+    }
+  }
+
+  const resetData = (e) => {
+    let metaDataObjClone = [...metadataObjects]
+    let metaDataObjPropertiesClone = [...metadataObjectProperties]
+    metaDataObjClone.map(obj => {
+      Object.keys(obj).map(val => {
+        obj[val] = ''
+      })
+    })
+    for (let index = 0; index < metaDataObjPropertiesClone.length; index++) {
+      metaDataObjPropertiesClone[index] = '';
+    }
+    setMetadataObjects(metaDataObjClone)
+    setMetadataObjectProperties(metaDataObjPropertiesClone)
   }
 
   const viewMetaData = () => {
-    console.log(metadataObject)
-    console.log(rowsData, 'rows')
+    console.log(metadataObjects)
+    console.log(metadataObjectProperties)
   }
 
   const handleChange = (index, evnt) => {
     const { name, value } = evnt.target;
-    const rowsInput = [...rowsData];
-    rowsInput[index][name] = value;
-    setRowsData(rowsInput);
-  }
-
-  const handleChangeTableHead = (index, evnt) => {
-    const { name, value } = evnt.target;
-    const rowsInput = [...rowsData];
-    rowsInput[index][name] = value;
-    setRowsData(rowsInput);
+    let metadataObjectsClone = [...metadataObjects]
+    Object.keys(metadataObjectsClone[index]).map(val => {
+      if (val == name) {
+        metadataObjectsClone[index][val] = value
+      }
+    })
+    metadataObjectsClone[index][name] = value;
+    setMetadataObjects(metadataObjectsClone)
   }
 
   return (
@@ -129,9 +168,9 @@ const ExcelSpreadSheet = ({ checked }) => {
                 </Box>
               </TableCell>
               {
-                Object.keys(metadataObject).map((val, index) => {
+                metadataObjectProperties.length > 0 ? metadataObjectProperties.map((val, index) => {
                   return (
-                    <TableCell key={val} align="left">
+                    <TableCell key={index} align="left">
                       <Box>
                         <TextField
                           sx={{
@@ -147,29 +186,38 @@ const ExcelSpreadSheet = ({ checked }) => {
                           label=" "
                           type="text"
                           size="small"
+                          value={metadataObjectProperties[index]}
                           onChange={e => {
-                            updateTableColName(val, e.target.value)
+                            updateTableColName(index, e.target.value)
                           }}
                           autoComplete="current-password"
                         />
                         <HighlightOff sx={{
-                          mt: "5px",
+                          mt: "7px",
                           ml: "3px",
                           "&:hover": {
                             cursor: "pointer"
                           }
                         }} onClick={() => {
-                          deleteTableCol(val)
+                          deleteTableCol(index)
                         }} />
                       </Box>
                     </TableCell>
                   )
-                })
+                }) :
+                  <TableCell align="left">
+                    <Button sx={{
+                      width: '250px',
+                      marginLeft: '10px'
+                    }} className="btn2" onClick={addTableCol}>
+                      Click to Add Property
+                    </Button>
+                  </TableCell>
               }
             </TableRow>
           </TableHead>
           <TableBody>
-            {rowsData.map((row, index) => (
+            {metadataObjects.map((row, rowIndex) => (
               <TableRow
                 key={row.id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -198,7 +246,7 @@ const ExcelSpreadSheet = ({ checked }) => {
                       }}
                     >
                       <HighlightOff onClick={() => {
-                        deleteTableRows(index)
+                        deleteTableRows(rowIndex)
                       }} sx={{
                         color: "#000",
                         border: "#fff",
@@ -210,7 +258,7 @@ const ExcelSpreadSheet = ({ checked }) => {
                   </Box>
                 </TableCell>
                 {
-                  Object.keys(metadataObject).map((val) => {
+                  Object.keys(row).map((val, index) => {
                     return (
                       <TableCell key={val} align="left">
                         <TextField
@@ -228,6 +276,11 @@ const ExcelSpreadSheet = ({ checked }) => {
                           type="text"
                           size="small"
                           autoComplete="current-password"
+                          value={metadataObjects[rowIndex][val]}
+                          name={val}
+                          onChange={e => {
+                            handleChange(rowIndex, e)
+                          }}
                         />
                       </TableCell>
                     )
@@ -242,15 +295,19 @@ const ExcelSpreadSheet = ({ checked }) => {
         mt: 3,
         display: 'flex'
       }} className="">
-        <Button className="btn2" onClick={() => console.log('yo')}>
+        <Button className="btn2" onClick={resetData}>
           Reset Data
         </Button>
-        <Button sx={{
-          width: '180px',
-          marginLeft: '10px'
-        }} className="btn2" onClick={addTableCol}>
-          Add Property
-        </Button>
+        {
+          metadataObjectProperties.length > 0 ?
+            <Button sx={{
+              width: '220px',
+              marginLeft: '10px'
+            }} className="btn2" onClick={addTableCol}>
+              Add More Properties
+            </Button> :
+            null
+        }
         <Button sx={{
           width: '180px',
           marginLeft: '10px'
@@ -258,7 +315,7 @@ const ExcelSpreadSheet = ({ checked }) => {
           View Metadata
         </Button>
       </Box>
-    </ExcelSpreadSheetStyled>
+    </ExcelSpreadSheetStyled >
   );
 };
 
