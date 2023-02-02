@@ -17,9 +17,10 @@ import Heading from "/components/shared/headings/Heading";
 import { List } from "@mui/icons-material";
 import { mintCollectionStep2 } from "/components/Routes/constants";
 import { useRouter } from "next/router";
+
 const Step1 = () => {
   const router = useRouter();
-  const [selectedFiles, setSeletedFiles] = useState(undefined);
+  const [selectedFiles, setSeletedFiles] = useState([]);
   const [metaFile, setMetaFile] = useState(undefined);
   const [metaData, setMetaData] = useState([]);
   const [progressInfos, setProgressInfos] = useState([]);
@@ -36,7 +37,6 @@ const Step1 = () => {
   const hiddenFileInputRef = useRef(null);
   const metaFileLabelRef = useRef(null);
   const selectedFilesLabelRef = useRef(null);
-  const excelRef = useRef(null);
 
   const onSelectedFiles = (e) => {
     if (e.target.files) {
@@ -44,9 +44,12 @@ const Step1 = () => {
     } else {
       selectedFilesLabelRef.current.innerHTML = `No file choosen`;
     }
-
-    setProgressInfos([]);
-    setSeletedFiles(e.target.files);
+    let files = []
+    var size = Object.keys(e.target.files).length;
+    for (let index = 0; index < size; index++) {
+      files.push(e.target.files[index])
+    }
+    setSeletedFiles(files);
   };
 
   const onSelectMetaFile = (e) => {
@@ -79,7 +82,7 @@ const Step1 = () => {
   function uploadMeta() {
     const file = metaFile;
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.uploadMeta(file, path, (event) => {})
+    UploadService.uploadMeta(file, path, (event) => { })
       .then((response) => {
         metaFileInputRef.current.value = null;
         metaFileLabelRef.current.innerHTML = "No file choosen";
@@ -92,41 +95,42 @@ const Step1 = () => {
   }
 
   const uploadFiles = async () => {
-    async function t() {
-      if (connectedWallet == "" || walletAddress == "") {
-        setConnectedWallet(sessionStorage.getItem("connectedWallet"));
-        setWalletAddress(sessionStorage.getItem("walletAddress"));
-        return;
-      }
-      const path = connectedWallet + "_" + walletAddress;
-
-      const _selectedFiles = selectedFiles;
-      _progressInfos = [];
-      for (let i = 0; i < _selectedFiles.length; i++) {
-        _progressInfos.push({
-          percentage: 0,
-          fileName: _selectedFiles[i].name,
+    if (selectedFiles.length > 0) {
+      // setIsUploading(true);
+      try {
+        const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
+        const projectSecret = "136393a5b7f4e47a9e153a88eb636003";
+        const auth = `Basic ${Buffer.from(
+          `${projectId}:${projectSecret}`
+        ).toString("base64")}`;
+        const client = create({
+          host: "ipfs.infura.io",
+          port: 5001,
+          protocol: "https",
+          headers: {
+            authorization: auth,
+          },
         });
-      }
-      const compressOptions = {
-        maxSizeMB: 0.5,
-        useWebWorker: true,
-      };
-      //_message = [];
-      setProgressInfos(_progressInfos);
-      for (let i = 0; i < _selectedFiles.length; i++) {
-        const originalFileSize = _selectedFiles[i].size / 1024 / 1024;
-        let compressedFile = _selectedFiles[i];
-        if (originalFileSize >= 0.5) {
-          compressedFile = await imageCompression(
-            _selectedFiles[i],
-            compressOptions
-          );
+        let paths = []
+        for (let index = 0; index < selectedFiles.length; index++) {
+          const uploaded_image = await client.add(selectedFiles[index]);
+          if (uploaded_image) {
+            if (typeof window !== "undefined") {
+              paths.push({
+                "path": uploaded_image.path,
+                "file_mimeType": selectedFiles[index].type
+              })
+            }
+          }
         }
-        upload(path, i, compressedFile);
+      } catch (error) {
+        setIsUploading(false);
+        Toast("error", "Uploading failed.");
       }
+    } else {
+      Toast("error", "Select a file and try again.");
+      setIsUploading(false);
     }
-    await t();
   };
 
   function upload(path, idx, file) {
@@ -173,15 +177,15 @@ const Step1 = () => {
     //     Toast("error", "Server Error: " + e.message);
     //   });
   }
+
   function onBackStep() {
     navigate("/mint");
   }
+
   function onResetData() {
     onRemoveImage("");
-    if (checked) {
-      excelRef.current.resetData();
-    }
   }
+
   function onRemoveImage(fileName) {
     const path = connectedWallet + "_" + walletAddress;
     UploadService.remove(fileName, path)
@@ -196,64 +200,50 @@ const Step1 = () => {
         Toast("error", "Remove images failed. " + e.message);
       });
   }
-  useEffect(() => {
-    const connected = sessionStorage.getItem("connected");
-    if (connected == false) {
-      Toast("error", "Please connect your wallet.");
-      navigate("/");
-    } else {
-      setWalletAddress(sessionStorage.getItem("walletAddress"));
-      setConnectedWallet(sessionStorage.getItem("connectedWallet"));
-      UploadService.getFiles(
-        sessionStorage.getItem("connectedWallet") +
-          "_" +
-          sessionStorage.getItem("walletAddress")
-      ).then((response) => {
-        setFileInfos(response.data);
-      });
-    }
-  }, []);
 
   const convertToJson = () => {
-    const excelData = excelRef.current.convertToJson();
-    const objectKey = excelData[0];
-    let convertedJson = {
-      Metadata: [],
-    };
-    excelData.map((row, index) => {
-      if (index !== 0) {
-        let oneObject = {
-          ImageName: row[1],
-          attributes: {},
-        };
-        row.map((value, indexAttr) => {
-          if (indexAttr > 1) {
-            oneObject.attributes[objectKey[indexAttr]] = value;
-          }
-        });
-        convertedJson.Metadata = [...convertedJson.Metadata, oneObject];
-      }
-    });
+    // const excelData = excelRef.current.convertToJson();
+    // const objectKey = excelData[0];
+    // let convertedJson = {
+    //   Metadata: [],
+    // };
+    // excelData.map((row, index) => {
+    //   if (index !== 0) {
+    //     let oneObject = {
+    //       ImageName: row[1],
+    //       attributes: {},
+    //     };
+    //     row.map((value, indexAttr) => {
+    //       if (indexAttr > 1) {
+    //         oneObject.attributes[objectKey[indexAttr]] = value;
+    //       }
+    //     });
+    //     convertedJson.Metadata = [...convertedJson.Metadata, oneObject];
+    //   }
+    // });
 
-    const path = connectedWallet + "_" + walletAddress;
-    UploadService.uploadWebExcelMeta(
-      JSON.stringify(convertedJson),
-      path,
-      (event) => {}
-    )
-      .then((response) => {
-        Toast("success", "Upload Metadata successed.");
-        setMetaDataURL(
-          `/resources/static/assets/uploads/meta/${path}/metadata.json`
-        );
-      })
-      .catch((e) => {
-        Toast("error", e.message);
-      });
+    // console.log(convertedJson, 'JSON')
+
+    // const path = connectedWallet + "_" + walletAddress;
+    // UploadService.uploadWebExcelMeta(
+    //   JSON.stringify(convertedJson),
+    //   path,
+    //   (event) => { }
+    // )
+    //   .then((response) => {
+    //     Toast("success", "Upload Metadata successed.");
+    //     setMetaDataURL(
+    //       `/resources/static/assets/uploads/meta/${path}/metadata.json`
+    //     );
+    //   })
+    //   .catch((e) => {
+    //     Toast("error", e.message);
+    //   });
   };
+
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => {})
+    UploadService.downloadMetafile(path, (event) => { })
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
@@ -262,13 +252,16 @@ const Step1 = () => {
         Toast("error", e.message);
       });
   };
+
   const onFileInputButton = () => {
     console.log("onFileInputButton");
     hiddenFileInputRef.current.click();
   };
+
   const onMetaFileInputButton = () => {
     metaFileInputRef.current.click();
   };
+
   return (
     <Step1Styled>
       <ContainerLayout>
@@ -377,10 +370,10 @@ const Step1 = () => {
                     className="br_15"
                     sx={{ background: "var(--box-color)" }}
                   >
-                    {Array(4)
-                      .fill()
-                      .map(() => (
+                    {selectedFiles.length > 0 && selectedFiles
+                      .map((file, index) => (
                         <Box
+                          key={index}
                           className="space_between"
                           sx={{
                             py: 1,
@@ -391,17 +384,14 @@ const Step1 = () => {
                           }}
                         >
                           <Box sx={{ pl: 2 }}>
-                            <LightText heading="Emma.jpg" />
-                          </Box>
-                          <Box sx={{ pr: 2 }}>
-                            <Delete sx={{ p: 0.2 }} />
+                            <LightText heading={`${file?.name}`} />
                           </Box>
                         </Box>
                       ))}
                   </Box>
                 </Grid>
               </Grid>
-              {/* {progressInfos &&
+              {progressInfos &&
                 progressInfos.map((progressInfo, index) => (
                   <>
                     {progressInfo.percentage !== 100 && (
@@ -422,8 +412,8 @@ const Step1 = () => {
                       </div>
                     )}
                   </>
-                ))} */}
-              {/* <div className="row file-list">
+                ))}
+              <div className="row file-list">
                 {fileInfos && !metaData.length ? (
                   <table className="table text-white file-list-table">
                     <tbody>
@@ -466,7 +456,7 @@ const Step1 = () => {
                     </tbody>
                   </table>
                 )}
-              </div> */}
+              </div>
             </Box>
             <Box>
               <Header
@@ -580,7 +570,7 @@ const Step1 = () => {
               </Grid>
               <Grid item xs={12} md={8}>
                 <div className={checked ? "" : "disabled-div"}>
-                  <ExcelSpreadSheet ref={excelRef} checked={checked} />
+                  <ExcelSpreadSheet checked={checked} />
                 </div>
               </Grid>
               <Grid item xs={12} md={4}>
@@ -612,14 +602,7 @@ const Step1 = () => {
                   </Box>
                 </Box>
               </Grid>
-              <Grid item xs={12}>
-                <Box className="max_btn">
-                  <Button className="btn2 w_100" onClick={() => onResetData()}>
-                    Reset Data
-                  </Button>
-                </Box>
-              </Grid>
-              <Grid item xs={12} sx={{ display: "flex" }}>
+              <Grid item xs={12} sx={{ marginTop: 5, display: "flex" }}>
                 <Box className="max_btn w_100" sx={{ mr: 2 }}>
                   <Button className="btn2 w_100 " onClick={() => onBackStep()}>
                     Back
@@ -629,7 +612,6 @@ const Step1 = () => {
                   <Button
                     className="btn2 w_100"
                     onClick={() => onNextStep()}
-                    //  onClick={() => onNextStep()}
                   >
                     Next
                   </Button>
@@ -639,7 +621,7 @@ const Step1 = () => {
           </Box>
         </Layout>
       </ContainerLayout>
-    </Step1Styled>
+    </Step1Styled >
   );
 };
 

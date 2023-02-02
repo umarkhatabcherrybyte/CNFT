@@ -117,6 +117,15 @@ const GlobalStyle = createGlobalStyle`
     display: flex;
     align-items: center;
   }
+  .table_icon {
+
+  }
+
+  .flex_align_center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   
   .br_15 {
     border-radius: 15px ;

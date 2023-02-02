@@ -113,7 +113,7 @@ const Navbar = () => {
           boxShadow: "none",
           padding: "8px 0",
         }}
-        // className={`${navScroll}`}
+      // className={`${navScroll}`}
       >
         <Container maxWidth="xl">
           <Toolbar
@@ -145,7 +145,7 @@ const Navbar = () => {
                 <>
                   <SearchBar />
                   <Tabs
-                    // value={value}
+                    value={value}
                     onChange={(e, value) => {
                       router.push(value);
                       setValue(value);
@@ -168,7 +168,8 @@ const Navbar = () => {
                   >
                     {navData.map((data) => (
                       <Tab
-                        value={data.navigate}
+                        key={data?.value}
+                        value={data?.navigate}
                         label={data.value}
                         className="proxima"
                       />

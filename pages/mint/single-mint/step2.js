@@ -21,14 +21,15 @@ const SingleMintStep2 = () => {
   const { wallet, connected } = useWallet();
   const [rangeValue, setRangeValue] = React.useState(10);
   const [loading, setLoading] = React.useState(false);
+
   const [metadata, setMetadata] = React.useState({
     image: `ipfs://${typeof window !== "undefined" && window.localStorage.getItem("img")}`,
     mediaType: "image/jpg",
     description: "",
-    item_name: "",
-    item_description: "",
-    item_creator: "",
-    item_link: "",
+    name: "",
+    description: "",
+    creator: "",
+    link: "",
   });
 
   const onInputChange = (e) => {
@@ -43,24 +44,15 @@ const SingleMintStep2 = () => {
   const onNextButton = async () => {
     setLoading(true);
     let img = typeof window !== "undefined" && window.localStorage.getItem("img")
-    if (!metadata.item_name || metadata.item_name === null || metadata.item_name === "") {
+    if (!metadata.name || metadata.name === null || metadata.name === "") {
       Toast("error", "Name is invalid.");
       setLoading(false);
       return;
     }
     if (img && connected) {
-      const recipientAddress = await wallet.getChangeAddress();
-      const utxos = await wallet.getUtxos();
-      const { maskedTx, originalMetadata } = await createTransaction(
-        recipientAddress,
-        utxos,
-        img,
-        metadata
-      );
       if (typeof window !== "undefined") {
-        window.localStorage.setItem("txHash", String(maskedTx));
+        // window.localStorage.setItem("txHash", String(unsignedTx));
         window.localStorage.setItem("metadata", JSON.stringify(metadata));
-        window.localStorage.setItem("original", String(originalMetadata));
       }
       setLoading(false);
       router.push(mintSingleStep3);
@@ -92,7 +84,7 @@ const SingleMintStep2 = () => {
             <>
               <TextField
                 placeholder="Name your item"
-                name="item_name"
+                name="name"
                 onChange={(e) => onInputChange(e)}
                 fullWidth
                 sx={{
@@ -222,7 +214,7 @@ const SingleMintStep2 = () => {
                         type="range"
                         className="slider"
                         id="royalty_range"
-                        name="item_royalty"
+                        name="royalty"
                         step="0.1"
                         max="15"
                         min="0"
@@ -242,13 +234,6 @@ const SingleMintStep2 = () => {
                     * We collect a 2.55 royalty fee each tome your NFT sells,
                     click here for more information
                   </Typography>
-                  {/* <Box
-                    sx={{ display: "flex", justifyContent: "center", pt: 10 }}
-                  >
-                    <Button className="btn" onClick={(e) => onNextButton(e)}>
-                      Next
-                    </Button>
-                  </Box> */}
                   <Box
                     sx={{ display: "flex", justifyContent: "center", py: 3 }}
                   >

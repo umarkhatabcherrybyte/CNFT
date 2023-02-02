@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import {
   Table,
@@ -7,369 +7,102 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Button
 } from "@mui/material";
-import { Add, Minimize } from "@mui/icons-material";
-const rows = [{}, {}, {}];
-const ExcelSpreadSheet = forwardRef(({ checked }, ref) => {
-  let defaultRowCount = 5; // No of rows
-  let defaultColCount = 5; // No of cols
-  const SPREADSHEET_DB = "spreadsheet_db";
+import { Add, Minimize, HighlightOff } from "@mui/icons-material";
+import TextField from '@mui/material/TextField';
 
-  useImperativeHandle(ref, () => ({
-    resetData() {
-      // confirm(
-      //     "This will erase all data and set default configs. Are you sure?"
-      //   )
-      if (true) {
-        localStorage.removeItem(SPREADSHEET_DB);
-        defaultRowCount = 5; // No of rows
-        defaultColCount = 5;
-        createSpreadsheet();
-      }
-    },
-    convertToJson() {
-      return getData();
-    },
-  }));
+const ExcelSpreadSheet = ({ checked }) => {
 
-  const initializeData = () => {
-    const data = [];
-    for (let i = 0; i <= defaultRowCount; i++) {
-      const child = [];
-      for (let j = 0; j <= defaultColCount; j++) {
-        if (i == 0) {
-          if (j == 1) child.push("ImageName");
-          else child.push("Col" + (j - 1));
-        } else {
-          child.push("");
-        }
-      }
-      data.push(child);
-    }
-    return data;
-  };
+  const [metadataObject, setMetadataObject] = useState({
+    "dummy1": ""
+  })
 
-  const getData = () => {
-    let data = localStorage.getItem(SPREADSHEET_DB);
-    if (data === undefined || data === null) {
-      return initializeData();
-    }
-    return JSON.parse(data);
-  };
+  const [metadataObjectProperties, setMetadataObjectProperties] = useState([
+    'dummy'
+  ])
 
-  const saveData = (data) => {
-    localStorage.setItem(SPREADSHEET_DB, JSON.stringify(data));
-  };
+  const [rowsData, setRowsData] = useState([]);
 
-  const createHeaderRow = () => {
-    const tr = document.createElement("tr");
-    const data = getData();
-    tr.setAttribute("id", "h-0");
-    for (let i = 0; i <= defaultColCount; i++) {
-      const th = document.createElement("th");
-      th.setAttribute("id", `h-0-${i}`);
-      th.setAttribute("class", `${i === 0 ? "" : "column-header"}`);
-      // th.innerHTML = i === 0 ? `` : `Col ${i}`;
-      if (i !== 0) {
-        const headerColDiv = document.createElement("div");
-        headerColDiv.setAttribute("class", "column-header-div");
-
-        const input = document.createElement("input");
-
-        input.value = data[0][i];
-        input.setAttribute("class", "column-header-span");
-        input.setAttribute("id", `c-0-${i}`);
-        const dropDownDiv = document.createElement("div");
-        dropDownDiv.setAttribute("class", "dropdown row-control-btn-div");
-
-        dropDownDiv.innerHTML = `
-                    <svg class="dropbtn addBtn" id="col-dropbtn-${i}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 28 28">
-                        <g class="rowAdd" id="col-dropbtn-${i}" data-name="Group 375" transform="translate(-216 -1374)">
-                        <circle class="rowAdd" id="col-dropbtn-${i}" data-name="Ellipse 24" cx="14" cy="14" r="14" transform="translate(216 1374)" fill="#fff"/>
-                        <path  class="rowAdd" id="col-dropbtn-${i}" data-name="Icon ionic-ios-add" d="M20.822,14.5H16.074V9.752a.787.787,0,0,0-1.574,0V14.5H9.752a.787.787,0,0,0,0,1.574H14.5v4.748a.787.787,0,1,0,1.574,0V16.074h4.748a.787.787,0,1,0,0-1.574Z" transform="translate(215.035 1373.035)"/>
-                        </g>
-                    </svg>
-                    <svg class="dropbtn addBtn" id="col-dropbtn-${i}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 28 28">
-                        <g  class="rowDel" id="col-dropbtn-${i}" data-name="Group 374" transform="translate(-251 -1374)">
-                            <circle  class="rowDel" id="col-dropbtn-${i}" data-name="Ellipse 25" cx="14" cy="14" r="14" transform="translate(251 1374)" fill="#fff"/>
-                            <path  class="rowDel" id="col-dropbtn-${i}" data-name="Icon ionic-ios-add" d="M20.822,14.5H16.074V9.752a.787.787,0,0,0-1.574,0V14.5H9.752a.787.787,0,0,0,0,1.574H14.5v4.748a.787.787,0,1,0,1.574,0V16.074h4.748a.787.787,0,1,0,0-1.574Z" transform="translate(265.035 1366.416) rotate(45)"/>
-                        </g>
-                    </svg>
-                    </div>`;
-        headerColDiv.appendChild(input);
-        headerColDiv.appendChild(dropDownDiv);
-        th.appendChild(headerColDiv);
-      }
-      tr.appendChild(th);
-    }
-    return tr;
-  };
-
-  const createTableBodyRow = (rowNum) => {
-    const tr = document.createElement("tr");
-    tr.setAttribute("id", `r-${rowNum}`);
-    for (let i = 0; i <= defaultColCount; i++) {
-      const cell = document.createElement(`${i === 0 ? "th" : "td"}`);
-      if (i === 0) {
-        cell.contentEditable = false;
-        const span = document.createElement("span");
-        const dropDownDiv = document.createElement("div");
-        span.innerHTML = rowNum;
-        dropDownDiv.setAttribute("class", "dropdown row-control-btn-div");
-        dropDownDiv.innerHTML = `
-                    <svg class="dropbtn addBtn" id="row-dropbtn-${rowNum}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 28 28">
-                        <g class="rowAdd" id="row-dropbtn-${rowNum}" data-name="Group 375" transform="translate(-216 -1374)">
-                        <circle class="rowAdd" id="row-dropbtn-${rowNum}" data-name="Ellipse 24" cx="14" cy="14" r="14" transform="translate(216 1374)" fill="#fff"/>
-                        <path  class="rowAdd" id="row-dropbtn-${rowNum}" data-name="Icon ionic-ios-add" d="M20.822,14.5H16.074V9.752a.787.787,0,0,0-1.574,0V14.5H9.752a.787.787,0,0,0,0,1.574H14.5v4.748a.787.787,0,1,0,1.574,0V16.074h4.748a.787.787,0,1,0,0-1.574Z" transform="translate(215.035 1373.035)"/>
-                        </g>
-                    </svg>
-                    <svg class="dropbtn addBtn" id="row-dropbtn-${rowNum}" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 28 28">
-                        <g  class="rowDel" id="row-dropbtn-${rowNum}" data-name="Group 374" transform="translate(-251 -1374)">
-                            <circle  class="rowDel" id="row-dropbtn-${rowNum}" data-name="Ellipse 25" cx="14" cy="14" r="14" transform="translate(251 1374)" fill="#fff"/>
-                            <path  class="rowDel" id="row-dropbtn-${rowNum}" data-name="Icon ionic-ios-add" d="M20.822,14.5H16.074V9.752a.787.787,0,0,0-1.574,0V14.5H9.752a.787.787,0,0,0,0,1.574H14.5v4.748a.787.787,0,1,0,1.574,0V16.074h4.748a.787.787,0,1,0,0-1.574Z" transform="translate(265.035 1366.416) rotate(45)"/>
-                        </g>
-                    </svg>
-                </div>`;
-        cell.appendChild(span);
-        cell.appendChild(dropDownDiv);
-        cell.setAttribute("class", "row-header");
-      } else {
-        cell.contentEditable = checked;
-      }
-      cell.setAttribute("id", `r-${rowNum}-${i}`);
-      // cell.id = `${rowNum}-${i}`;
-      tr.appendChild(cell);
-    }
-    return tr;
-  };
-
-  const createTableBody = (tableBody) => {
-    for (let rowNum = 1; rowNum <= defaultRowCount; rowNum++) {
-      tableBody.appendChild(createTableBodyRow(rowNum));
-    }
-  };
-
-  // Fill Data in created table from localstorage
-  const populateTable = () => {
-    const data = getData();
-    if (data === undefined || data === null) return;
-
-    for (let i = 1; i < data.length; i++) {
-      for (let j = 1; j < data[i].length; j++) {
-        const cell = document.getElementById(`r-${i}-${j}`);
-        cell.innerHTML = data[i][j];
-      }
-    }
-  };
-
-  // Utility function to add row
-  const addRow = (currentRow, direction) => {
-    let data = getData();
-    const colCount = data[0].length;
-    const newRow = new Array(colCount).fill("");
-    if (direction === "top") {
-      data.splice(currentRow, 0, newRow);
-    } else if (direction === "bottom") {
-      data.splice(currentRow + 1, 0, newRow);
-    }
-    defaultRowCount++;
-    saveData(data);
-    createSpreadsheet();
-  };
-
-  // Utility function to delete row
-  const deleteRow = (currentRow) => {
-    let data = getData();
-    data.splice(currentRow, 1);
-    defaultRowCount++;
-    saveData(data);
-    createSpreadsheet();
-  };
-
-  // Utility function to add columns
-  const addColumn = (currentCol, direction) => {
-    let data = getData();
-    if (direction === "left") {
-      data[0].splice(currentCol, 0, "NewCol");
-    } else if (direction === "right") {
-      data[0].splice(currentCol + 1, 0, "NewCol");
-    }
-
-    for (let i = 1; i <= defaultRowCount; i++) {
-      if (direction === "left") {
-        data[i].splice(currentCol, 0, "");
-      } else if (direction === "right") {
-        data[i].splice(currentCol + 1, 0, "");
-      }
-    }
-    defaultColCount++;
-    saveData(data);
-    createSpreadsheet();
-  };
-
-  // Utility function to delete column
-  const deleteColumn = (currentCol) => {
-    let data = getData();
-    for (let i = 0; i <= defaultRowCount; i++) {
-      data[i].splice(currentCol, 1);
-    }
-    defaultColCount++;
-    saveData(data);
-    createSpreadsheet();
-  };
-
-  const createSpreadsheet = () => {
-    const spreadsheetData = getData();
-    defaultRowCount = spreadsheetData.length - 1 || defaultRowCount;
-    defaultColCount = spreadsheetData[0].length - 1 || defaultColCount;
-
-    const tableHeaderElement = document.getElementById("table-headers");
-    const tableBodyElement = document.getElementById("table-body");
-
-    const tableBody = tableBodyElement.cloneNode(true);
-    tableBodyElement.parentNode.replaceChild(tableBody, tableBodyElement);
-    const tableHeaders = tableHeaderElement.cloneNode(true);
-    tableHeaderElement.parentNode.replaceChild(
-      tableHeaders,
-      tableHeaderElement
-    );
-
-    tableHeaders.innerHTML = "";
-    tableBody.innerHTML = "";
-
-    tableHeaders.appendChild(createHeaderRow(defaultColCount));
-    createTableBody(tableBody, defaultRowCount, defaultColCount);
-
-    populateTable();
-
-    // attach focusout event listener to whole table body container
-    tableBody.addEventListener("focusout", function (e) {
-      if (e.target && e.target.nodeName === "TD") {
-        let item = e.target;
-        const indices = item.id.split("-");
-        let spreadsheetData = getData();
-        spreadsheetData[indices[1]][indices[2]] = item.innerHTML;
-        saveData(spreadsheetData);
-      }
-    });
-
-    // Attach click event listener to table body
-    tableBody.addEventListener("click", function (e) {
-      if (e.target) {
-        if (
-          e.target.className?.baseVal === "dropbtn addBtn" ||
-          e.target.className?.baseVal === "rowAdd"
-        ) {
-          const idArr = e.target.id.split("-");
-          addRow(parseInt(idArr[2]), "bottom");
-        } else if (
-          e.target.className?.baseVal === "dropbtn delBtn" ||
-          e.target.className?.baseVal === "rowDel"
-        ) {
-          const idArr = e.target.id.split("-");
-          deleteRow(parseInt(idArr[2]));
-        }
-      }
-    });
-    tableHeaders.addEventListener("focusout", function (e) {
-      if (e.target && e.target.nodeName === "INPUT") {
-        let item = e.target;
-        const indices = item.id.split("-");
-        let spreadsheetData = getData();
-        if (item.value == "") {
-          e.target.value = spreadsheetData[indices[1]][indices[2]];
-          return;
-        }
-        spreadsheetData[indices[1]][indices[2]] = item.value;
-        saveData(spreadsheetData);
-      }
-    });
-    // Attach click event listener to table headers
-    tableHeaders.addEventListener("click", function (e) {
-      if (e.target) {
-        if (
-          e.target.className?.baseVal === "dropbtn addBtn" ||
-          e.target.className?.baseVal === "rowAdd"
-        ) {
-          const idArr = e.target.id.split("-");
-          addColumn(parseInt(idArr[2]), "right");
-        } else if (
-          e.target.className?.baseVal === "dropbtn delBtn" ||
-          e.target.className?.baseVal === "rowDel"
-        ) {
-          const idArr = e.target.id.split("-");
-          deleteColumn(parseInt(idArr[2]));
-        }
-      }
-    });
-  };
   useEffect(() => {
-    // createSpreadsheet();
-  }, []);
-  useEffect(() => {
-    let elementList = document.querySelectorAll(
-      '[contenteditable="' + !checked + '"]'
-    );
-    elementList.forEach(function (element) {
-      element.contentEditable = checked;
-    });
-  }, [checked]);
-  // window.onclick = function (event) {
-  //   if (!event.target.matches(".dropbtn")) {
-  //     var dropdowns = document.getElementsByClassName("dropdown-content");
-  //     var i;
-  //     for (i = 0; i < dropdowns.length; i++) {
-  //       var openDropdown = dropdowns[i];
-  //       if (openDropdown.classList.contains("show")) {
-  //         openDropdown.classList.remove("show");
-  //       }
-  //     }
-  //   }
-  // };
+    console.log('yo')
+  }, [metadataObject])
+
+  const addTableRow = () => {
+    const rowsInput = metadataObject
+    setRowsData([...rowsData, rowsInput])
+  }
+
+  const deleteTableRows = (index) => {
+    const rows = [...rowsData];
+    rows.splice(index, 1);
+    setRowsData(rows);
+  }
+
+  const addTableCol = () => {
+    let x = { ...metadataObject }
+    let length = Object.keys(x).length + 1
+    let name = `dummy` + length
+    x[name] = "value3";
+    setMetadataObject(x)
+  }
+
+  const updateTableColName = (oldName, newName) => {
+    console.log(oldName, newName, 'here')
+    let metadata = { ...metadataObject }
+    metadata[oldName] = newName
+    setMetadataObject(metadata)
+  }
+
+  const deleteTableCol = (name) => {
+    let x = { ...metadataObject }
+    delete x[name]
+    setMetadataObject(x)
+  }
+
+  const viewMetaData = () => {
+    console.log(metadataObject)
+    console.log(rowsData, 'rows')
+  }
+
+  const handleChange = (index, evnt) => {
+    const { name, value } = evnt.target;
+    const rowsInput = [...rowsData];
+    rowsInput[index][name] = value;
+    setRowsData(rowsInput);
+  }
+
+  const handleChangeTableHead = (index, evnt) => {
+    const { name, value } = evnt.target;
+    const rowsInput = [...rowsData];
+    rowsInput[index][name] = value;
+    setRowsData(rowsInput);
+  }
+
   return (
     <ExcelSpreadSheetStyled>
-      {/* <section className="spreadsheet">
-        <table className="spreadsheet__table" id="table-main">
-          <thead
-            className="spreadsheet__table--headers"
-            id="table-headers"
-          ></thead>
-          <tbody className="spreadsheet__table--body" id="table-body"></tbody>
-        </table>
-      </section> */}
-      <Table
-        sx={{
-          borderRadius: "15px",
-          minWidth: 650,
-          "& th": {
-            background: "var(--box-color)",
-          },
-          "& td": {
-            background: "var(--dark-box-color)",
-          },
-          "& th , td": {
-            color: "#fff",
-          },
-        }}
-        aria-label="simple table"
-      >
-        <TableHead>
-          <TableRow>
-            <TableCell align="left"></TableCell>
-            <TableCell align="left">Image</TableCell>
-            <TableCell align="left">Head</TableCell>
-            <TableCell align="left">Body</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <TableRow
-              key={row.name}
-              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-            >
+      <Box className="table-wrap">
+        <Table
+          sx={{
+            borderRadius: "15px",
+            minWidth: 650,
+            "& th": {
+              background: "var(--box-color)",
+            },
+            "& td": {
+              background: "var(--dark-box-color)",
+            },
+            "& th , td": {
+              color: "#fff",
+            },
+          }}
+          aria-label="simple table"
+        >
+          <TableHead>
+            <TableRow>
               <TableCell align="left">
                 <Box
-                  className="flex_align"
+                  className="flex_align_center"
                   sx={{
                     "& .icon": {
                       background: "#fff",
@@ -384,31 +117,159 @@ const ExcelSpreadSheet = forwardRef(({ checked }, ref) => {
                   }}
                 >
                   <Box className="icon">
-                    <Add sx={{ color: "#000" }} />
-                  </Box>
-                  <Box
-                    className="icon"
-                    sx={{
-                      alignItems: "start",
+                    <Add sx={{
+                      color: "#000",
+                      "&:hover": {
+                        cursor: "pointer"
+                      }
                     }}
-                  >
-                    <Minimize sx={{ color: "#000" }} />
+                      onClick={addTableRow}
+                    />
                   </Box>
                 </Box>
               </TableCell>
-              <TableCell align="left">1.png</TableCell>
-              <TableCell align="left">Black</TableCell>
-              <TableCell align="left">Yellow</TableCell>
+              {
+                Object.keys(metadataObject).map((val, index) => {
+                  return (
+                    <TableCell key={val} align="left">
+                      <Box>
+                        <TextField
+                          sx={{
+                            width: '70px',
+                            '& .MuiOutlinedInput-root': {
+                              '&.Mui-focused fieldset': {
+                                borderColor: 'white',
+                              },
+                            },
+                          }}
+                          InputLabelProps={{ shrink: false }}
+                          id="outlined-password-input"
+                          label=" "
+                          type="text"
+                          size="small"
+                          onChange={e => {
+                            updateTableColName(val, e.target.value)
+                          }}
+                          autoComplete="current-password"
+                        />
+                        <HighlightOff sx={{
+                          mt: "5px",
+                          ml: "3px",
+                          "&:hover": {
+                            cursor: "pointer"
+                          }
+                        }} onClick={() => {
+                          deleteTableCol(val)
+                        }} />
+                      </Box>
+                    </TableCell>
+                  )
+                })
+              }
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {rowsData.map((row, index) => (
+              <TableRow
+                key={row.id}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell align="left">
+                  <Box
+                    className="flex_align_center"
+                    sx={{
+                      "& .icon": {
+                        background: "#fff",
+                        mr: 2,
+                        borderRadius: "50%",
+                        borderColor: "white",
+                        height: "30px",
+                        width: "30px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      },
+                    }}
+                  >
+                    <Box
+                      className="icon"
+                      sx={{
+                        alignItems: "start",
+                      }}
+                    >
+                      <HighlightOff onClick={() => {
+                        deleteTableRows(index)
+                      }} sx={{
+                        color: "#000",
+                        border: "#fff",
+                        "&:hover": {
+                          cursor: "pointer"
+                        }
+                      }} />
+                    </Box>
+                  </Box>
+                </TableCell>
+                {
+                  Object.keys(metadataObject).map((val) => {
+                    return (
+                      <TableCell key={val} align="left">
+                        <TextField
+                          sx={{
+                            width: '100px',
+                            '& .MuiOutlinedInput-root': {
+                              '&.Mui-focused fieldset': {
+                                borderColor: 'white',
+                              },
+                            },
+                          }}
+                          InputLabelProps={{ shrink: false }}
+                          id="outlined-password-input"
+                          label=" "
+                          type="text"
+                          size="small"
+                          autoComplete="current-password"
+                        />
+                      </TableCell>
+                    )
+                  })
+                }
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
+      <Box sx={{
+        mt: 3,
+        display: 'flex'
+      }} className="">
+        <Button className="btn2" onClick={() => console.log('yo')}>
+          Reset Data
+        </Button>
+        <Button sx={{
+          width: '180px',
+          marginLeft: '10px'
+        }} className="btn2" onClick={addTableCol}>
+          Add Property
+        </Button>
+        <Button sx={{
+          width: '180px',
+          marginLeft: '10px'
+        }} className="btn2" onClick={viewMetaData}>
+          View Metadata
+        </Button>
+      </Box>
     </ExcelSpreadSheetStyled>
   );
-});
+};
+
 export default ExcelSpreadSheet;
 
 const ExcelSpreadSheetStyled = styled.section`
+  .table-wrap {
+    padding-bottom: 10px;
+    overflow-x: auto;
+    overflow-y: auto;
+  }
   .spreadsheet {
     color: black;
     overflow: auto;

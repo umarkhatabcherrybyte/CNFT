@@ -114,7 +114,7 @@ const WalletDropDown = () => {
         }}
         inputProps={{
           "aria-label": "Without label",
-          className: "root",
+          "className": "root",
         }}
         MenuProps={{
           PaperProps: {

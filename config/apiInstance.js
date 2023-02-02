@@ -3,8 +3,8 @@ import axios from "axios";
 // const apiUrl = process.env.REACT_APP_API_URL;
 
 export default axios.create({
-  baseURL: "http://cnftgenie.io/",
-  //baseURL: "http://localhost:5000/",
+  // baseURL: "http://cnftgenie.io/",
+  baseURL: "http://localhost:4001/",
   headers: {
     "Content-type": "application/json",
   },

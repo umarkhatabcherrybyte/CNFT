@@ -21,6 +21,8 @@ import Strips from "/components/Design/Strips";
 import Baloon from "/components/Design/Ballon";
 import { useRouter } from "next/router";
 import { singleMintStep1 } from '../../../components/Routes/constants'
+import { Transaction, ForgeScript, resolveSlotNo, resolvePaymentKeyHash, largestFirst } from '@meshsdk/core';
+import { costLovelace } from "../../../config/utils";
 
 const payData = [
   {
@@ -60,22 +62,55 @@ const SingleMintStep3 = () => {
         if (selectedValue == "a") {
           Toast("error", "This Option is Currently in Development");
         } else if (selectedValue == "b") {
-          const signedTx = await wallet.signTx(
-            typeof window !== "undefined" &&
-            window.localStorage.getItem("txHash"),
-            true
-          );
-          const { txHash } = await signTransaction(
-            "nice",
-            signedTx,
-            typeof window !== "undefined" &&
-            window.localStorage.getItem("original")
-          );
-          console.log(txHash, "hasafh3333");
-          if (txHash) {
-            Toast("success", "Minted Succesfully");
-            router.push(singleMintStep1)
+          const utxos = await wallet.getUtxos();
+          const addresses = await wallet.getUsedAddresses();
+          const selectedUtxos = largestFirst(costLovelace, utxos, true);
+          console.log(selectedUtxos, 'dsdasd')
+          const slot = resolveSlotNo('preprod', Date.now() + 10000)
+          // const keyHash = resolvePaymentKeyHash("addr_test1qqhg0fa30eglhmkg57eh7z2uenthgtzs3pcrqhjmtxw2m73a5fqzs44y203szvnyrtvkdcppa8we6tecc45n4c4j56wsafczlj");
+          const keyHash = resolvePaymentKeyHash(addresses[0]);
+          const nativeScript = {
+            type: "any",
+            scripts: [
+              {
+                type: 'sig',
+                keyHash: keyHash,
+              },
+              {
+                type: "before",
+                slot: slot,
+              },
+            ],
           }
+          const forgingScript = ForgeScript.fromNativeScript(nativeScript);
+          const tx = new Transaction({ initiator: wallet });
+          const assetMetadata1 = {
+            "name": "Mesh Token",
+            "image": "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
+            "mediaType": "image/jpg",
+            "description": "This NFT is minted by Mesh (https://meshjs.dev/)."
+          };
+          const asset1 = {
+            assetName: 'MeshToken',
+            assetQuantity: '1',
+            metadata: assetMetadata1,
+            label: '721',
+            recipient: 'addr_test1qqhg0fa30eglhmkg57eh7z2uenthgtzs3pcrqhjmtxw2m73a5fqzs44y203szvnyrtvkdcppa8we6tecc45n4c4j56wsafczlj',
+          };
+          tx.setTxInputs(selectedUtxos);
+          tx.mintAsset(
+            forgingScript,
+            asset1,
+          );
+
+          const unsignedTx = await tx.build();
+          const signedTx = await wallet.signTx(unsignedTx, true);
+          console.log(signedTx, 'sign')
+          const txHash = await wallet.submitTx(signedTx);
+          if (txHash) {
+            router.push('/')
+          }
+
         } else if (selectedValue == "c") {
           const utxos = await wallet.getUtxos();
           const { maskedTx, originalMetadata } = await createTransaction(
@@ -101,6 +136,7 @@ const SingleMintStep3 = () => {
         Toast("error", "You are not Not Connected");
       }
     } catch (error) {
+      console.log('error', error)
       Toast("error", "Error Occured while Minting");
     }
   };

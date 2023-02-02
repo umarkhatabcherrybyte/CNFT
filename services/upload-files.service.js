@@ -1,5 +1,6 @@
 import http from "../config/apiInstance";
 class UploadFilesService {
+
   upload(file, path, onUploadProgress) {
     let formData = new FormData();
     formData.append("file", file, file.name);
@@ -45,7 +46,6 @@ class UploadFilesService {
       }
     );
   }
-
   uploadWebExcelMeta(convertedJson, path) {
     return http.post(
       "/api/uploadMultiFiles/upload/webExcelMeta",
@@ -65,5 +65,6 @@ class UploadFilesService {
       },
     });
   }
+
 }
 export default new UploadFilesService();
