@@ -7,22 +7,37 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Button
+  Button,
+  Grid
 } from "@mui/material";
 import { Add, HighlightOff } from "@mui/icons-material";
 import TextField from '@mui/material/TextField';
 import { Toast } from "../../shared/Toast";
+import MintService from '../../../services/mint.service'
+import { List } from "@mui/icons-material";
 
 const ExcelSpreadSheet = ({
   metadataObjects,
   setMetadataObjects,
   metadataObjectProperties,
   setMetadataObjectProperties,
-  checked }) => {
+  checked
+}) => {
 
-  // const [metadataObjects, setMetadataObjects] = useState([])
-
-  // const [metadataObjectProperties, setMetadataObjectProperties] = useState([])
+  const convertToJson = () => {
+    let metadataObjectPropertiesClone = metadataObjects
+    let metadataArr = []
+    for (let index = 0; index < metadataObjectPropertiesClone.length; index++) {
+      let obj = {}
+      const element = metadataObjectPropertiesClone[index];
+      for (let index = 0; index < metadataObjectProperties.length; index++) {
+        obj[metadataObjectProperties[index]] = element[Object.keys(element)[index]]
+      }
+      metadataArr.push(obj)
+    }
+    console.log(metadataArr, 'arr')
+    return metadataArr
+  };
 
   const addTableRow = () => {
     const rows = [...metadataObjects]
@@ -123,210 +138,260 @@ const ExcelSpreadSheet = ({
     setMetadataObjects(metadataObjectsClone)
   }
 
+  const metaFileDown = async () => {
+    let data = JSON.stringify(convertToJson())
+    MintService.downloadMetadataFile(data)
+      .then((res) => {
+
+      })
+      .catch((e) => {
+        Toast("error", e.message);
+      });
+  };
+
   return (
-    <ExcelSpreadSheetStyled>
-      <Box className="table-wrap">
-        <Table
-          sx={{
-            borderRadius: "15px",
-            minWidth: 650,
-            "& th": {
-              background: "var(--box-color)",
-            },
-            "& td": {
-              background: "var(--dark-box-color)",
-            },
-            "& th , td": {
-              color: "#fff",
-            },
-          }}
-          aria-label="simple table"
-        >
-          <TableHead>
-            <TableRow>
-              <TableCell align="left">
-                <Box
-                  className="flex_align_center"
-                  sx={{
-                    "& .icon": {
-                      background: "#fff",
-                      mr: 2,
-                      borderRadius: "50%",
-                      height: "30px",
-                      width: "30px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    },
-                  }}
-                >
-                  <Box className="icon">
-                    <Add sx={{
-                      color: "#000",
-                      "&:hover": {
-                        cursor: "pointer"
-                      }
-                    }}
-                      onClick={addTableRow}
-                    />
-                  </Box>
-                </Box>
-              </TableCell>
-              {
-                metadataObjectProperties.length > 0 ? metadataObjectProperties.map((val, index) => {
-                  return (
-                    <TableCell key={index} align="left">
-                      <Box>
-                        <TextField
-                          sx={{
-                            width: '70px',
-                            '& .MuiOutlinedInput-root': {
-                              '&.Mui-focused fieldset': {
-                                borderColor: 'white',
-                              },
-                            },
+    <>
+      <Grid item xs={12} md={8}>
+        <div className={checked ? "" : "disabled-div"}>
+          <ExcelSpreadSheetStyled>
+            <Box className="table-wrap">
+              <Table
+                sx={{
+                  borderRadius: "15px",
+                  minWidth: 650,
+                  "& th": {
+                    background: "var(--box-color)",
+                  },
+                  "& td": {
+                    background: "var(--dark-box-color)",
+                  },
+                  "& th , td": {
+                    color: "#fff",
+                  },
+                }}
+                aria-label="simple table"
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="left">
+                      <Box
+                        className="flex_align_center"
+                        sx={{
+                          "& .icon": {
+                            background: "#fff",
+                            mr: 2,
+                            borderRadius: "50%",
+                            height: "30px",
+                            width: "30px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          },
+                        }}
+                      >
+                        <Box className="icon">
+                          <Add sx={{
+                            color: "#000",
+                            "&:hover": {
+                              cursor: "pointer"
+                            }
                           }}
-                          InputLabelProps={{ shrink: false }}
-                          id="outlined-password-input"
-                          label=" "
-                          type="text"
-                          size="small"
-                          value={metadataObjectProperties[index]}
-                          onChange={e => {
-                            updateTableColName(index, e.target.value)
-                          }}
-                          autoComplete="current-password"
-                        />
-                        <HighlightOff sx={{
-                          mt: "7px",
-                          ml: "3px",
-                          "&:hover": {
-                            cursor: "pointer"
-                          }
-                        }} onClick={() => {
-                          deleteTableCol(index)
-                        }} />
+                            onClick={addTableRow}
+                          />
+                        </Box>
                       </Box>
                     </TableCell>
-                  )
-                }) :
-                  <TableCell align="left">
-                    <Button sx={{
-                      width: '250px',
-                      marginLeft: '10px'
-                    }} className="btn2" onClick={addTableCol}>
-                      Click to Add Property
-                    </Button>
-                  </TableCell>
-              }
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {metadataObjects.map((row, rowIndex) => (
-              <TableRow
-                key={row.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell align="left">
-                  <Box
-                    className="flex_align_center"
-                    sx={{
-                      "& .icon": {
-                        background: "#fff",
-                        mr: 2,
-                        borderRadius: "50%",
-                        borderColor: "white",
-                        height: "30px",
-                        width: "30px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      },
-                    }}
-                  >
-                    <Box
-                      className="icon"
-                      sx={{
-                        alignItems: "start",
-                      }}
+                    {
+                      metadataObjectProperties.length > 0 ? metadataObjectProperties.map((val, index) => {
+                        return (
+                          <TableCell key={index} align="left">
+                            <Box>
+                              <TextField
+                                sx={{
+                                  width: '70px',
+                                  '& .MuiOutlinedInput-root': {
+                                    '&.Mui-focused fieldset': {
+                                      borderColor: 'white',
+                                    },
+                                  },
+                                }}
+                                InputLabelProps={{ shrink: false }}
+                                id="outlined-password-input"
+                                label=" "
+                                type="text"
+                                size="small"
+                                value={metadataObjectProperties[index]}
+                                onChange={e => {
+                                  updateTableColName(index, e.target.value)
+                                }}
+                                autoComplete="current-password"
+                              />
+                              <HighlightOff sx={{
+                                mt: "7px",
+                                ml: "3px",
+                                "&:hover": {
+                                  cursor: "pointer"
+                                }
+                              }} onClick={() => {
+                                deleteTableCol(index)
+                              }} />
+                            </Box>
+                          </TableCell>
+                        )
+                      }) :
+                        <TableCell align="left">
+                          <Button sx={{
+                            width: '250px',
+                            marginLeft: '10px'
+                          }} className="btn2" onClick={addTableCol}>
+                            Click to Add Property
+                          </Button>
+                        </TableCell>
+                    }
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {metadataObjects.map((row, rowIndex) => (
+                    <TableRow
+                      key={row.id}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     >
-                      <HighlightOff onClick={() => {
-                        deleteTableRows(rowIndex)
-                      }} sx={{
-                        color: "#000",
-                        border: "#fff",
-                        "&:hover": {
-                          cursor: "pointer"
-                        }
-                      }} />
-                    </Box>
-                  </Box>
-                </TableCell>
-                {
-                  Object.keys(row).map((val, index) => {
-                    return (
-                      <TableCell key={val} align="left">
-                        <TextField
+                      <TableCell align="left">
+                        <Box
+                          className="flex_align_center"
                           sx={{
-                            width: '100px',
-                            '& .MuiOutlinedInput-root': {
-                              '&.Mui-focused fieldset': {
-                                borderColor: 'white',
-                              },
+                            "& .icon": {
+                              background: "#fff",
+                              mr: 2,
+                              borderRadius: "50%",
+                              borderColor: "white",
+                              height: "30px",
+                              width: "30px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
                             },
                           }}
-                          InputLabelProps={{ shrink: false }}
-                          id="outlined-password-input"
-                          label=" "
-                          type="text"
-                          size="small"
-                          autoComplete="current-password"
-                          value={metadataObjects[rowIndex][val]}
-                          name={val}
-                          onChange={e => {
-                            handleChange(rowIndex, e)
-                          }}
-                        />
+                        >
+                          <Box
+                            className="icon"
+                            sx={{
+                              alignItems: "start",
+                            }}
+                          >
+                            <HighlightOff onClick={() => {
+                              deleteTableRows(rowIndex)
+                            }} sx={{
+                              color: "#000",
+                              border: "#fff",
+                              "&:hover": {
+                                cursor: "pointer"
+                              }
+                            }} />
+                          </Box>
+                        </Box>
                       </TableCell>
-                    )
-                  })
-                }
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Box>
-      <Box sx={{
-        mt: 3,
-        display: 'flex'
-      }} className="">
-        <Button className="btn2" onClick={resetData}>
-          Reset Data
-        </Button>
-        {
-          metadataObjectProperties.length > 0 ?
-            <Button sx={{
-              width: '220px',
-              marginLeft: '10px'
-            }} className="btn2" onClick={addTableCol}>
-              Add More Properties
-            </Button> :
-            null
-        }
-        <Button sx={{
-          width: '180px',
-          marginLeft: '10px'
-        }} className="btn2" onClick={viewMetaData}>
-          View Metadata
-        </Button>
-      </Box>
-    </ExcelSpreadSheetStyled >
+                      {
+                        Object.keys(row).map((val, index) => {
+                          return (
+                            <TableCell key={val} align="left">
+                              <TextField
+                                sx={{
+                                  width: '100px',
+                                  '& .MuiOutlinedInput-root': {
+                                    '&.Mui-focused fieldset': {
+                                      borderColor: 'white',
+                                    },
+                                  },
+                                }}
+                                InputLabelProps={{ shrink: false }}
+                                id="outlined-password-input"
+                                label=" "
+                                type="text"
+                                size="small"
+                                autoComplete="current-password"
+                                value={metadataObjects[rowIndex][val]}
+                                name={val}
+                                onChange={e => {
+                                  handleChange(rowIndex, e)
+                                }}
+                              />
+                            </TableCell>
+                          )
+                        })
+                      }
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+            <Box sx={{
+              mt: 3,
+              display: 'flex'
+            }} className="">
+              <Button className="btn2" onClick={resetData}>
+                Reset Data
+              </Button>
+              {
+                metadataObjectProperties.length > 0 ?
+                  <Button sx={{
+                    width: '220px',
+                    marginLeft: '10px'
+                  }} className="btn2" onClick={addTableCol}>
+                    Add More Properties
+                  </Button> :
+                  null
+              }
+              <Button sx={{
+                width: '180px',
+                marginLeft: '10px'
+              }} className="btn2" onClick={viewMetaData}>
+                View Metadata
+              </Button>
+            </Box>
+          </ExcelSpreadSheetStyled >
+        </div>
+      </Grid>
+      <Grid item xs={12} md={4}>
+        <Box
+          className={`${checked ? "" : "disabled-div"} br_15 flex`}
+          sx={{
+            background: "var(--box-color)",
+            height: "100%",
+            flexDirection: "column",
+          }}
+        >
+          <Button
+            className="btn2"
+            onClick={() => convertToJson()}
+            sx={{ my: 2 }}
+          >
+            Convert to JSON
+          </Button>
+          <Box className="flex_align">
+            <List />
+            <Button
+              onClick={() => {
+                if (metaDataUrl) metaFileDown();
+              }}
+              sx={{ background: "none", color: "#fff" }}
+            >
+              Download Your JSON File
+            </Button>
+          </Box>
+        </Box>
+      </Grid>
+    </>
   );
 };
 
 export default ExcelSpreadSheet;
 
 const ExcelSpreadSheetStyled = styled.section`
+  .disabled-div {
+    pointer-events: none;
+    opacity: 0.4;
+  }
   .table-wrap {
     padding-bottom: 10px;
     overflow-x: auto;

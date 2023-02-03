@@ -6,22 +6,33 @@ import { Grid, Box, Button, Typography, TextField } from "@mui/material";
 import { mintSingleStep3 } from "/components/Routes/constants";
 import styled from "styled-components";
 import { useRouter } from "next/router";
+import { Toast } from "../../../components/shared/Toast";
 
 const Step2 = () => {
   const router = useRouter();
   const [rangeValue, setRangeValue] = React.useState(10);
   var params = {};
+
   const onInputChange = (e) => {
     params = { ...params, [e.target.name]: e.target.value };
   };
+
   const onInputRangeChange = (e) => {
     params = { ...params, [e.target.name]: e.target.value };
     setRangeValue(e.target.value);
   };
 
   const onNextButton = () => {
-    router.push(mintSingleStep3);
+    console.log(params, 'lolxxx')
+    if (params?.name == undefined || params?.name == null) {
+      Toast('error', 'Name Field is Missing')
+    }
+    else if (typeof window !== "undefined") {
+      window.localStorage.setItem("params", JSON.stringify(params));
+      router.push(mintSingleStep3);
+    }
   };
+
   return (
     <Step2Styled>
       <ContainerLayout>
@@ -29,9 +40,7 @@ const Step2 = () => {
           <Grid item xs={12} md={8}>
             <Header
               heading="Add additional metadata"
-              desc="
-      Royalty fees may be set up to 15%; However, the lower your royalty fee, the better chance that your NFT(s) will sell, Royalty fees in excess of 10% are not recommended.
-      "
+              desc="Royalty fees may be set up to 15%; However, the lower your royalty fee, the better chance that your NFT(s) will sell, Royalty fees in excess of 10% are not recommended."
             />
           </Grid>
         </Grid>

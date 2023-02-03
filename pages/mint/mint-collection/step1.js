@@ -4,8 +4,9 @@ import Header from "/components/Mint/shared/Header";
 import Layout from "/components/Mint/Layout";
 import styled from "styled-components";
 import VerifyMetaFileService from "/services/verify-metafile.service";
-import { Toast } from "/components/shared/Toast";
 import UploadService from "/services/upload-files.service";
+import MintService from "/services/mint.service";
+import { Toast } from "/components/shared/Toast";
 import imageCompression from "browser-image-compression";
 import download from "js-file-download";
 import { Delete, DeleteForever } from "@mui/icons-material";
@@ -172,8 +173,9 @@ const Step1 = () => {
       return
     }
     else if (typeof window !== "undefined") {
+      let objs = convertMetadataObjects()
       window.localStorage.setItem("images", imagePaths);
-      window.localStorage.setItem("metadataObjects", metadataObjects);
+      window.localStorage.setItem("metadataObjects", objs);
       window.localStorage.setItem("metadataObjectsProperties", metadataObjectProperties);
       router.push(mintCollectionStep2);
     }
@@ -217,34 +219,47 @@ const Step1 = () => {
       });
   }
 
-  const convertToJson = () => {
-    // const excelData = excelRef.current.convertToJson();
-    // const objectKey = excelData[0];
-    // let convertedJson = {
-    //   Metadata: [],
-    // };
-    // excelData.map((row, index) => {
-    //   if (index !== 0) {
-    //     let oneObject = {
-    //       ImageName: row[1],
-    //       attributes: {},
-    //     };
-    //     row.map((value, indexAttr) => {
-    //       if (indexAttr > 1) {
-    //         oneObject.attributes[objectKey[indexAttr]] = value;
-    //       }
-    //     });
-    //     convertedJson.Metadata = [...convertedJson.Metadata, oneObject];
-    //   }
-    // });
+  const convertMetadataObjects = () => {
+    let metadataObjectPropertiesClone = metadataObjects
+    let metadataArr = []
+    for (let index = 0; index < metadataObjectPropertiesClone.length; index++) {
+      let obj = {}
+      const element = metadataObjectPropertiesClone[index];
+      for (let index = 0; index < metadataObjectProperties.length; index++) {
+        obj[metadataObjectProperties[index]] = element[Object.keys(element)[index]]
+      }
+      metadataArr.push(obj)
+    }
+    console.log(metadataArr, 'arr')
+    return metadataArr
+  };
 
-    // console.log(convertedJson, 'JSON')
+  const convertToJson = () => {
+    const excelData = excelRef.current.convertToJson();
+    const objectKey = excelData[0];
+    let convertedJson = {
+      Metadata: [],
+    };
+    excelData.map((row, index) => {
+      if (index !== 0) {
+        let oneObject = {
+          ImageName: row[1],
+          attributes: {},
+        };
+        row.map((value, indexAttr) => {
+          if (indexAttr > 1) {
+            oneObject.attributes[objectKey[indexAttr]] = value;
+          }
+        });
+        convertedJson.Metadata = [...convertedJson.Metadata, oneObject];
+      }
+    });
 
     // const path = connectedWallet + "_" + walletAddress;
     // UploadService.uploadWebExcelMeta(
     //   JSON.stringify(convertedJson),
     //   path,
-    //   (event) => { }
+    //   (event) => {}
     // )
     //   .then((response) => {
     //     Toast("success", "Upload Metadata successed.");
@@ -585,46 +600,14 @@ const Step1 = () => {
                   Use a webform
                 </label>
               </Grid>
-              <Grid item xs={12} md={8}>
-                <div className={checked ? "" : "disabled-div"}>
-                  <ExcelSpreadSheet
-                    metadataObjects={metadataObjects}
-                    setMetadataObjects={setMetadataObjects}
-                    metadataObjectProperties={metadataObjectProperties}
-                    setMetadataObjectProperties={setMetadataObjectProperties}
-                    checked={checked}
-                  />
-                </div>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Box
-                  className={`${checked ? "" : "disabled-div"} br_15 flex`}
-                  sx={{
-                    background: "var(--box-color)",
-                    height: "100%",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Button
-                    className="btn2"
-                    onClick={() => convertToJson()}
-                    sx={{ my: 2 }}
-                  >
-                    Convert to JSON
-                  </Button>
-                  <Box className="flex_align">
-                    <List />
-                    <Button
-                      onClick={() => {
-                        if (metaDataUrl) metaFileDown();
-                      }}
-                      sx={{ background: "none", color: "#fff" }}
-                    >
-                      Download Your JSON File
-                    </Button>
-                  </Box>
-                </Box>
-              </Grid>
+
+              <ExcelSpreadSheet
+                metadataObjects={metadataObjects}
+                setMetadataObjects={setMetadataObjects}
+                metadataObjectProperties={metadataObjectProperties}
+                setMetadataObjectProperties={setMetadataObjectProperties}
+                checked={checked}
+              />
               <Grid item xs={12} sx={{ marginTop: 5, display: "flex" }}>
                 <Box className="max_btn w_100" sx={{ mr: 2 }}>
                   <Button className="btn2 w_100 " onClick={() => onBackStep()}>
