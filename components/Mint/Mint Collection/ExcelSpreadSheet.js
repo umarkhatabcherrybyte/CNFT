@@ -13,11 +13,16 @@ import { Add, HighlightOff } from "@mui/icons-material";
 import TextField from '@mui/material/TextField';
 import { Toast } from "../../shared/Toast";
 
-const ExcelSpreadSheet = ({ checked }) => {
+const ExcelSpreadSheet = ({
+  metadataObjects,
+  setMetadataObjects,
+  metadataObjectProperties,
+  setMetadataObjectProperties,
+  checked }) => {
 
-  const [metadataObjects, setMetadataObjects] = useState([])
+  // const [metadataObjects, setMetadataObjects] = useState([])
 
-  const [metadataObjectProperties, setMetadataObjectProperties] = useState([])
+  // const [metadataObjectProperties, setMetadataObjectProperties] = useState([])
 
   const addTableRow = () => {
     const rows = [...metadataObjects]

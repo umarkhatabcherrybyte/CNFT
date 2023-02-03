@@ -26,10 +26,14 @@ const Step1 = () => {
   const [progressInfos, setProgressInfos] = useState([]);
   const [fileInfos, setFileInfos] = useState([]);
   const [metaFileInfos, setMetaFileInfos] = useState([]);
+  const [imagePaths, setImagePaths] = useState([]);
   const [walletAddress, setWalletAddress] = useState("");
   const [connectedWallet, setConnectedWallet] = useState("");
   const [checked, setChecked] = useState(true);
   const [metaDataUrl, setMetaDataURL] = useState(null);
+
+  const [metadataObjects, setMetadataObjects] = useState([])
+  const [metadataObjectProperties, setMetadataObjectProperties] = useState([])
 
   let _progressInfos = [];
 
@@ -37,6 +41,13 @@ const Step1 = () => {
   const hiddenFileInputRef = useRef(null);
   const metaFileLabelRef = useRef(null);
   const selectedFilesLabelRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.getItem("connectedWallet", imagePaths);
+      // window.localStorage.getItem("metadataObjects", metadataObjects);
+    }
+  }, [])
 
   const onSelectedFiles = (e) => {
     if (e.target.files) {
@@ -96,7 +107,6 @@ const Step1 = () => {
 
   const uploadFiles = async () => {
     if (selectedFiles.length > 0) {
-      // setIsUploading(true);
       try {
         const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
         const projectSecret = "136393a5b7f4e47a9e153a88eb636003";
@@ -111,16 +121,13 @@ const Step1 = () => {
             authorization: auth,
           },
         });
-        let paths = []
         for (let index = 0; index < selectedFiles.length; index++) {
           const uploaded_image = await client.add(selectedFiles[index]);
           if (uploaded_image) {
-            if (typeof window !== "undefined") {
-              paths.push({
-                "path": uploaded_image.path,
-                "file_mimeType": selectedFiles[index].type
-              })
-            }
+            setImagePaths([...imagePaths, {
+              "path": uploaded_image.path,
+              "file_mimeType": selectedFiles[index].type
+            }])
           }
         }
       } catch (error) {
@@ -160,7 +167,16 @@ const Step1 = () => {
   }
 
   function onNextStep() {
-    router.push(mintCollectionStep2);
+    if (imagePaths.length == 0) {
+      Toast("error", 'Please Upload NFT files first');
+      return
+    }
+    else if (typeof window !== "undefined") {
+      window.localStorage.setItem("images", imagePaths);
+      window.localStorage.setItem("metadataObjects", metadataObjects);
+      window.localStorage.setItem("metadataObjectsProperties", metadataObjectProperties);
+      router.push(mintCollectionStep2);
+    }
     // const path = connectedWallet + "_" + walletAddress;
     // VerifyMetaFileService.verify(path)
     //   .then((response) => {
@@ -261,6 +277,7 @@ const Step1 = () => {
   const onMetaFileInputButton = () => {
     metaFileInputRef.current.click();
   };
+
 
   return (
     <Step1Styled>
@@ -570,7 +587,13 @@ const Step1 = () => {
               </Grid>
               <Grid item xs={12} md={8}>
                 <div className={checked ? "" : "disabled-div"}>
-                  <ExcelSpreadSheet checked={checked} />
+                  <ExcelSpreadSheet
+                    metadataObjects={metadataObjects}
+                    setMetadataObjects={setMetadataObjects}
+                    metadataObjectProperties={metadataObjectProperties}
+                    setMetadataObjectProperties={setMetadataObjectProperties}
+                    checked={checked}
+                  />
                 </div>
               </Grid>
               <Grid item xs={12} md={4}>
