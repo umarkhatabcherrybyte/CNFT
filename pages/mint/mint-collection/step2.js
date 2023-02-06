@@ -11,10 +11,16 @@ import { Toast } from "../../../components/shared/Toast";
 const Step2 = () => {
   const router = useRouter();
   const [rangeValue, setRangeValue] = React.useState(10);
+  const [metadata, setMetadata] = React.useState({
+    item_name: "",
+    item_description: "",
+    item_creator: "",
+    item_link: "",
+  });
   var params = {};
 
   const onInputChange = (e) => {
-    params = { ...params, [e.target.name]: e.target.value };
+    setMetadata({ ...metadata, [e.target.name]: e.target.value });
   };
 
   const onInputRangeChange = (e) => {
@@ -24,7 +30,7 @@ const Step2 = () => {
 
   const onNextButton = () => {
     console.log(params, 'lolxxx')
-    if (params?.name == undefined || params?.name == null) {
+    if (metadata?.item_name == undefined || metadata?.item_name == null) {
       Toast('error', 'Name Field is Missing')
     }
     else if (typeof window !== "undefined") {

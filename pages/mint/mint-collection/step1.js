@@ -18,6 +18,7 @@ import Heading from "/components/shared/headings/Heading";
 import { List } from "@mui/icons-material";
 import { mintCollectionStep2 } from "/components/Routes/constants";
 import { useRouter } from "next/router";
+import { create } from "ipfs-http-client";
 
 const Step1 = () => {
   const router = useRouter();
@@ -26,12 +27,12 @@ const Step1 = () => {
   const [metaData, setMetaData] = useState([]);
   const [progressInfos, setProgressInfos] = useState([]);
   const [fileInfos, setFileInfos] = useState([]);
-  const [metaFileInfos, setMetaFileInfos] = useState([]);
   const [imagePaths, setImagePaths] = useState([]);
   const [walletAddress, setWalletAddress] = useState("");
   const [connectedWallet, setConnectedWallet] = useState("");
   const [checked, setChecked] = useState(true);
-  const [metaDataUrl, setMetaDataURL] = useState(null);
+  const [metadataFileUploaded, setMetadataFileUploaded] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const [metadataObjects, setMetadataObjects] = useState([])
   const [metadataObjectProperties, setMetadataObjectProperties] = useState([])
@@ -75,39 +76,35 @@ const Step1 = () => {
     setMetaFile(e.target.files[0]);
   };
 
-  function verifyMeta() {
-    const path = connectedWallet + "_" + walletAddress;
-    VerifyMetaFileService.verify(path)
-      .then((response) => {
-        if (response.data.err == "") {
-          setMetaData(response.data.data.Metadata);
-          Toast("success", response.data.msg);
-        } else {
-          Toast("error", response.data.err);
-        }
-      })
-      .catch((e) => {
-        Toast("error", "Server Error: " + e.message);
-      });
-  }
-
   function uploadMeta() {
-    const file = metaFile;
-    const path = connectedWallet + "_" + walletAddress;
-    UploadService.uploadMeta(file, path, (event) => { })
-      .then((response) => {
-        metaFileInputRef.current.value = null;
-        metaFileLabelRef.current.innerHTML = "No file choosen";
-        setMetaFile(null);
-        Toast("success", "Upload Metadata successed.");
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    if (metaFile == undefined || metaFile == null) {
+      Toast("error", "No File Selected");
+    }
+    else {
+      const file = metaFile;
+      const path = connectedWallet + "_" + walletAddress;
+      UploadService.uploadMeta(file, path, (event) => { })
+        .then((response) => {
+          if (typeof window !== "undefined" && response.data.data.length > 0) {
+            setMetadataObjects(response.data.data || [])
+            window.localStorage.setItem("metadataObjects", JSON.stringify(response.data.data));
+            setMetadataFileUploaded(true)
+            metaFileInputRef.current.value = null;
+            metaFileLabelRef.current.innerHTML = "No file choosen";
+            setMetaFile(null);
+            Toast("success", "Uploaded Metadata Successfully");
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          setMetadataFileUploaded(false)
+        });
+    }
   }
 
-  const uploadFiles = async () => {
+  const uploadFilesIPFS = async () => {
     if (selectedFiles.length > 0) {
+      setImagePaths([])
       try {
         const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
         const projectSecret = "136393a5b7f4e47a9e153a88eb636003";
@@ -122,16 +119,22 @@ const Step1 = () => {
             authorization: auth,
           },
         });
+        let arr = []
         for (let index = 0; index < selectedFiles.length; index++) {
           const uploaded_image = await client.add(selectedFiles[index]);
+          console.log(uploaded_image, selectedFiles[index], 'img')
           if (uploaded_image) {
-            setImagePaths([...imagePaths, {
+            arr.push({
               "path": uploaded_image.path,
               "file_mimeType": selectedFiles[index].type
-            }])
+            })
           }
         }
+        setImagePaths(arr)
+        // console.log()
+        Toast("success", "Files Uploaded Successfully");
       } catch (error) {
+        console.log(error, 'err')
         setIsUploading(false);
         Toast("error", "Uploading failed.");
       }
@@ -168,40 +171,38 @@ const Step1 = () => {
   }
 
   function onNextStep() {
+    let objs = convertMetadataObjects()
+    console.log(objs.length != imagePaths.length, objs.length, imagePaths.length)
     if (imagePaths.length == 0) {
-      Toast("error", 'Please Upload NFT files first');
+      Toast("error", 'please upload NFT files first');
       return
     }
-    else if (typeof window !== "undefined") {
-      let objs = convertMetadataObjects()
+    else if (checked && (objs.length != imagePaths.length)) {
+      Toast("error", 'missing metadata of some Files');
+      return
+    }
+    else if (!checked && (metadataObjects.length != imagePaths.length)) {
+      Toast("error", 'missing metadata of some Files');
+      return
+    }
+    else if (!checked &&
+      metadataObjects.length == imagePaths.length &&
+      typeof window !== "undefined" &&
+      metadataFileUploaded) {
+      window.localStorage.setItem("images", imagePaths);
+      window.localStorage.setItem("metadataObjectsProperties", metadataObjectProperties);
+      router.push(mintCollectionStep2);
+    }
+    else if (checked && typeof window !== "undefined") {
       window.localStorage.setItem("images", imagePaths);
       window.localStorage.setItem("metadataObjects", objs);
       window.localStorage.setItem("metadataObjectsProperties", metadataObjectProperties);
       router.push(mintCollectionStep2);
     }
-    // const path = connectedWallet + "_" + walletAddress;
-    // VerifyMetaFileService.verify(path)
-    //   .then((response) => {
-    //     if (response.data.err == "") {
-    //       setMetaData(response.data.data.Metadata);
-    //       Toast("success", response.data.msg);
-    //       sessionStorage.setItem("item_amount", metaData.length);
-    //       navigate(mintCollectionStep2);
-    //     } else {
-    //       Toast("error", response.data.err);
-    //     }
-    //   })
-    //   .catch((e) => {
-    //     Toast("error", "Server Error: " + e.message);
-    //   });
   }
 
   function onBackStep() {
     navigate("/mint");
-  }
-
-  function onResetData() {
-    onRemoveImage("");
   }
 
   function onRemoveImage(fileName) {
@@ -293,6 +294,9 @@ const Step1 = () => {
     metaFileInputRef.current.click();
   };
 
+  const viewImagesPaths = () => {
+    console.log(imagePaths, 'o')
+  }
 
   return (
     <Step1Styled>
@@ -392,7 +396,7 @@ const Step1 = () => {
                   <Button
                     className="btn w_100"
                     // disabled={!selectedFiles}
-                    onClick={() => uploadFiles()}
+                    onClick={() => uploadFilesIPFS()}
                   >
                     Upload
                   </Button>
@@ -587,7 +591,7 @@ const Step1 = () => {
                 </Button>
               </Grid>
               <Grid item md={2} xs={12}>
-                <Button className="btn w_100">Verify</Button>
+                <Button onClick={viewImagesPaths} className="btn w_100">Verify</Button>
               </Grid>
               <Grid xs={12} item>
                 <label className="form-check-label">
