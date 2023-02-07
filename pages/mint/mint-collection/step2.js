@@ -3,12 +3,12 @@ import Header from "/components/Mint/shared/Header";
 import Layout from "/components/Mint/Layout";
 import ContainerLayout from "/components/shared/ContainerLayout";
 import { Grid, Box, Button, Typography, TextField } from "@mui/material";
-import { mintSingleStep3 } from "/components/Routes/constants";
+import { mintCollectionStep3 } from "/components/Routes/constants";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { Toast } from "../../../components/shared/Toast";
 
-const Step2 = () => {
+const CollectionStep2 = () => {
   const router = useRouter();
   const [rangeValue, setRangeValue] = React.useState(10);
   const [metadata, setMetadata] = React.useState({
@@ -35,7 +35,7 @@ const Step2 = () => {
     }
     else if (typeof window !== "undefined") {
       window.localStorage.setItem("params", JSON.stringify(params));
-      router.push(mintSingleStep3);
+      router.push(mintCollectionStep3);
     }
   };
 
@@ -215,7 +215,7 @@ const Step2 = () => {
   );
 };
 
-export default Step2;
+export default CollectionStep2;
 
 const Step2Styled = styled.section`
   .slider {

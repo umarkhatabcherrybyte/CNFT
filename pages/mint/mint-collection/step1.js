@@ -20,7 +20,7 @@ import { mintCollectionStep2 } from "/components/Routes/constants";
 import { useRouter } from "next/router";
 import { create } from "ipfs-http-client";
 
-const Step1 = () => {
+const CollectionStep1 = () => {
   const router = useRouter();
   const [selectedFiles, setSeletedFiles] = useState([]);
   const [metaFile, setMetaFile] = useState(undefined);
@@ -189,14 +189,15 @@ const Step1 = () => {
       metadataObjects.length == imagePaths.length &&
       typeof window !== "undefined" &&
       metadataFileUploaded) {
-      window.localStorage.setItem("images", imagePaths);
-      window.localStorage.setItem("metadataObjectsProperties", metadataObjectProperties);
+      window.localStorage.setItem("metadataObjects", JSON.stringify(metadataObjects));
+      window.localStorage.setItem("images", JSON.stringify(imagePaths));
+      window.localStorage.setItem("metadataObjectsProperties", JSON.stringify(metadataObjectProperties));
       router.push(mintCollectionStep2);
     }
     else if (checked && typeof window !== "undefined") {
-      window.localStorage.setItem("images", imagePaths);
-      window.localStorage.setItem("metadataObjects", objs);
-      window.localStorage.setItem("metadataObjectsProperties", metadataObjectProperties);
+      window.localStorage.setItem("images", JSON.stringify(imagePaths));
+      window.localStorage.setItem("metadataObjects", JSON.stringify(objs));
+      window.localStorage.setItem("metadataObjectsProperties", JSON.stringify(metadataObjectProperties));
       router.push(mintCollectionStep2);
     }
   }
@@ -229,6 +230,8 @@ const Step1 = () => {
       for (let index = 0; index < metadataObjectProperties.length; index++) {
         obj[metadataObjectProperties[index]] = element[Object.keys(element)[index]]
       }
+      obj["image"] = imagePaths[index].path
+      obj["mediaType"] = imagePaths[index].file_mimeType
       metadataArr.push(obj)
     }
     console.log(metadataArr, 'arr')
@@ -635,7 +638,7 @@ const Step1 = () => {
   );
 };
 
-export default Step1;
+export default CollectionStep1;
 
 const Step1Styled = styled.section`
   .file-input-wrapper {

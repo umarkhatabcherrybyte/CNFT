@@ -67,7 +67,6 @@ const SingleMintStep3 = () => {
           const selectedUtxos = largestFirst(costLovelace, utxos, true);
           console.log(selectedUtxos, 'dsdasd')
           const slot = resolveSlotNo('preprod', Date.now() + 10000)
-          // const keyHash = resolvePaymentKeyHash("addr_test1qqhg0fa30eglhmkg57eh7z2uenthgtzs3pcrqhjmtxw2m73a5fqzs44y203szvnyrtvkdcppa8we6tecc45n4c4j56wsafczlj");
           const keyHash = resolvePaymentKeyHash(addresses[0]);
           const nativeScript = {
             type: "any",
@@ -84,24 +83,21 @@ const SingleMintStep3 = () => {
           }
           const forgingScript = ForgeScript.fromNativeScript(nativeScript);
           const tx = new Transaction({ initiator: wallet });
-          const assetMetadata1 = {
-            "name": "Mesh Token",
-            "image": "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-            "mediaType": "image/jpg",
-            "description": "This NFT is minted by Mesh (https://meshjs.dev/)."
-          };
+          let metadata = JSON.parse(window.localStorage.setItem("metadata"))
+          let changeAddress = await wallet.getChangeAddress()
           const asset1 = {
-            assetName: 'MeshToken',
+            assetName: metadata.name,
             assetQuantity: '1',
-            metadata: assetMetadata1,
+            metadata: metadata,
             label: '721',
-            recipient: 'addr_test1qqhg0fa30eglhmkg57eh7z2uenthgtzs3pcrqhjmtxw2m73a5fqzs44y203szvnyrtvkdcppa8we6tecc45n4c4j56wsafczlj',
+            recipient: addresses[0],
           };
           tx.setTxInputs(selectedUtxos);
           tx.mintAsset(
             forgingScript,
             asset1,
           );
+          tx.setChangeAddress(changeAddress)
 
           const unsignedTx = await tx.build();
           const signedTx = await wallet.signTx(unsignedTx, true);
@@ -113,23 +109,48 @@ const SingleMintStep3 = () => {
 
         } else if (selectedValue == "c") {
           const utxos = await wallet.getUtxos();
-          const { maskedTx, originalMetadata } = await createTransaction(
-            currentAddr,
-            utxos,
-            img,
-            JSON.parse(
-              typeof window !== "undefined" &&
-              window.localStorage.getItem("metadata")
-            )
+          const addresses = await wallet.getUsedAddresses();
+          const selectedUtxos = largestFirst(costLovelace, utxos, true);
+          console.log(selectedUtxos, 'dsdasd')
+          const slot = resolveSlotNo('preprod', Date.now() + 10000)
+          const keyHash = resolvePaymentKeyHash(addresses[0]);
+          const nativeScript = {
+            type: "any",
+            scripts: [
+              {
+                type: 'sig',
+                keyHash: keyHash,
+              },
+              {
+                type: "before",
+                slot: slot,
+              },
+            ],
+          }
+          const forgingScript = ForgeScript.fromNativeScript(nativeScript);
+          const tx = new Transaction({ initiator: wallet });
+          let metadata = JSON.parse(window.localStorage.setItem("metadata"))
+          let changeAddress = await wallet.getChangeAddress()
+          const asset1 = {
+            assetName: metadata.name,
+            assetQuantity: '1',
+            metadata: metadata,
+            label: '721',
+            recipient: currentAddr,
+          };
+          tx.setTxInputs(selectedUtxos);
+          tx.mintAsset(
+            forgingScript,
+            asset1,
           );
-          const signedTx = await wallet.signTx(maskedTx, true);
-          const { txHash } = await signTransaction(
-            "nice",
-            signedTx,
-            originalMetadata
-          );
+          tx.setChangeAddress(changeAddress)
+
+          const unsignedTx = await tx.build();
+          const signedTx = await wallet.signTx(unsignedTx, true);
+          console.log(signedTx, 'sign')
+          const txHash = await wallet.submitTx(signedTx);
           if (txHash) {
-            Toast("success", "Minted Succesfully");
+            router.push('/')
           }
         }
       } else {

@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import CaptionHeading from "/components/shared/headings/CaptionHeading";
 import { Toast } from "../shared/Toast";
+import UserService from "../../services/user.service";
 
 import { Box, Select, MenuItem, Button, Typography } from "@mui/material";
 
@@ -39,19 +40,27 @@ const wallets = [
   },
 ];
 
-const WalletDropDown = () => {
-  const { wallet, connected, name, connecting, connect, disconnect, error } =
-    useWallet();
+const WalletDropdown = () => {
+  const {
+    wallet,
+    connected,
+    name,
+    connecting,
+    connect,
+    disconnect,
+    error
+  } = useWallet();
 
   const lovelace = useLovelace();
 
-  // console.info(wallet, "1");
-  // console.info(name, "2");
-  // console.log(error);
   const [walletName, setWalletName] = React.useState("default");
   useEffect(() => {
     disconnect();
   }, []);
+
+  useEffect(() => {
+    signIn()
+  }, [connected, wallet]);
   useEffect(() => {
     if (error) {
       setWalletName(name);
@@ -61,12 +70,30 @@ const WalletDropDown = () => {
   const handleWalletChange = (event) => {
     setWalletName(event.target.value);
   };
+
+  const signIn = async () => {
+    try {
+      if (connected) {
+        // console.log(wallet, 'weawdas')
+        let addrss = await wallet?.getUsedAddresses()
+        // console.log('here', await wallet?.getUsedAddress(), await wallet?.getUsedAddresses())
+        let res = await UserService.signIn(addrss[0])
+        if (res.data) {
+          console.log(res.data)
+          window.localStorage.setItem("userid", res.data.data[0]._id);
+        }
+      }
+    } catch (error) {
+      console.log(error, 'err')
+    }
+  }
+
   const handleWalletClick = async (event, walletV) => {
     if (walletV.value === walletName) {
       setWalletName("default");
       disconnect();
     } else {
-      connect(walletV.value);
+      connect(walletV.value)
       window.localStorage.setItem("connectedWallet", String(walletV.value).toLowerCase());
     }
   };
@@ -218,7 +245,7 @@ const WalletDropDown = () => {
   );
 };
 
-export default WalletDropDown;
+export default WalletDropdown;
 
 const WalletDropDownStyled = styled.section`
   display: flex;
