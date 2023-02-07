@@ -9,7 +9,11 @@ import MintService from "/services/mint.service";
 import { Toast } from "/components/shared/Toast";
 import imageCompression from "browser-image-compression";
 import download from "js-file-download";
-import { Delete, DeleteForever } from "@mui/icons-material";
+import {
+  Delete,
+  DeleteForever,
+  DeleteForeverOutlined,
+} from "@mui/icons-material";
 import ExcelSpreadSheet from "/components/Mint/Mint Collection/ExcelSpreadSheet";
 import { Box, Button, Grid } from "@mui/material";
 import CaptionHeading from "/components/shared/headings/CaptionHeading";
@@ -30,13 +34,12 @@ const Step1 = () => {
   const [imagePaths, setImagePaths] = useState([]);
   const [walletAddress, setWalletAddress] = useState("");
   const [connectedWallet, setConnectedWallet] = useState("");
-  const [checked, setChecked] = useState(true);
+  const [isWebform, setIsWebform] = useState(false);
   const [metadataFileUploaded, setMetadataFileUploaded] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  const [metadataObjects, setMetadataObjects] = useState([])
-  const [metadataObjectProperties, setMetadataObjectProperties] = useState([])
-
+  const [metadataObjects, setMetadataObjects] = useState([]);
+  const [metadataObjectProperties, setMetadataObjectProperties] = useState([]);
   let _progressInfos = [];
 
   const metaFileInputRef = useRef(null);
@@ -49,20 +52,34 @@ const Step1 = () => {
       window.localStorage.getItem("connectedWallet", imagePaths);
       // window.localStorage.getItem("metadataObjects", metadataObjects);
     }
-  }, [])
+  }, []);
+  console.log("selectedFiles.length", selectedFiles.length);
+  console.log("metadataObjects.length", metadataObjects.length);
 
+  const onDeleteFile = (index_num) => {
+    const files = selectedFiles.filter((item, index) => {
+      return index !== index_num;
+    });
+    setSeletedFiles(files);
+  };
   const onSelectedFiles = (e) => {
     if (e.target.files) {
       selectedFilesLabelRef.current.innerHTML = `${e.target.files.length} files choosen`;
     } else {
       selectedFilesLabelRef.current.innerHTML = `No file choosen`;
     }
-    let files = []
-    var size = Object.keys(e.target.files).length;
-    for (let index = 0; index < size; index++) {
-      files.push(e.target.files[index])
+    // let files = [];
+    // var size = Object.keys(e.target.files).length;
+    // for (let index = 0; index < size; index++) {
+    //   files.push(e.target.files[index]);
+    // }
+    // setSeletedFiles(files);
+    var temp = selectedFiles ? [...selectedFiles] : [];
+    for (let i = 0; i < e.target.files.length; i++) {
+      const files = e.target.files[i];
+      temp.push(files);
     }
-    setSeletedFiles(files);
+    setSeletedFiles(temp);
   };
 
   const onSelectMetaFile = (e) => {
@@ -79,16 +96,18 @@ const Step1 = () => {
   function uploadMeta() {
     if (metaFile == undefined || metaFile == null) {
       Toast("error", "No File Selected");
-    }
-    else {
+    } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => { })
+      UploadService.uploadMeta(file, path, (event) => {})
         .then((response) => {
           if (typeof window !== "undefined" && response.data.data.length > 0) {
-            setMetadataObjects(response.data.data || [])
-            window.localStorage.setItem("metadataObjects", JSON.stringify(response.data.data));
-            setMetadataFileUploaded(true)
+            setMetadataObjects(response.data.data || []);
+            window.localStorage.setItem(
+              "metadataObjects",
+              JSON.stringify(response.data.data)
+            );
+            setMetadataFileUploaded(true);
             metaFileInputRef.current.value = null;
             metaFileLabelRef.current.innerHTML = "No file choosen";
             setMetaFile(null);
@@ -97,14 +116,14 @@ const Step1 = () => {
         })
         .catch((e) => {
           console.log(e);
-          setMetadataFileUploaded(false)
+          setMetadataFileUploaded(false);
         });
     }
   }
 
   const uploadFilesIPFS = async () => {
     if (selectedFiles.length > 0) {
-      setImagePaths([])
+      setImagePaths([]);
       try {
         const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
         const projectSecret = "136393a5b7f4e47a9e153a88eb636003";
@@ -119,22 +138,22 @@ const Step1 = () => {
             authorization: auth,
           },
         });
-        let arr = []
+        let arr = [];
         for (let index = 0; index < selectedFiles.length; index++) {
           const uploaded_image = await client.add(selectedFiles[index]);
-          console.log(uploaded_image, selectedFiles[index], 'img')
+          console.log(uploaded_image, selectedFiles[index], "img");
           if (uploaded_image) {
             arr.push({
-              "path": uploaded_image.path,
-              "file_mimeType": selectedFiles[index].type
-            })
+              path: uploaded_image.path,
+              file_mimeType: selectedFiles[index].type,
+            });
           }
         }
-        setImagePaths(arr)
+        setImagePaths(arr);
         // console.log()
         Toast("success", "Files Uploaded Successfully");
       } catch (error) {
-        console.log(error, 'err')
+        console.log(error, "err");
         setIsUploading(false);
         Toast("error", "Uploading failed.");
       }
@@ -171,33 +190,45 @@ const Step1 = () => {
   }
 
   function onNextStep() {
-    let objs = convertMetadataObjects()
-    console.log(objs.length != imagePaths.length, objs.length, imagePaths.length)
-    if (imagePaths.length == 0) {
-      Toast("error", 'please upload NFT files first');
-      return
-    }
-    else if (checked && (objs.length != imagePaths.length)) {
-      Toast("error", 'missing metadata of some Files');
-      return
-    }
-    else if (!checked && (metadataObjects.length != imagePaths.length)) {
-      Toast("error", 'missing metadata of some Files');
-      return
-    }
-    else if (!checked &&
-      metadataObjects.length == imagePaths.length &&
-      typeof window !== "undefined" &&
-      metadataFileUploaded) {
-      window.localStorage.setItem("images", imagePaths);
-      window.localStorage.setItem("metadataObjectsProperties", metadataObjectProperties);
-      router.push(mintCollectionStep2);
-    }
-    else if (checked && typeof window !== "undefined") {
-      window.localStorage.setItem("images", imagePaths);
-      window.localStorage.setItem("metadataObjects", objs);
-      window.localStorage.setItem("metadataObjectsProperties", metadataObjectProperties);
-      router.push(mintCollectionStep2);
+    if (selectedFiles.length === metadataObjects.length) {
+      let objs = convertMetadataObjects();
+      console.log(
+        objs.length != imagePaths.length,
+        objs.length,
+        imagePaths.length
+      );
+      if (imagePaths.length == 0) {
+        Toast("error", "please upload NFT files first");
+        return;
+      } else if (checked && objs.length != imagePaths.length) {
+        Toast("error", "missing metadata of some Files");
+        return;
+      } else if (!checked && metadataObjects.length != imagePaths.length) {
+        Toast("error", "missing metadata of some Files");
+        return;
+      } else if (
+        !checked &&
+        metadataObjects.length == imagePaths.length &&
+        typeof window !== "undefined" &&
+        metadataFileUploaded
+      ) {
+        window.localStorage.setItem("images", imagePaths);
+        window.localStorage.setItem(
+          "metadataObjectsProperties",
+          metadataObjectProperties
+        );
+        router.push(mintCollectionStep2);
+      } else if (checked && typeof window !== "undefined") {
+        window.localStorage.setItem("images", imagePaths);
+        window.localStorage.setItem("metadataObjects", objs);
+        window.localStorage.setItem(
+          "metadataObjectsProperties",
+          metadataObjectProperties
+        );
+        router.push(mintCollectionStep2);
+      }
+    } else {
+      Toast("error", "Your selected files and webform rows should be equal.");
     }
   }
 
@@ -221,18 +252,19 @@ const Step1 = () => {
   }
 
   const convertMetadataObjects = () => {
-    let metadataObjectPropertiesClone = metadataObjects
-    let metadataArr = []
+    let metadataObjectPropertiesClone = metadataObjects;
+    let metadataArr = [];
     for (let index = 0; index < metadataObjectPropertiesClone.length; index++) {
-      let obj = {}
+      let obj = {};
       const element = metadataObjectPropertiesClone[index];
       for (let index = 0; index < metadataObjectProperties.length; index++) {
-        obj[metadataObjectProperties[index]] = element[Object.keys(element)[index]]
+        obj[metadataObjectProperties[index]] =
+          element[Object.keys(element)[index]];
       }
-      metadataArr.push(obj)
+      metadataArr.push(obj);
     }
-    console.log(metadataArr, 'arr')
-    return metadataArr
+    console.log(metadataArr, "arr");
+    return metadataArr;
   };
 
   const convertToJson = () => {
@@ -275,7 +307,7 @@ const Step1 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => { })
+    UploadService.downloadMetafile(path, (event) => {})
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
@@ -295,8 +327,8 @@ const Step1 = () => {
   };
 
   const viewImagesPaths = () => {
-    console.log(imagePaths, 'o')
-  }
+    console.log(imagePaths, "o");
+  };
 
   return (
     <Step1Styled>
@@ -406,21 +438,37 @@ const Step1 = () => {
                     className="br_15"
                     sx={{ background: "var(--box-color)" }}
                   >
-                    {selectedFiles.length > 0 && selectedFiles
-                      .map((file, index) => (
+                    {selectedFiles.length > 0 &&
+                      selectedFiles.map((file, index) => (
                         <Box
                           key={index}
                           className="space_between"
                           sx={{
                             py: 1,
+                            px: 2,
                             borderBottom: "1px solid #fff",
                             "&:last-child": {
                               border: "none",
                             },
                           }}
                         >
-                          <Box sx={{ pl: 2 }}>
-                            <LightText heading={`${file?.name}`} />
+                          <Box>
+                            <Box className="flex_align">
+                              <Box sx={{ pr: 2 }}>
+                                <CaptionHeading heading={index + 1} />
+                              </Box>
+                              <LightText heading={`${file?.name}`} />
+                            </Box>
+                          </Box>
+                          <Box
+                            sx={{
+                              "&:hover": {
+                                opacity: "0.7",
+                                cursor: "pointer",
+                              },
+                            }}
+                          >
+                            <Delete onClick={() => onDeleteFile(index)} />
                           </Box>
                         </Box>
                       ))}
@@ -449,7 +497,7 @@ const Step1 = () => {
                     )}
                   </>
                 ))}
-              <div className="row file-list">
+              {/* <div className="row file-list">
                 {fileInfos && !metaData.length ? (
                   <table className="table text-white file-list-table">
                     <tbody>
@@ -492,7 +540,7 @@ const Step1 = () => {
                     </tbody>
                   </table>
                 )}
-              </div>
+              </div> */}
             </Box>
             <Box>
               <Header
@@ -581,7 +629,7 @@ const Step1 = () => {
                   />
                 </div>
               </Grid>
-              <Grid item md={2} xs={12}>
+              <Grid item md={4} xs={12}>
                 <Button
                   className="btn  w_100"
                   // disabled={!metaFile}
@@ -590,16 +638,18 @@ const Step1 = () => {
                   Upload
                 </Button>
               </Grid>
-              <Grid item md={2} xs={12}>
-                <Button onClick={viewImagesPaths} className="btn w_100">Verify</Button>
-              </Grid>
+              {/* <Grid item md={2} xs={12}>
+                <Button onClick={viewImagesPaths} className="btn w_100">
+                  Verify
+                </Button>
+              </Grid> */}
               <Grid xs={12} item>
                 <label className="form-check-label">
                   <input
                     type="checkbox"
                     className="form-check-input"
-                    checked={checked}
-                    onChange={() => setChecked(!checked)}
+                    checked={isWebform}
+                    onChange={() => setIsWebform(!isWebform)}
                   />
                   Use a webform
                 </label>
@@ -610,7 +660,7 @@ const Step1 = () => {
                 setMetadataObjects={setMetadataObjects}
                 metadataObjectProperties={metadataObjectProperties}
                 setMetadataObjectProperties={setMetadataObjectProperties}
-                checked={checked}
+                isWebform={isWebform}
               />
               <Grid item xs={12} sx={{ marginTop: 5, display: "flex" }}>
                 <Box className="max_btn w_100" sx={{ mr: 2 }}>
@@ -619,10 +669,7 @@ const Step1 = () => {
                   </Button>
                 </Box>
                 <Box className="max_btn w_100">
-                  <Button
-                    className="btn2 w_100"
-                    onClick={() => onNextStep()}
-                  >
+                  <Button className="btn2 w_100" onClick={() => onNextStep()}>
                     Next
                   </Button>
                 </Box>
@@ -631,7 +678,7 @@ const Step1 = () => {
           </Box>
         </Layout>
       </ContainerLayout>
-    </Step1Styled >
+    </Step1Styled>
   );
 };
 

@@ -4,7 +4,7 @@ import axios from "axios";
 
 export default axios.create({
   // baseURL: "http://cnftgenie.io/",
-  baseURL: "http://localhost:4001/",
+  baseURL: "http://192.168.100.64:4001/",
   headers: {
     "Content-type": "application/json",
   },
