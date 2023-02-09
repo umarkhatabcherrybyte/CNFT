@@ -21,12 +21,8 @@ import AssetInputField from "./AssetInputField";
 import LightText from "../shared/headings/LightText";
 import { ArrowDropUp, ArrowDropDown } from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import Image from "next/image";
-
-const SaleMethod = () => {
+const SaleMethod = ({ setListingSteps }) => {
   const [paymentValue, setPaymentValue] = useState("fixed");
   const [auctionDuration, setAuctionDuration] = useState({
     days: "",
@@ -69,6 +65,13 @@ const SaleMethod = () => {
   };
   return (
     <>
+      <Button
+        className="btn2"
+        sx={{ my: 2 }}
+        onClick={() => setListingSteps("step1")}
+      >
+        Back
+      </Button>
       <PaymentHeader heading="Heading Goes Here #001254" show={false} />
       <Box
         sx={{
