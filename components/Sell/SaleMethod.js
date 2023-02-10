@@ -21,6 +21,8 @@ import AssetInputField from "./AssetInputField";
 import LightText from "../shared/headings/LightText";
 import { ArrowDropUp, ArrowDropDown } from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
+import { saleMethodSchema } from "../../schema/Index";
+import { useFormik } from "formik";
 import Image from "next/image";
 const SaleMethod = ({ setListingSteps }) => {
   const [paymentValue, setPaymentValue] = useState("fixed");
@@ -63,15 +65,29 @@ const SaleMethod = ({ setListingSteps }) => {
       });
     }
   };
+  const formik = useFormik({
+    initialValues: {
+      asset_name: "",
+      asset_id: "",
+      policy_id: "",
+      quantity: "",
+      minted_on: "",
+      creator: "",
+    },
+    validationSchema: saleMethodSchema,
+    onSubmit: (values) => {
+      console.log(values);
+    },
+  });
   return (
-    <>
-      <Button
+    <form onSubmit={formik.handleSubmit}>
+      {/* <Button
         className="btn2"
         sx={{ my: 2 }}
         onClick={() => setListingSteps("step1")}
       >
         Back
-      </Button>
+      </Button> */}
       <PaymentHeader heading="Heading Goes Here #001254" show={false} />
       <Box
         sx={{
@@ -413,47 +429,74 @@ const SaleMethod = ({ setListingSteps }) => {
           <Grid item xs={12} md={6}>
             <Box>
               <CaptionHeading heading="Asset Name" font="montserrat" />
-              <AssetInputField placeholder="Enter Asset Name" />
+              <AssetInputField
+                formik={formik}
+                placeholder="Enter Asset Name"
+                name="asset_name"
+              />
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
               <CaptionHeading heading="Asset ID" font="montserrat" />
-              <AssetInputField placeholder="Enter Asset ID" copy />
+              <AssetInputField
+                formik={formik}
+                placeholder="Enter Asset ID"
+                copy
+                name="asset_id"
+              />
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
               <CaptionHeading heading="Policy ID" font="montserrat" />
-              <AssetInputField placeholder="Enter policy ID" copy />
+              <AssetInputField
+                formik={formik}
+                placeholder="Enter policy ID"
+                copy
+                name="policy_id"
+              />
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
               <CaptionHeading heading="Quantity" font="montserrat" />
-              <AssetInputField placeholder="Enter Quantity" />
+              <AssetInputField
+                formik={formik}
+                placeholder="Enter Quantity"
+                name="quantity"
+              />
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
               <CaptionHeading heading="Minted On" font="montserrat" />
-              <AssetInputField placeholder="Enter Minted Date" />
+              <AssetInputField
+                formik={formik}
+                placeholder="Enter Minted Date"
+                name="minted_on"
+              />
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
               <CaptionHeading heading="Creator" font="montserrat" />
-              <AssetInputField placeholder="Enter Creator" />
+
+              <AssetInputField
+                formik={formik}
+                placeholder="Enter Creator"
+                name="creator"
+              />
             </Box>
           </Grid>
           <Grid item xs={12} className="flex">
-            <Button sx={{ width: "150px" }} className="btn2">
+            <Button sx={{ width: "150px" }} className="btn2" type="submit">
               Sell
             </Button>
           </Grid>
         </Grid>
       </Box>
-    </>
+    </form>
   );
 };
 

@@ -2,13 +2,18 @@ import React from "react";
 import { TextField, InputAdornment } from "@mui/material";
 import CaptionHeading from "../shared/headings/CaptionHeading";
 import { ContentCopy } from "@mui/icons-material";
-const AssetInputField = ({ placeholder, ada, copy, label }) => {
+const AssetInputField = ({ placeholder, ada, copy, label, formik, name }) => {
   return (
     <>
       <TextField
         placeholder={placeholder}
         label={label && label}
         fullWidth
+        name={name}
+        value={formik?.values[name]}
+        onChange={formik?.handleChange}
+        error={formik?.touched[name] && Boolean(formik?.errors[name])}
+        helperText={formik?.touched[name] && formik?.errors[name]}
         InputLabelProps={{
           style: { color: "#fff" },
         }}

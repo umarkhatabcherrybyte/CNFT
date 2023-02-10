@@ -24,6 +24,14 @@ export const addCollectioneListingSchema = yup.object({
   feature_image: yup.mixed().nullable().required("Feature image is required"),
   banner_image: yup.mixed().nullable().required("Banner image is required"),
 });
+export const saleMethodSchema = yup.object({
+  asset_name: yup.string().required("Please enter asset name"),
+  asset_id: yup.string().required("Please enter asset id"),
+  policy_id: yup.string().required("Please enter policy id"),
+  quantity: yup.string().required("Please enter quantity"),
+  minted_on: yup.string().required("Please enter minted on"),
+  creator: yup.string().required("Please enter creator"),
+});
 const validationSchema = yup.object({
   platform_url: yup
     .string()
