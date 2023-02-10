@@ -11,14 +11,15 @@ import {
   Select,
   MenuItem,
   FormControl,
+  FormHelperText,
   InputLabel,
 } from "@mui/material";
 import { Image } from "@mui/icons-material";
 import InputField from "./InputField";
 import LightText from "../shared/headings/LightText";
-import { useFormik } from "formik";
-import * as yup from "yup";
 import { addSingleListingSchema } from "../../schema/Index";
+import { useFormik, setFieldValue } from "formik";
+import ListCollection from "./ListCollection";
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",
@@ -37,35 +38,7 @@ const names = [
   "Omar Alexander",
   "Carlos Abbott",
 ];
-const AddImage = ({ heading, desc, width }) => {
-  return (
-    <>
-      <Typography className="bold text_white">{heading}</Typography>
-      <Typography
-        variant="caption"
-        className="text_white"
-        sx={{ opacity: "0.7" }}
-      >
-        {desc}
-      </Typography>
-      <Box
-        sx={{
-          my: 2,
-          background: "#FFFFFF33 ",
-          border: "3px dashed #fff",
-          maxWidth: width,
-          height: "12rem",
-          borderRadius: "15px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Image sx={{ color: "#fff", width: "4em", height: "4em" }} />
-      </Box>
-    </>
-  );
-};
+
 const MylistTabs = ({ setListingSteps }) => {
   const [tabValue, setTabValue] = useState("add");
   const [selectedValue, setSelectedValue] = useState("");
@@ -79,9 +52,17 @@ const MylistTabs = ({ setListingSteps }) => {
     } = event;
     setSelectedValue(value);
   };
+  const [singleListLogo, setSingleListLogo] = useState(null);
+  const onUploadFile = ({ currentTarget: input }) => {
+    if (input.files && input.files[0]) {
+      const files = input.files[0];
+      const _url = URL.createObjectURL(files);
+      setSingleListLogo(files);
+    }
+  };
   const formik = useFormik({
     initialValues: {
-      // file: "",
+      file: null,
       name: "",
       description: "",
       policy_id: "",
@@ -90,6 +71,7 @@ const MylistTabs = ({ setListingSteps }) => {
     validationSchema: addSingleListingSchema,
     onSubmit: (values) => {
       console.log(values);
+      // setListingSteps("step2");
       // let data = new FormData();
       // data.append("platform_id", product);
       // data.append("product_url", values.platform_url);
@@ -99,6 +81,7 @@ const MylistTabs = ({ setListingSteps }) => {
     },
   });
 
+  console.log(formik);
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
@@ -215,9 +198,11 @@ const MylistTabs = ({ setListingSteps }) => {
                   </Typography>
                   <LightText heading="if this is a part of collection select the collection." />
                   <Select
-                    value={selectedValue}
+                    // value={selectedValue}
+                    value={formik.values.collection_name}
                     displayEmpty
-                    onChange={onMenuChange}
+                    // onChange={onMenuChange}
+                    onChange={formik.handleChange("collection_name")}
                     sx={{
                       background: "var(--box-color)",
                       color: "#fff",
@@ -249,6 +234,10 @@ const MylistTabs = ({ setListingSteps }) => {
                       </MenuItem>
                     ))}
                   </Select>
+                  <FormHelperText sx={{ color: "#d32f2f" }}>
+                    {formik.touched.collection_name &&
+                      formik.errors.collection_name}
+                  </FormHelperText>
                 </Box>
                 <Box sx={{ py: 2 }}>
                   <Button
@@ -266,7 +255,7 @@ const MylistTabs = ({ setListingSteps }) => {
                   variant="contained"
                   component="label"
                   sx={{
-                    height: "67%",
+                    // height: "67%",
                     my: 2,
                     background: "#FFFFFF33 ",
                     border: "3px dashed #fff",
@@ -280,21 +269,64 @@ const MylistTabs = ({ setListingSteps }) => {
                     },
                   }}
                 >
-                  <Box className="flex_align" sx={{ flexDirection: "column" }}>
-                    <Image
-                      sx={{ color: "#fff", width: "10em", height: "10em" }}
-                    />
-                    <Typography
-                      variant="caption"
-                      className="text_white montserrat"
-                      sx={{ opacity: "0.7" }}
-                      component="div"
+                  {singleListLogo ? (
+                    <Box
+                      sx={{
+                        overflow: "hidden",
+                        width: "100%",
+                        img: {
+                          width: "100%",
+                          borderRadius: "10px",
+                        },
+                      }}
                     >
-                      Upload file to preview your brand new NFT
-                    </Typography>
-                  </Box>
-                  <input hidden accept="image/*" type="file" />
+                      {singleListLogo && (
+                        <img
+                          src={URL.createObjectURL(singleListLogo)}
+                          alt=""
+                          className="thumbnail_overlay"
+                          name="file"
+                        />
+                      )}
+                    </Box>
+                  ) : (
+                    <>
+                      <Box
+                        className="flex_align"
+                        sx={{ flexDirection: "column" }}
+                      >
+                        <Image
+                          sx={{ color: "#fff", width: "10em", height: "10em" }}
+                        />
+                        <Typography
+                          variant="caption"
+                          className="text_white montserrat"
+                          sx={{ opacity: "0.7" }}
+                          component="div"
+                        >
+                          Upload file to preview your brand new NFT
+                        </Typography>
+                      </Box>
+                    </>
+                  )}
+
+                  <input
+                    hidden
+                    accept="image/*"
+                    type="file"
+                    name="file"
+                    onChange={(e) => {
+                      formik.handleChange("file")(e);
+                      onUploadFile(e);
+                    }}
+                    // onChange={(event) => {
+                    //   setFieldValue("file", event.currentTarget.files[0]);
+                    // }}
+                  />
                 </Button>
+                <FormHelperText sx={{ color: "#d32f2f" }}>
+                  {formik.touched.file && formik.errors.file}
+                </FormHelperText>
               </Grid>
             </Grid>
           </TabPanel>
@@ -306,91 +338,7 @@ const MylistTabs = ({ setListingSteps }) => {
               py: 5,
             }}
           >
-            <Typography
-              variant="caption"
-              sx={{ color: "#fff", opacity: "0.7", py: 2 }}
-            >
-              Required fields*
-            </Typography>
-            <AddImage
-              heading="Logo Image*"
-              desc="This  image will also be used for navigation. 350 x 350 recommendation."
-              width="15rem"
-            />
-            <AddImage
-              heading="Featured Image"
-              desc="This image will be used for featuring your collection on homepage, category page, or other promotional areas of CNFT Genie. 600 x 600 recommendation."
-              width="35rem"
-            />
-            <AddImage
-              heading="Banner Image"
-              desc="This image will be appear at the top of your collection page. Avoid including too much text in this banner image, as the dimensions change on different devices. 1400 x 400 recommendation."
-              width="100%"
-            />
-            <Box sx={{ py: 1 }}>
-              <TextField
-                fullWidth
-                placeholder="Name*"
-                sx={{
-                  maxWidth: "400px",
-                  fieldset: {
-                    border: "none",
-                  },
-                  input: {
-                    background: "var(--light-white-color)",
-                    borderRadius: "15px",
-                    padding: "15px 10px",
-                    "&::placeholder": {
-                      color: "#fff",
-                    },
-                  },
-                }}
-              />
-            </Box>
-            <Box sx={{ py: 1 }}>
-              <Typography
-                variant="caption"
-                className="bold text_white montserrat"
-                component="div"
-              >
-                Description
-              </Typography>
-              <Typography
-                variant="caption"
-                className="text_white montserrat"
-                component="div"
-                sx={{ opacity: "0.7", pb: 1 }}
-              >
-                Tell us about your collection. 0 of 1000 characters used.
-                (Optional)
-              </Typography>
-              <TextField
-                fullWidth
-                multiline
-                rows={4}
-                // placeholder="Name*"
-                sx={{
-                  maxWidth: "400px",
-                  "& .MuiInputBase-root": {
-                    padding: "0",
-                  },
-                  fieldset: {
-                    border: "none",
-                  },
-                  textarea: {
-                    background: "var(--light-white-color)",
-                    borderRadius: "15px",
-                    padding: "15px 10px",
-                    "&::placeholder": {
-                      color: "#fff",
-                    },
-                  },
-                }}
-              />
-            </Box>
-            <Button className="btn2" sx={{ width: "200px", my: 3 }}>
-              Create
-            </Button>
+            <ListCollection />
           </TabPanel>
         </TabContext>
       </form>

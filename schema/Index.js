@@ -4,7 +4,18 @@ export const addSingleListingSchema = yup.object({
   name: yup.string().required("Please enter Name"),
   description: yup.string(),
   policy_id: yup.string().required("Please enter Policy ID"),
-  collection_name: yup.string(),
+  collection_name: yup.string().required("Please enter Policy ID"),
+  file: yup.mixed().nullable().required("File is required"),
+  // .test(
+  //   "fileSize",
+  //   "File Size is too large",
+  //   (value) => value && value.size <= FILE_SIZE
+  // )
+  // .test(
+  //   "fileFormat",
+  //   "Unsupported Format",
+  //   (value) => value && SUPPORTED_FORMATS.includes(value.type)
+  // ),
 });
 const validationSchema = yup.object({
   platform_url: yup
