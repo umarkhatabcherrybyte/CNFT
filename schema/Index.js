@@ -17,6 +17,13 @@ export const addSingleListingSchema = yup.object({
   //   (value) => value && SUPPORTED_FORMATS.includes(value.type)
   // ),
 });
+export const addCollectioneListingSchema = yup.object({
+  name: yup.string().required("Please enter Name"),
+  description: yup.string(),
+  logo_image: yup.mixed().nullable().required("Logo image is required"),
+  feature_image: yup.mixed().nullable().required("Feature image is required"),
+  banner_image: yup.mixed().nullable().required("Banner image is required"),
+});
 const validationSchema = yup.object({
   platform_url: yup
     .string()

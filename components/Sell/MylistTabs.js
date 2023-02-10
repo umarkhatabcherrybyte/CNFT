@@ -18,7 +18,7 @@ import { Image } from "@mui/icons-material";
 import InputField from "./InputField";
 import LightText from "../shared/headings/LightText";
 import { addSingleListingSchema } from "../../schema/Index";
-import { useFormik, setFieldValue } from "formik";
+import { useFormik } from "formik";
 import ListCollection from "./ListCollection";
 const inputFileStyle = {
   my: 2,
@@ -84,65 +84,65 @@ const MylistTabs = ({ setListingSteps }) => {
   console.log(formik);
   return (
     <>
-      <form onSubmit={formik.handleSubmit}>
-        <TabContext value={tabValue}>
-          <TabList
-            onChange={onTabChange}
-            aria-label="lab API tabs example"
-            sx={{
-              minHeight: "auto",
-              "& .MuiTabs-flexContainer": {
-                alignItems: "center",
-              },
-              "& .MuiTabs-indicator": {
-                background: "transparent",
-              },
+      <TabContext value={tabValue}>
+        <TabList
+          onChange={onTabChange}
+          aria-label="lab API tabs example"
+          sx={{
+            minHeight: "auto",
+            "& .MuiTabs-flexContainer": {
+              alignItems: "center",
+            },
+            "& .MuiTabs-indicator": {
+              background: "transparent",
+            },
 
-              "& 	.Mui-selected": {
-                color: "#000 !important",
-                background: "var(--secondary-color) !important",
-              },
-              "& 	.MuiTabs-flexContainer": {
-                flexWrap: "wrap",
-              },
-              "& .tab_btn": {
-                color: "#ffff",
-                minHeight: "58px",
-                border: "none !important",
-                maxWidth: "inherit",
-                flexShrink: "inherit",
-                background: "#0000004d",
-                width: { sm: "50%", xs: "100%" },
-                fontWeight: "bold",
-                alignItems: "flex-start",
-                fontSize: "1.4rem",
-                padding: 0,
-                py: 3,
-                pl: 3,
-              },
-            }}
-          >
-            <Tab
-              label="Add Listing"
-              value="add"
-              className="tab_btn initialcase oswald"
-              sx={{ borderTopLeftRadius: "15px" }}
-            />
-            <Tab
-              label="List Collection"
-              value="collection"
-              className="tab_btn initialcase oswald"
-              sx={{ borderTopRightRadius: "15px" }}
-            />
-          </TabList>
-          <TabPanel
+            "& 	.Mui-selected": {
+              color: "#000 !important",
+              background: "var(--secondary-color) !important",
+            },
+            "& 	.MuiTabs-flexContainer": {
+              flexWrap: "wrap",
+            },
+            "& .tab_btn": {
+              color: "#ffff",
+              minHeight: "58px",
+              border: "none !important",
+              maxWidth: "inherit",
+              flexShrink: "inherit",
+              background: "#0000004d",
+              width: { sm: "50%", xs: "100%" },
+              fontWeight: "bold",
+              alignItems: "flex-start",
+              fontSize: "1.4rem",
+              padding: 0,
+              py: 3,
+              pl: 3,
+            },
+          }}
+        >
+          <Tab
+            label="Add Listing"
             value="add"
-            sx={{
-              background: "#0009",
-              borderRadius: "0px 0px  15px 15px",
-              py: 5,
-            }}
-          >
+            className="tab_btn initialcase oswald"
+            sx={{ borderTopLeftRadius: "15px" }}
+          />
+          <Tab
+            label="List Collection"
+            value="collection"
+            className="tab_btn initialcase oswald"
+            sx={{ borderTopRightRadius: "15px" }}
+          />
+        </TabList>
+        <TabPanel
+          value="add"
+          sx={{
+            background: "#0009",
+            borderRadius: "0px 0px  15px 15px",
+            py: 5,
+          }}
+        >
+          <form onSubmit={formik.handleSubmit}>
             <Grid container spacing={3}>
               <Grid xs={12} md={6} item>
                 <Typography variant="h6" className="text_white bold montserrat">
@@ -269,7 +269,7 @@ const MylistTabs = ({ setListingSteps }) => {
                     },
                   }}
                 >
-                  {singleListLogo ? (
+                  {formik.values.file ? (
                     <Box
                       sx={{
                         overflow: "hidden",
@@ -280,14 +280,12 @@ const MylistTabs = ({ setListingSteps }) => {
                         },
                       }}
                     >
-                      {singleListLogo && (
-                        <img
-                          src={URL.createObjectURL(singleListLogo)}
-                          alt=""
-                          className="thumbnail_overlay"
-                          name="file"
-                        />
-                      )}
+                      <img
+                        src={URL.createObjectURL(formik.values.file)}
+                        alt=""
+                        className="thumbnail_overlay"
+                        name="file"
+                      />
                     </Box>
                   ) : (
                     <>
@@ -316,12 +314,8 @@ const MylistTabs = ({ setListingSteps }) => {
                     type="file"
                     name="file"
                     onChange={(e) => {
-                      formik.handleChange("file")(e);
-                      onUploadFile(e);
+                      formik.setFieldValue("file", e.currentTarget.files[0]);
                     }}
-                    // onChange={(event) => {
-                    //   setFieldValue("file", event.currentTarget.files[0]);
-                    // }}
                   />
                 </Button>
                 <FormHelperText sx={{ color: "#d32f2f" }}>
@@ -329,19 +323,19 @@ const MylistTabs = ({ setListingSteps }) => {
                 </FormHelperText>
               </Grid>
             </Grid>
-          </TabPanel>
-          <TabPanel
-            value="collection"
-            sx={{
-              background: "#0009",
-              borderRadius: "0px 0px  15px 15px",
-              py: 5,
-            }}
-          >
-            <ListCollection />
-          </TabPanel>
-        </TabContext>
-      </form>
+          </form>
+        </TabPanel>
+        <TabPanel
+          value="collection"
+          sx={{
+            background: "#0009",
+            borderRadius: "0px 0px  15px 15px",
+            py: 5,
+          }}
+        >
+          <ListCollection />
+        </TabPanel>
+      </TabContext>
     </>
   );
 };

@@ -1,7 +1,15 @@
 import React from "react";
-import { Typography, TextField, Box, Button } from "@mui/material";
+import {
+  Typography,
+  TextField,
+  Box,
+  Button,
+  FormHelperText,
+} from "@mui/material";
 import { Image } from "@mui/icons-material";
-const AddImage = ({ heading, desc, width }) => {
+import { useFormik } from "formik";
+import { addCollectioneListingSchema } from "../../schema/Index";
+const AddImage = ({ heading, desc, width, formik, name }) => {
   return (
     <>
       <Typography className="bold text_white">{heading}</Typography>
@@ -12,44 +20,108 @@ const AddImage = ({ heading, desc, width }) => {
       >
         {desc}
       </Typography>
+
       <Box
         sx={{
           my: 2,
-          background: "#FFFFFF33 ",
+          //   background: "#FFFFFF33 ",
           border: "3px dashed #fff",
           maxWidth: width,
           height: "12rem",
           borderRadius: "15px",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <Image sx={{ color: "#fff", width: "4em", height: "4em" }} />
+        {formik.values[name] ? (
+          <img
+            className="br_15"
+            src={URL.createObjectURL(formik.values[name])}
+            alt="no image"
+            style={{
+              width: "98%",
+              height: "90%",
+            }}
+          />
+        ) : (
+          <Button
+            variant="contained"
+            component="label"
+            sx={{
+              width: "100%",
+              height: "100%",
+              background: "#FFFFFF33 ",
+
+              "&:hover": {
+                background: "#FFFFFF33",
+              },
+            }}
+          >
+            <Image sx={{ color: "#fff", width: "4em", height: "4em" }} />
+            <input
+              hidden
+              accept="image/*"
+              type="file"
+              name={name}
+              onChange={(e) => {
+                formik.setFieldValue(name, e.currentTarget.files[0]);
+              }}
+            />
+          </Button>
+        )}
       </Box>
+      <FormHelperText sx={{ color: "#d32f2f" }}>
+        {formik.touched[name] && formik.errors[name]}
+      </FormHelperText>
     </>
   );
 };
 const ListCollection = () => {
+  const formik = useFormik({
+    initialValues: {
+      logo_image: null,
+      feature_image: null,
+      banner_image: null,
+      name: "",
+      description: "",
+    },
+    validationSchema: addCollectioneListingSchema,
+    onSubmit: (values) => {
+      console.log(values);
+    },
+  });
+  console.log(formik);
   return (
-    <>
+    <form onSubmit={formik.handleSubmit}>
       <Typography
         variant="caption"
         sx={{ color: "#fff", opacity: "0.7", py: 2 }}
       >
         Required fields*
       </Typography>
+
       <AddImage
+        formik={formik}
+        name="logo_image"
         heading="Logo Image*"
         desc="This  image will also be used for navigation. 350 x 350 recommendation."
         width="15rem"
       />
+      <FormHelperText sx={{ color: "#d32f2f" }}>
+        {formik.touched.file && formik.errors.file}
+      </FormHelperText>
       <AddImage
+        formik={formik}
+        name="feature_image"
         heading="Featured Image"
         desc="This image will be used for featuring your collection on homepage, category page, or other promotional areas of CNFT Genie. 600 x 600 recommendation."
         width="35rem"
       />
       <AddImage
+        formik={formik}
+        name="banner_image"
         heading="Banner Image"
         desc="This image will be appear at the top of your collection page. Avoid including too much text in this banner image, as the dimensions change on different devices. 1400 x 400 recommendation."
         width="100%"
@@ -57,13 +129,19 @@ const ListCollection = () => {
       <Box sx={{ py: 1 }}>
         <TextField
           fullWidth
+          name="name"
           placeholder="Name*"
+          value={formik.values.name}
+          onChange={formik.handleChange}
+          error={formik.touched.name && Boolean(formik.errors.name)}
+          helperText={formik.touched.name && formik.errors.name}
           sx={{
             maxWidth: "400px",
             fieldset: {
               border: "none",
             },
             input: {
+              color: "#fff",
               background: "var(--light-white-color)",
               borderRadius: "15px",
               padding: "15px 10px",
@@ -93,6 +171,13 @@ const ListCollection = () => {
         <TextField
           fullWidth
           multiline
+          name="description"
+          value={formik.values.description}
+          onChange={formik.handleChange}
+          error={
+            formik.touched.description && Boolean(formik.errors.description)
+          }
+          helperText={formik.touched.description && formik.errors.description}
           rows={4}
           sx={{
             maxWidth: "400px",
@@ -103,6 +188,7 @@ const ListCollection = () => {
               border: "none",
             },
             textarea: {
+              color: "#fff",
               background: "var(--light-white-color)",
               borderRadius: "15px",
               padding: "15px 10px",
@@ -113,10 +199,10 @@ const ListCollection = () => {
           }}
         />
       </Box>
-      <Button className="btn2" sx={{ width: "200px", my: 3 }}>
+      <Button type="submit" className="btn2" sx={{ width: "200px", my: 3 }}>
         Create
       </Button>
-    </>
+    </form>
   );
 };
 
