@@ -24,7 +24,7 @@ import { mintCollectionStep2 } from "/components/Routes/constants";
 import { useRouter } from "next/router";
 import { create } from "ipfs-http-client";
 
-const Step1 = () => {
+const CollectionStep1 = () => {
   const router = useRouter();
   const [selectedFiles, setSeletedFiles] = useState([]);
   const [metaFile, setMetaFile] = useState(undefined);
@@ -190,45 +190,34 @@ const Step1 = () => {
   }
 
   function onNextStep() {
-    if (selectedFiles.length === metadataObjects.length) {
-      let objs = convertMetadataObjects();
-      console.log(
-        objs.length != imagePaths.length,
-        objs.length,
-        imagePaths.length
-      );
-      if (imagePaths.length == 0) {
-        Toast("error", "please upload NFT files first");
-        return;
-      } else if (checked && objs.length != imagePaths.length) {
-        Toast("error", "missing metadata of some Files");
-        return;
-      } else if (!checked && metadataObjects.length != imagePaths.length) {
-        Toast("error", "missing metadata of some Files");
-        return;
-      } else if (
-        !checked &&
-        metadataObjects.length == imagePaths.length &&
-        typeof window !== "undefined" &&
-        metadataFileUploaded
-      ) {
-        window.localStorage.setItem("images", imagePaths);
-        window.localStorage.setItem(
-          "metadataObjectsProperties",
-          metadataObjectProperties
-        );
-        router.push(mintCollectionStep2);
-      } else if (checked && typeof window !== "undefined") {
-        window.localStorage.setItem("images", imagePaths);
-        window.localStorage.setItem("metadataObjects", objs);
-        window.localStorage.setItem(
-          "metadataObjectsProperties",
-          metadataObjectProperties
-        );
-        router.push(mintCollectionStep2);
-      }
-    } else {
-      Toast("error", "Your selected files and webform rows should be equal.");
+    let objs = convertMetadataObjects()
+    console.log(objs.length != imagePaths.length, objs.length, imagePaths.length)
+    if (imagePaths.length == 0) {
+      Toast("error", 'please upload NFT files first');
+      return
+    }
+    else if (checked && (objs.length != imagePaths.length)) {
+      Toast("error", 'missing metadata of some Files');
+      return
+    }
+    else if (!checked && (metadataObjects.length != imagePaths.length)) {
+      Toast("error", 'missing metadata of some Files');
+      return
+    }
+    else if (!checked &&
+      metadataObjects.length == imagePaths.length &&
+      typeof window !== "undefined" &&
+      metadataFileUploaded) {
+      window.localStorage.setItem("metadataObjects", JSON.stringify(metadataObjects));
+      window.localStorage.setItem("images", JSON.stringify(imagePaths));
+      window.localStorage.setItem("metadataObjectsProperties", JSON.stringify(metadataObjectProperties));
+      router.push(mintCollectionStep2);
+    }
+    else if (checked && typeof window !== "undefined") {
+      window.localStorage.setItem("images", JSON.stringify(imagePaths));
+      window.localStorage.setItem("metadataObjects", JSON.stringify(objs));
+      window.localStorage.setItem("metadataObjectsProperties", JSON.stringify(metadataObjectProperties));
+      router.push(mintCollectionStep2);
     }
   }
 
@@ -261,7 +250,9 @@ const Step1 = () => {
         obj[metadataObjectProperties[index]] =
           element[Object.keys(element)[index]];
       }
-      metadataArr.push(obj);
+      obj["image"] = imagePaths[index].path
+      obj["mediaType"] = imagePaths[index].file_mimeType
+      metadataArr.push(obj)
     }
     console.log(metadataArr, "arr");
     return metadataArr;
@@ -682,7 +673,7 @@ const Step1 = () => {
   );
 };
 
-export default Step1;
+export default CollectionStep1;
 
 const Step1Styled = styled.section`
   .file-input-wrapper {
