@@ -5,7 +5,8 @@ import BreadCrumHeader from "../../components/shared/BreadCrumHeader";
 import SellTable from "../../components/Sell/SellTable";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Box, Tab } from "@mui/material";
-
+import { useFormik } from "formik";
+import * as yup from "yup";
 import MylistTabs from "../../components/Sell/MylistTabs";
 import SellMethod from "../../components/Sell/SaleMethod";
 import MyListCard from "../../components/Sell/MyListCard";
@@ -15,7 +16,6 @@ import { useRouter } from "next/router";
 const Sell = () => {
   const router = useRouter();
   const { type } = router.query;
-
   const [tabValue, setTabValue] = useState("list");
   const [listTabValue, setListTabValue] = useState("add");
   const [listingSteps, setListingSteps] = useState("step1");
@@ -28,6 +28,17 @@ const Sell = () => {
       navigate("/design");
     }
   };
+  const validationSchema = yup.object({
+    platform_url: yup
+      .string()
+      .matches(
+        /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
+        "Enter correct url!"
+      )
+      .required("Please enter website"),
+    platform_name: yup.string("").required("Game Name is required"),
+  });
+
   return (
     <SellStyled>
       <ContainerLayout>
@@ -78,16 +89,6 @@ const Sell = () => {
                 value="active"
                 className="tab_btn initialcase poppin"
               />
-              {/* <Tab
-                label="My Wallet"
-                value="wallet"
-                className="tab_btn initialcase poppin"
-              />
-              <Tab
-                label="Second Design"
-                value="design"
-                className="tab_btn initialcase poppin"
-              /> */}
               <img
                 src="/images/heart.png"
                 className="w_100"
@@ -98,10 +99,12 @@ const Sell = () => {
             <TabPanel value="list" sx={{ p: 0, py: 2 }}>
               {type === "add-listing" ? (
                 <>
-                  {listingSteps === "step1" && (
+                  {listingSteps === "step12" && (
                     <MylistTabs setListingSteps={setListingSteps} />
                   )}
-                  {listingSteps === "step2" && <SellMethod />}
+                  {listingSteps === "step1" && (
+                    <SellMethod setListingSteps={setListingSteps} />
+                  )}
                 </>
               ) : (
                 <MyListCard />
