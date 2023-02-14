@@ -170,7 +170,7 @@ const MylistTabs = ({ setListingSteps }) => {
                 <Box sx={{ py: 1 }}>
                   <InputField
                     label="Name"
-                    placeholder="Name your token"
+                    placeholder="Name of Your Token"
                     name="name"
                     formik={formik}
                   />
@@ -244,7 +244,7 @@ const MylistTabs = ({ setListingSteps }) => {
                     className="btn2"
                     sx={{ width: "150px" }}
                     type="submit"
-                    // onClick={() => setListingSteps("step2")}
+                  // onClick={() => setListingSteps("step2")}
                   >
                     Next
                   </Button>
