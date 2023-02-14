@@ -7,6 +7,7 @@ export const buyDetailRoute = "/buy";
 export const buyPaymentRoute = "/buy/payment";
 export const auctionDetailRoute = "/auction";
 export const sellRoute = "/sell";
+export const listCollectionRoute = "/sell/list-collection";
 export const collectionRoute = "/collection";
 export const collectionDetailRoute = "/collection";
 export const MycollectionRoute = "/collection/my-collection";
