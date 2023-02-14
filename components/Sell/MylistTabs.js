@@ -20,6 +20,8 @@ import LightText from "../shared/headings/LightText";
 import { addSingleListingSchema } from "../../schema/Index";
 import { useFormik } from "formik";
 import ListCollection from "./ListCollection";
+import { Lucid, fromText, Blockfrost } from "lucid-cardano";
+
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",
@@ -69,8 +71,63 @@ const MylistTabs = ({ setListingSteps }) => {
       collection_name: "",
     },
     validationSchema: addSingleListingSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       console.log(values);
+      const lucid = await Lucid.new(
+        new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
+        "Preprod"
+      );
+
+      const api = await window.cardano[String(connectedWallet)].enable();
+      lucid.selectWallet(api);
+
+      const { paymentCredential } = lucid.utils.getAddressDetails(
+        await lucid.wallet.address(),
+      );
+
+      const mintingPolicy = lucid.utils.nativeScriptFromJson(
+        {
+          type: "all",
+          scripts: [
+            { type: "sig", keyHash: paymentCredential?.hash },
+            {
+              type: "before",
+              slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
+            },
+          ],
+        },
+      );
+
+      // const policyId = lucid.utils.mintingPolicyToId(
+      //   mintingPolicy,
+      // );
+      const policyId = "e8d7b7b0943cc239c8ed7c7d4f5351ab05f0f8c19beb1f0f73a53ad2"
+      console.log(policyId, mintingPolicy.script)
+      let metadata = JSON.parse(window.localStorage.getItem("metadata"))
+      const unit = policyId + fromText(metadata.name);
+      let obj = { [policyId]: metadata };
+      const txL = await lucid
+        .newTx()
+        .attachMetadata('721', obj)
+        .mintAssets({ [unit]: 1n })
+        .validTo(Date.now() + 100000)
+        .attachMintingPolicy({ "type": "Native", "script": "8201828200581c006312b255ff7dafd0d1680e6ed40357d063ac459b78d0c2c0855aad82051a0143a3dc" })
+        .complete();
+
+      const signedTxL = await txL.sign().complete();
+
+      const txHashL = await signedTxL.submit();
+
+      console.log(txHashL, 'das')
+
+      if (txHashL) {
+        window.localStorage.setItem('policy', mintingPolicy.script)
+        window.localStorage.setItem('policy-id', policyId)
+        window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
+        router.push('/mint')
+      }
+
+
       // setListingSteps("step2");
       // let data = new FormData();
       // data.append("platform_id", product);
