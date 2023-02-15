@@ -53,8 +53,6 @@ const CollectionStep1 = () => {
       // window.localStorage.getItem("metadataObjects", metadataObjects);
     }
   }, []);
-  console.log("selectedFiles.length", selectedFiles.length);
-  console.log("metadataObjects.length", metadataObjects.length);
 
   const onDeleteFile = (index_num) => {
     const files = selectedFiles.filter((item, index) => {
@@ -99,7 +97,7 @@ const CollectionStep1 = () => {
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => {})
+      UploadService.uploadMeta(file, path, (event) => { })
         .then((response) => {
           if (typeof window !== "undefined" && response.data.data.length > 0) {
             setMetadataObjects(response.data.data || []);
@@ -196,15 +194,15 @@ const CollectionStep1 = () => {
       Toast("error", 'please upload NFT files first');
       return
     }
-    else if (checked && (objs.length != imagePaths.length)) {
+    else if (isWebform && (objs.length != imagePaths.length)) {
       Toast("error", 'missing metadata of some Files');
       return
     }
-    else if (!checked && (metadataObjects.length != imagePaths.length)) {
+    else if (!isWebform && (metadataObjects.length != imagePaths.length)) {
       Toast("error", 'missing metadata of some Files');
       return
     }
-    else if (!checked &&
+    else if (!isWebform &&
       metadataObjects.length == imagePaths.length &&
       typeof window !== "undefined" &&
       metadataFileUploaded) {
@@ -213,7 +211,7 @@ const CollectionStep1 = () => {
       window.localStorage.setItem("metadataObjectsProperties", JSON.stringify(metadataObjectProperties));
       router.push(mintCollectionStep2);
     }
-    else if (checked && typeof window !== "undefined") {
+    else if (isWebform && typeof window !== "undefined") {
       window.localStorage.setItem("images", JSON.stringify(imagePaths));
       window.localStorage.setItem("metadataObjects", JSON.stringify(objs));
       window.localStorage.setItem("metadataObjectsProperties", JSON.stringify(metadataObjectProperties));
@@ -298,7 +296,7 @@ const CollectionStep1 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => {})
+    UploadService.downloadMetafile(path, (event) => { })
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
