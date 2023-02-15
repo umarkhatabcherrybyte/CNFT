@@ -14,6 +14,23 @@ class MintService {
 		});
 	}
 
+	saveMint(
+		user_id,
+		metadata,
+		type,
+		total_supply,
+		recipient_address,
+		policy_id) {
+		return http.post("api/collection/single", {
+			user_id,
+			metadata,
+			type,
+			total_supply,
+			recipient_address,
+			policy_id,
+		});
+	}
+
 	mintTransactionCollection(metadataFiles, utxos, address) {
 		return http.post("api/mint/collection", {
 			metadata_frontend: metadataFiles,
