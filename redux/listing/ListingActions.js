@@ -1,4 +1,4 @@
-import { SET_LISTING } from "./ListingConstants";
+import { SET_LISTING, SET_AUCTION } from "./ListingConstants";
 export const ADD = (item) => {
   return {
     type: "ADD_CART",
@@ -8,6 +8,12 @@ export const ADD = (item) => {
 export const setListing = (item) => {
   return {
     type: SET_LISTING,
+    payload: item,
+  };
+};
+export const setAuction = (item) => {
+  return {
+    type: SET_AUCTION,
     payload: item,
   };
 };

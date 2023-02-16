@@ -2,8 +2,7 @@ import React from "react";
 import { TextField, InputAdornment } from "@mui/material";
 import CaptionHeading from "../shared/headings/CaptionHeading";
 import { ContentCopy } from "@mui/icons-material";
-const AssetInputField = ({ placeholder, ada, copy, label, name, value }) => {
-  console.log(value);
+const PriceInputField = ({ placeholder, ada, copy, label, name, formik }) => {
   return (
     <>
       <TextField
@@ -11,16 +10,12 @@ const AssetInputField = ({ placeholder, ada, copy, label, name, value }) => {
         label={label && label}
         fullWidth
         name={name}
-        // value={formik?.values[name]}
-        // onChange={formik?.handleChange}
-        // error={formik?.touched[name] && Boolean(formik?.errors[name])}
-        // helperText={formik?.touched[name] && formik?.errors[name]}
-        defaultValue={value}
+        value={formik?.values[name]}
+        onChange={formik?.handleChange}
+        error={formik?.touched[name] && Boolean(formik?.errors[name])}
+        helperText={formik?.touched[name] && formik?.errors[name]}
         InputLabelProps={{
           style: { color: "#fff" },
-        }}
-        inputProps={{
-          readOnly: true,
         }}
         sx={{
           my: 1,
@@ -59,4 +54,4 @@ const AssetInputField = ({ placeholder, ada, copy, label, name, value }) => {
   );
 };
 
-export default AssetInputField;
+export default PriceInputField;

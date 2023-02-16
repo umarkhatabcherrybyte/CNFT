@@ -1,14 +1,18 @@
-import { SET_LISTING } from "./ListingConstants";
+import { SET_LISTING, SET_AUCTION } from "./ListingConstants";
 const INIT_STATE = {
-  data: [],
+  data: {},
+  auction: {},
 };
 
 export const listingreducer = (state = INIT_STATE, action) => {
   switch (action.type) {
     case SET_LISTING:
       // return {action.payload};
-      return { data: [action.payload] };
+      return { data: action.payload };
     // return { ...state, products: action.payload };
+    case SET_AUCTION:
+      return { auction: action.payload };
+
     case "ADD_CART":
       const IteamIndex = state.data.findIndex(
         (iteam) => iteam.id === action.payload.id
