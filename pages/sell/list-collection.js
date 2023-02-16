@@ -337,12 +337,7 @@ const ListCollectionStep2 = () => {
       <ContainerLayout>
         <Grid container spacing={2}>
           <Grid item xs={12} md={8}>
-            <Header
-              heading="Mint Your Collection"
-              desc="
-      The minting process on CNFT GENIE is simple and the NFT (s) may be sold on the marketplace using smart contracts, making the money exchange for NFT(s) occur automatically and simultaneously.
-      "
-            />
+            <Header heading="List Your Collection" />
           </Grid>
         </Grid>
         <Layout>
@@ -560,7 +555,7 @@ const ListCollectionStep2 = () => {
                 },
               }}
             >
-              <Grid xs={12} md={8} item>
+              <Grid xs={12} md={9} item>
                 <div className="col-9 file-input-wrapper">
                   <div
                     className="file-select-button"
@@ -631,7 +626,7 @@ const ListCollectionStep2 = () => {
                   />
                 </div>
               </Grid>
-              <Grid item md={4} xs={12}>
+              <Grid item md={3} xs={12}>
                 <Button
                   className="btn  w_100"
                   // disabled={!metaFile}

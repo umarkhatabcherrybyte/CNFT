@@ -3,8 +3,7 @@ import * as yup from "yup";
 export const addSingleListingSchema = yup.object({
   name: yup.string().required("Please enter Name"),
   description: yup.string(),
-  policy_id: yup.string().required("Please enter Policy ID"),
-  collection_name: yup.string().required("Please enter Policy ID"),
+  collection_name: yup.string(),
   file: yup.mixed().nullable().required("File is required"),
   // .test(
   //   "fileSize",
