@@ -11,6 +11,8 @@ import { useFormik } from "formik";
 import { addCollectioneListingSchema } from "../../schema/Index";
 import { useRouter } from "next/router";
 import { listCollectionRoute } from "/components/Routes/constants";
+import { setListing } from "../../redux/listing/ListingActions";
+import { useDispatch, useSelector } from "react-redux";
 const AddImage = ({ heading, desc, width, formik, name }) => {
   return (
     <>
@@ -82,6 +84,9 @@ const AddImage = ({ heading, desc, width, formik, name }) => {
 };
 const ListCollection = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const data = useSelector((state) => state.listing.data);
+  console.log(data);
   const formik = useFormik({
     initialValues: {
       type: "collection",
@@ -93,7 +98,9 @@ const ListCollection = () => {
     },
     validationSchema: addCollectioneListingSchema,
     onSubmit: (values) => {
-      router.push(listCollectionRoute);
+      // router.push(listCollectionRoute);
+      dispatch(setListing(values));
+
       console.log(values);
     },
   });

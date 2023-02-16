@@ -64,8 +64,6 @@ const MylistTabs = ({ setListingSteps }) => {
     validationSchema: addSingleListingSchema,
     onSubmit: async (values) => {
       console.log(values);
-      
-            // console.log(values);
       setListingSteps("step2");
       dispatch(setListing(values));
       // let data = new FormData();

@@ -99,7 +99,7 @@ const Sell = () => {
             <TabPanel value="list" sx={{ p: 0, py: 2 }}>
               {type === "add-listing" ? (
                 <>
-                  {listingSteps === "step2" && (
+                  {listingSteps === "step1" && (
                     <MylistTabs setListingSteps={setListingSteps} />
                   )}
                   {listingSteps === "step1" && (
