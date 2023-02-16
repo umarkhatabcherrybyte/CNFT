@@ -18,9 +18,11 @@ import { addSingleListingSchema } from "../../schema/Index";
 import { useFormik } from "formik";
 import { listCollectionRoute } from "/components/Routes/constants";
 import ListCollection from "./ListCollection";
+import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { setListing } from "../../redux/listing/ListingActions";
+
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",
@@ -60,8 +62,10 @@ const MylistTabs = ({ setListingSteps }) => {
       collection_name: "",
     },
     validationSchema: addSingleListingSchema,
-    onSubmit: (values) => {
-      // console.log(values);
+    onSubmit: async (values) => {
+      console.log(values);
+      
+            // console.log(values);
       setListingSteps("step2");
       dispatch(setListing(values));
       // let data = new FormData();
@@ -70,6 +74,58 @@ const MylistTabs = ({ setListingSteps }) => {
       // data.append("product_name", values.platform_name);
       // data.append("icon", appIcon);
       // dispatch(createProduct(data));
+
+      // const transferLucid = await Lucid.new(
+      //   new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
+      //   "Preprod"
+      // );
+
+      // transferLucid.selectWalletFromSeed("cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise");
+
+      // const { paymentCredential } = transferLucid.utils.getAddressDetails(
+      //   await transferLucid.wallet.address(),
+      // );
+
+      // const mintingPolicy = transferLucid.utils.nativeScriptFromJson(
+      //   {
+      //     type: "all",
+      //     scripts: [
+      //       { type: "sig", keyHash: paymentCredential?.hash },
+      //       {
+      //         type: "before",
+      //         slot: transferLucid.utils.unixTimeToSlot(Date.now() + 518400000),
+      //       },
+      //     ],
+      //   },
+      // );
+
+      // const policyId = transferLucid.utils.mintingPolicyToId(
+      //   mintingPolicy,
+      // );
+      // let metadataX = {}
+      // let metadata = JSON.parse(window.localStorage.getItem("metadata"))
+      // metadataX[metadata.name] = metadata
+      // console.log(metadataX, 'dsadasd')
+      // const unit = policyId + fromText(metadata.name);
+      // let obj = { [policyId]: metadataX };
+      // const tx = await transferLucid
+      //   .newTx()
+      //   .attachMetadata('721', obj)
+      //   .mintAssets({ [unit]: 1n })
+      //   .payToAddress(currentAddr, { [unit]: 1n })
+      //   .payToAddress(bankWalletAddress, { lovelace: 5000000n })
+      //   .validTo(Date.now() + 100000)
+      //   .attachMintingPolicy(mintingPolicy)
+      //   .complete();
+
+      // const signedTx = await tx.sign().complete();
+      // const txHash = await signedTx.submit();
+      // if (txHash) {
+      //   window.localStorage.setItem('policy', mintingPolicy.script)
+      //   window.localStorage.setItem('policy-id', policyId)
+      //   window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
+      //   router.push('/mint')
+      // }
     },
   });
 
@@ -206,7 +262,7 @@ const MylistTabs = ({ setListingSteps }) => {
                       },
                     }}
                     renderValue={(selected) => {
-                      console.log(selected);
+                      // console.log(selected);
                       if (selected === "") {
                         return <p>Select</p>;
                       }

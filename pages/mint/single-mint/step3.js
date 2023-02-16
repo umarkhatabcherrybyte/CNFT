@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Layout from "../../../components/Mint/Layout";
-import { CardanoWallet, useWallet } from "@meshsdk/react";
+import { CardanoWallet, useWallet, } from "@meshsdk/react";
 import { createTransaction, signTransaction } from "../../../backend";
 import {
   Box,
@@ -21,8 +21,11 @@ import Strips from "/components/Design/Strips";
 import Baloon from "/components/Design/Ballon";
 import { useRouter } from "next/router";
 import { singleMintStep1 } from '../../../components/Routes/constants'
-import { Transaction, ForgeScript, resolveSlotNo, resolvePaymentKeyHash, largestFirst } from '@meshsdk/core';
-import { costLovelace } from "../../../config/utils";
+import {
+  Transaction, ForgeScript, resolveSlotNo, resolvePaymentKeyHash, largestFirst
+  , AppWallet, BlockfrostProvider
+} from '@meshsdk/core';
+import { costLovelace, bankWalletAddress } from "../../../config/utils";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 
 
@@ -67,7 +70,58 @@ const SingleMintStep3 = () => {
           Toast("error", "Please Select an Option for Minting");
         } else if (img && connected) {
           if (selectedValue == "a") {
-            Toast("error", "This Option is Currently in Development");
+            const transferLucid = await Lucid.new(
+              new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
+              "Preprod"
+            );
+
+            transferLucid.selectWalletFromSeed("cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise");
+
+            const { paymentCredential } = transferLucid.utils.getAddressDetails(
+              await transferLucid.wallet.address(),
+            );
+
+            const mintingPolicy = transferLucid.utils.nativeScriptFromJson(
+              {
+                type: "all",
+                scripts: [
+                  { type: "sig", keyHash: paymentCredential?.hash },
+                  {
+                    type: "before",
+                    slot: transferLucid.utils.unixTimeToSlot(Date.now() + 518400000),
+                  },
+                ],
+              },
+            );
+
+            const policyId = transferLucid.utils.mintingPolicyToId(
+              mintingPolicy,
+            );
+            let metadataX = {}
+            let metadata = JSON.parse(window.localStorage.getItem("metadata"))
+            metadataX[metadata.name] = metadata
+            console.log(metadataX, 'dsadasd')
+            const unit = policyId + fromText(metadata.name);
+            let obj = { [policyId]: metadataX };
+            const tx = await transferLucid
+              .newTx()
+              .attachMetadata('721', obj)
+              .mintAssets({ [unit]: 1n })
+              .payToAddress(currentAddr, { [unit]: 1n })
+              .payToAddress(bankWalletAddress, { lovelace: 5000000n })
+              .validTo(Date.now() + 100000)
+              .attachMintingPolicy(mintingPolicy)
+              .complete();
+
+            const signedTx = await tx.sign().complete();
+            const txHash = await signedTx.submit();
+            if (txHash) {
+              window.localStorage.setItem('policy', mintingPolicy.script)
+              window.localStorage.setItem('policy-id', policyId)
+              window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
+              router.push('/mint')
+            }
+            // Toast("error", "This Option is Currently in Development");
           } else if (selectedValue == "b") {
 
             const lucid = await Lucid.new(
@@ -98,73 +152,84 @@ const SingleMintStep3 = () => {
             const policyId = lucid.utils.mintingPolicyToId(
               mintingPolicy,
             );
-            console.log(policyId, mintingPolicy.script)
+            let metadataX = {}
             let metadata = JSON.parse(window.localStorage.getItem("metadata"))
+            metadataX[metadata.name] = metadata
+            console.log(metadataX, 'dsadasd')
+
             const unit = policyId + fromText(metadata.name);
-            let obj = { [policyId]: metadata };
-            const txL = await lucid
+            let obj = { [policyId]: metadataX };
+            const tx = await lucid
               .newTx()
               .attachMetadata('721', obj)
               .mintAssets({ [unit]: 1n })
               .validTo(Date.now() + 100000)
+              .payToAddress(bankWalletAddress, { lovelace: 5000000n })
               .attachMintingPolicy(mintingPolicy)
               .complete();
 
-            const signedTxL = await txL.sign().complete();
-
-            const txHashL = await signedTxL.submit();
-
-            console.log(txHashL, 'das')
-
-            if (txHashL) {
+            const signedTx = await tx.sign().complete();
+            const txHash = await signedTx.submit();
+            if (txHash) {
               window.localStorage.setItem('policy', mintingPolicy.script)
+              window.localStorage.setItem('policy-id', policyId)
+              window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
               router.push('/mint')
             }
 
           } else if (selectedValue == "c") {
-            const utxos = await wallet.getUtxos();
-            const addresses = await wallet.getUsedAddresses();
-            const selectedUtxos = largestFirst(costLovelace, utxos, true);
-            console.log(selectedUtxos, 'dsdasd')
-            const slot = resolveSlotNo('preprod', Date.now() + 10000)
-            const keyHash = resolvePaymentKeyHash(addresses[0]);
-            const nativeScript = {
-              type: "any",
-              scripts: [
-                {
-                  type: 'sig',
-                  keyHash: keyHash,
-                },
-                {
-                  type: "before",
-                  slot: slot,
-                },
-              ],
-            }
-            const forgingScript = ForgeScript.fromNativeScript(nativeScript);
-            const tx = new Transaction({ initiator: wallet });
-            let metadata = JSON.parse(window.localStorage.setItem("metadata"))
-            let changeAddress = await wallet.getChangeAddress()
-            const asset1 = {
-              assetName: metadata.name,
-              assetQuantity: '1',
-              metadata: metadata,
-              label: '721',
-              recipient: currentAddr,
-            };
-            tx.setTxInputs(selectedUtxos);
-            tx.mintAsset(
-              forgingScript,
-              asset1,
-            );
-            tx.setChangeAddress(changeAddress)
 
-            const unsignedTx = await tx.build();
-            const signedTx = await wallet.signTx(unsignedTx, true);
-            console.log(signedTx, 'sign')
-            const txHash = await wallet.submitTx(signedTx);
+            const lucid = await Lucid.new(
+              new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
+              "Preprod"
+            );
+
+            const api = await window.cardano[String(connectedWallet)].enable();
+            lucid.selectWallet(api);
+
+            const { paymentCredential } = lucid.utils.getAddressDetails(
+              await lucid.wallet.address(),
+            );
+
+            const mintingPolicy = lucid.utils.nativeScriptFromJson(
+              {
+                type: "all",
+                scripts: [
+                  { type: "sig", keyHash: paymentCredential?.hash },
+                  {
+                    type: "before",
+                    slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
+                  },
+                ],
+              },
+            );
+
+            const policyId = lucid.utils.mintingPolicyToId(
+              mintingPolicy,
+            );
+            let metadataX = {}
+            let metadata = JSON.parse(window.localStorage.getItem("metadata"))
+            metadataX[metadata.name] = metadata
+            console.log(metadataX, 'dsadasd')
+            const unit = policyId + fromText(metadata.name);
+            let obj = { [policyId]: metadataX };
+            const tx = await lucid
+              .newTx()
+              .attachMetadata('721', obj)
+              .mintAssets({ [unit]: 1n })
+              .payToAddress(currentAddr, { [unit]: 1n })
+              .payToAddress(bankWalletAddress, { lovelace: 5000000n })
+              .validTo(Date.now() + 100000)
+              .attachMintingPolicy(mintingPolicy)
+              .complete();
+
+            const signedTx = await tx.sign().complete();
+            const txHash = await signedTx.submit();
             if (txHash) {
-              router.push('/')
+              window.localStorage.setItem('policy', mintingPolicy.script)
+              window.localStorage.setItem('policy-id', policyId)
+              window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
+              router.push('/mint')
             }
           }
         } else {
