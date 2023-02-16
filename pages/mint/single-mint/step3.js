@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Layout from "../../../components/Mint/Layout";
 import { CardanoWallet, useWallet, } from "@meshsdk/react";
+import { Toast } from "../../../components/shared/Toast";
 import { createTransaction, signTransaction } from "../../../backend";
 import {
   Box,
@@ -16,7 +17,6 @@ import {
   Grid,
 } from "@mui/material";
 import QRCode from "react-qr-code";
-import { Toast } from "../../../components/shared/Toast";
 import Strips from "/components/Design/Strips";
 import Baloon from "/components/Design/Ballon";
 import { useRouter } from "next/router";

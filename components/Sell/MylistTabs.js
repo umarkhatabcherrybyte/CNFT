@@ -21,7 +21,10 @@ import ListCollection from "./ListCollection";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
+import { create } from "ipfs-http-client";
 import { setListing } from "../../redux/listing/ListingActions";
+import { CardanoWallet, useWallet, } from "@meshsdk/react";
+import { Toast } from "../shared/Toast";
 
 const inputFileStyle = {
   my: 2,
@@ -52,6 +55,7 @@ const MylistTabs = ({ setListingSteps }) => {
   const onTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
+  const { wallet, connected } = useWallet();
 
   const formik = useFormik({
     initialValues: {
@@ -63,69 +67,107 @@ const MylistTabs = ({ setListingSteps }) => {
     },
     validationSchema: addSingleListingSchema,
     onSubmit: async (values) => {
-      console.log(values);
-      
-            // console.log(values);
-      setListingSteps("step2");
-      dispatch(setListing(values));
-      // let data = new FormData();
-      // data.append("platform_id", product);
-      // data.append("product_url", values.platform_url);
-      // data.append("product_name", values.platform_name);
-      // data.append("icon", appIcon);
-      // dispatch(createProduct(data));
+      try {
 
-      // const transferLucid = await Lucid.new(
-      //   new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
-      //   "Preprod"
-      // );
+        console.log(values);
+        if (connected) {
+          let connectedWallet = window.localStorage.getItem("connectedWallet")
+          if (values.file != null || values.file != undefined) {
+            const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
+            const projectSecret = "136393a5b7f4e47a9e153a88eb636003";
+            const auth = `Basic ${Buffer.from(
+              `${projectId}:${projectSecret}`
+            ).toString("base64")}`;
+            const client = create({
+              host: "ipfs.infura.io",
+              port: 5001,
+              protocol: "https",
+              headers: {
+                authorization: auth,
+              },
+            });
+            const uploaded_image = await client.add(values.file);
+            if (uploaded_image) {
+              console.log(uploaded_image, 'img')
+              const transferLucid = await Lucid.new(
+                new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
+                "Preprod"
+              );
 
-      // transferLucid.selectWalletFromSeed("cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise");
+              transferLucid.selectWalletFromSeed("cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise");
 
-      // const { paymentCredential } = transferLucid.utils.getAddressDetails(
-      //   await transferLucid.wallet.address(),
-      // );
+              const lucidBrowser = await Lucid.new(
+                new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
+                "Preprod"
+              );
 
-      // const mintingPolicy = transferLucid.utils.nativeScriptFromJson(
-      //   {
-      //     type: "all",
-      //     scripts: [
-      //       { type: "sig", keyHash: paymentCredential?.hash },
-      //       {
-      //         type: "before",
-      //         slot: transferLucid.utils.unixTimeToSlot(Date.now() + 518400000),
-      //       },
-      //     ],
-      //   },
-      // );
+              const api = await window.cardano[String(connectedWallet)].enable();
+              lucidBrowser.selectWallet(api);
 
-      // const policyId = transferLucid.utils.mintingPolicyToId(
-      //   mintingPolicy,
-      // );
-      // let metadataX = {}
-      // let metadata = JSON.parse(window.localStorage.getItem("metadata"))
-      // metadataX[metadata.name] = metadata
-      // console.log(metadataX, 'dsadasd')
-      // const unit = policyId + fromText(metadata.name);
-      // let obj = { [policyId]: metadataX };
-      // const tx = await transferLucid
-      //   .newTx()
-      //   .attachMetadata('721', obj)
-      //   .mintAssets({ [unit]: 1n })
-      //   .payToAddress(currentAddr, { [unit]: 1n })
-      //   .payToAddress(bankWalletAddress, { lovelace: 5000000n })
-      //   .validTo(Date.now() + 100000)
-      //   .attachMintingPolicy(mintingPolicy)
-      //   .complete();
+              const { paymentCredential } = transferLucid.utils.getAddressDetails(
+                await lucidBrowser.wallet.address(),
+              )
+              const mintingPolicy = lucidBrowser.utils.nativeScriptFromJson(
+                {
+                  type: "all",
+                  scripts: [
+                    { type: "sig", keyHash: paymentCredential?.hash },
+                    {
+                      type: "before",
+                      slot: lucidBrowser.utils.unixTimeToSlot(Date.now() + 518400000),
+                    },
+                  ],
+                },
+              );
+              // {"image":"ipfs://QmW5EvXd3si8PzKVYdjDhFAoavr8oiASKmHt3LBoa9PYbL","mediaType":"image/jpg","description":"","name":"Qazzzi","creator":"","link":""}
+              const policyId = lucidBrowser.utils.mintingPolicyToId(
+                mintingPolicy,
+              );
 
-      // const signedTx = await tx.sign().complete();
-      // const txHash = await signedTx.submit();
-      // if (txHash) {
-      //   window.localStorage.setItem('policy', mintingPolicy.script)
-      //   window.localStorage.setItem('policy-id', policyId)
-      //   window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
-      //   router.push('/mint')
-      // }
+              console.log(mintingPolicy, policyId, 'pm')
+              let metadataX = {}
+              let metadata = {
+                "name": values.name,
+                "image": `ipfs://${uploaded_image.path}`,
+                "mediaType": values.file.type,
+              }
+              if (values.description.length > 0) {
+                metadata["description"] = values.description
+              }
+              metadataX[metadata.name] = metadata
+              console.log(metadataX, 'dsadasd')
+              const unit = policyId + fromText(metadata.name);
+              let obj = { [policyId]: metadataX };
+              console.log(obj, 'obj')
+              const tx = await lucidBrowser
+                .newTx()
+                .attachMetadata('721', obj)
+                .mintAssets({ [unit]: 1n })
+                .payToAddress(await transferLucid.wallet.address(), { [unit]: 1n })
+                .validTo(Date.now() + 100000)
+                .attachMintingPolicy(mintingPolicy)
+                .complete();
+              const signedTx = await tx.sign().complete();
+              const txHash = await signedTx.submit();
+              console.log(txHash, 'hasg')
+              if (txHash) {
+                //api for mint save
+                window.localStorage.setItem('policy', mintingPolicy.script)
+                window.localStorage.setItem('policy-id', policyId)
+                window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
+                setListingSteps("step2");
+                dispatch(setListing(metadata));
+              }
+            }
+          }
+        } else {
+          Toast('error', 'Please Connect Your Waller First')
+        }
+
+      } catch (error) {
+        console.log(error, err)
+        Toast('error', 'Error Occured During Minting')
+      }
     },
   });
 
@@ -291,7 +333,7 @@ const MylistTabs = ({ setListingSteps }) => {
                     className="btn2"
                     sx={{ width: "150px" }}
                     type="submit"
-                    // onClick={() => setListingSteps("step2")}
+                  // onClick={() => setListingSteps("step2")}
                   >
                     Next
                   </Button>
