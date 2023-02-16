@@ -9,6 +9,8 @@ import {
 import { Image } from "@mui/icons-material";
 import { useFormik } from "formik";
 import { addCollectioneListingSchema } from "../../schema/Index";
+import { useRouter } from "next/router";
+import { listCollectionRoute } from "/components/Routes/constants";
 const AddImage = ({ heading, desc, width, formik, name }) => {
   return (
     <>
@@ -79,8 +81,10 @@ const AddImage = ({ heading, desc, width, formik, name }) => {
   );
 };
 const ListCollection = () => {
+  const router = useRouter();
   const formik = useFormik({
     initialValues: {
+      type: "collection",
       logo_image: null,
       feature_image: null,
       banner_image: null,
@@ -89,6 +93,7 @@ const ListCollection = () => {
     },
     validationSchema: addCollectioneListingSchema,
     onSubmit: (values) => {
+      router.push(listCollectionRoute);
       console.log(values);
     },
   });

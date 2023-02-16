@@ -278,6 +278,8 @@ const SaleMethod = ({ setListingSteps }) => {
                           value={auctionDuration.hours}
                           onChange={(e) => onAuctionDurationChange(e, "hours")}
                           InputLabelProps={{
+                            readOnly: true,
+
                             style: {
                               color: "#fff",
                             },
@@ -316,6 +318,7 @@ const SaleMethod = ({ setListingSteps }) => {
                             onAuctionDurationChange(e, "minutes")
                           }
                           InputLabelProps={{
+                            readOnly: true,
                             style: {
                               color: "#fff",
                             },
@@ -430,7 +433,6 @@ const SaleMethod = ({ setListingSteps }) => {
             <Box>
               <CaptionHeading heading="Asset Name" font="montserrat" />
               <AssetInputField
-                formik={formik}
                 placeholder="Enter Asset Name"
                 name="asset_name"
               />
@@ -440,7 +442,6 @@ const SaleMethod = ({ setListingSteps }) => {
             <Box>
               <CaptionHeading heading="Asset ID" font="montserrat" />
               <AssetInputField
-                formik={formik}
                 placeholder="Enter Asset ID"
                 copy
                 name="asset_id"
@@ -451,7 +452,6 @@ const SaleMethod = ({ setListingSteps }) => {
             <Box>
               <CaptionHeading heading="Policy ID" font="montserrat" />
               <AssetInputField
-                formik={formik}
                 placeholder="Enter policy ID"
                 copy
                 name="policy_id"
@@ -461,18 +461,13 @@ const SaleMethod = ({ setListingSteps }) => {
           <Grid item xs={12} md={6}>
             <Box>
               <CaptionHeading heading="Quantity" font="montserrat" />
-              <AssetInputField
-                formik={formik}
-                placeholder="Enter Quantity"
-                name="quantity"
-              />
+              <AssetInputField placeholder="Enter Quantity" name="quantity" />
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
               <CaptionHeading heading="Minted On" font="montserrat" />
               <AssetInputField
-                formik={formik}
                 placeholder="Enter Minted Date"
                 name="minted_on"
               />

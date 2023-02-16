@@ -6,20 +6,21 @@ import {
   Divider,
   Grid,
   Tab,
-  TextField,
   Typography,
   Select,
   MenuItem,
-  FormControl,
   FormHelperText,
-  InputLabel,
 } from "@mui/material";
 import { Image } from "@mui/icons-material";
 import InputField from "./InputField";
 import LightText from "../shared/headings/LightText";
 import { addSingleListingSchema } from "../../schema/Index";
 import { useFormik } from "formik";
+import { listCollectionRoute } from "/components/Routes/constants";
 import ListCollection from "./ListCollection";
+import { useRouter } from "next/router";
+import { useDispatch, useSelector } from "react-redux";
+import { setListing } from "../../redux/listing/ListingActions";
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",
@@ -40,38 +41,29 @@ const names = [
 ];
 
 const MylistTabs = ({ setListingSteps }) => {
+  const listing = useSelector((state) => state.listing.data);
+  console.log(listing);
+  const dispatch = useDispatch();
+  const router = useRouter();
   const [tabValue, setTabValue] = useState("add");
-  const [selectedValue, setSelectedValue] = useState("");
 
   const onTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
-  const onMenuChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedValue(value);
-  };
-  const [singleListLogo, setSingleListLogo] = useState(null);
-  const onUploadFile = ({ currentTarget: input }) => {
-    if (input.files && input.files[0]) {
-      const files = input.files[0];
-      const _url = URL.createObjectURL(files);
-      setSingleListLogo(files);
-    }
-  };
+
   const formik = useFormik({
     initialValues: {
+      type: "single",
       file: null,
       name: "",
       description: "",
-      policy_id: "",
       collection_name: "",
     },
     validationSchema: addSingleListingSchema,
     onSubmit: (values) => {
-      console.log(values);
-      // setListingSteps("step2");
+      // console.log(values);
+      setListingSteps("step2");
+      dispatch(setListing(values));
       // let data = new FormData();
       // data.append("platform_id", product);
       // data.append("product_url", values.platform_url);
@@ -81,7 +73,6 @@ const MylistTabs = ({ setListingSteps }) => {
     },
   });
 
-  console.log(formik);
   return (
     <>
       <TabContext value={tabValue}>
@@ -183,7 +174,7 @@ const MylistTabs = ({ setListingSteps }) => {
                     formik={formik}
                   />
                 </Box>
-                <Box sx={{ py: 1 }}>
+                {/* <Box sx={{ py: 1 }}>
                   <InputField
                     label="Policy ID*"
                     placeholder="Enter your policy ID"
@@ -191,7 +182,7 @@ const MylistTabs = ({ setListingSteps }) => {
                     formik={formik}
                   />
                   <LightText heading="with policy ID we can verify your token" />
-                </Box>
+                </Box> */}
                 <Box sx={{ py: 1 }}>
                   <Typography className="text_white bold" variant="caption">
                     Collection
@@ -244,7 +235,7 @@ const MylistTabs = ({ setListingSteps }) => {
                     className="btn2"
                     sx={{ width: "150px" }}
                     type="submit"
-                  // onClick={() => setListingSteps("step2")}
+                    // onClick={() => setListingSteps("step2")}
                   >
                     Next
                   </Button>
