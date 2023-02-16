@@ -73,68 +73,58 @@ const MylistTabs = ({ setListingSteps }) => {
     validationSchema: addSingleListingSchema,
     onSubmit: async (values) => {
       console.log(values);
-      const lucid = await Lucid.new(
-        new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
-        "Preprod"
-      );
 
-      const api = await window.cardano[String(connectedWallet)].enable();
-      lucid.selectWallet(api);
+      // const transferLucid = await Lucid.new(
+      //   new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
+      //   "Preprod"
+      // );
 
-      const { paymentCredential } = lucid.utils.getAddressDetails(
-        await lucid.wallet.address(),
-      );
+      // transferLucid.selectWalletFromSeed("cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise");
 
-      const mintingPolicy = lucid.utils.nativeScriptFromJson(
-        {
-          type: "all",
-          scripts: [
-            { type: "sig", keyHash: paymentCredential?.hash },
-            {
-              type: "before",
-              slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
-            },
-          ],
-        },
-      );
+      // const { paymentCredential } = transferLucid.utils.getAddressDetails(
+      //   await transferLucid.wallet.address(),
+      // );
 
-      // const policyId = lucid.utils.mintingPolicyToId(
+      // const mintingPolicy = transferLucid.utils.nativeScriptFromJson(
+      //   {
+      //     type: "all",
+      //     scripts: [
+      //       { type: "sig", keyHash: paymentCredential?.hash },
+      //       {
+      //         type: "before",
+      //         slot: transferLucid.utils.unixTimeToSlot(Date.now() + 518400000),
+      //       },
+      //     ],
+      //   },
+      // );
+
+      // const policyId = transferLucid.utils.mintingPolicyToId(
       //   mintingPolicy,
       // );
-      const policyId = "e8d7b7b0943cc239c8ed7c7d4f5351ab05f0f8c19beb1f0f73a53ad2"
-      console.log(policyId, mintingPolicy.script)
-      let metadata = JSON.parse(window.localStorage.getItem("metadata"))
-      const unit = policyId + fromText(metadata.name);
-      let obj = { [policyId]: metadata };
-      const txL = await lucid
-        .newTx()
-        .attachMetadata('721', obj)
-        .mintAssets({ [unit]: 1n })
-        .validTo(Date.now() + 100000)
-        .attachMintingPolicy({ "type": "Native", "script": "8201828200581c006312b255ff7dafd0d1680e6ed40357d063ac459b78d0c2c0855aad82051a0143a3dc" })
-        .complete();
+      // let metadataX = {}
+      // let metadata = JSON.parse(window.localStorage.getItem("metadata"))
+      // metadataX[metadata.name] = metadata
+      // console.log(metadataX, 'dsadasd')
+      // const unit = policyId + fromText(metadata.name);
+      // let obj = { [policyId]: metadataX };
+      // const tx = await transferLucid
+      //   .newTx()
+      //   .attachMetadata('721', obj)
+      //   .mintAssets({ [unit]: 1n })
+      //   .payToAddress(currentAddr, { [unit]: 1n })
+      //   .payToAddress(bankWalletAddress, { lovelace: 5000000n })
+      //   .validTo(Date.now() + 100000)
+      //   .attachMintingPolicy(mintingPolicy)
+      //   .complete();
 
-      const signedTxL = await txL.sign().complete();
-
-      const txHashL = await signedTxL.submit();
-
-      console.log(txHashL, 'das')
-
-      if (txHashL) {
-        window.localStorage.setItem('policy', mintingPolicy.script)
-        window.localStorage.setItem('policy-id', policyId)
-        window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
-        router.push('/mint')
-      }
-
-
-      // setListingSteps("step2");
-      // let data = new FormData();
-      // data.append("platform_id", product);
-      // data.append("product_url", values.platform_url);
-      // data.append("product_name", values.platform_name);
-      // data.append("icon", appIcon);
-      // dispatch(createProduct(data));
+      // const signedTx = await tx.sign().complete();
+      // const txHash = await signedTx.submit();
+      // if (txHash) {
+      //   window.localStorage.setItem('policy', mintingPolicy.script)
+      //   window.localStorage.setItem('policy-id', policyId)
+      //   window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
+      //   router.push('/mint')
+      // }
     },
   });
 
@@ -272,7 +262,7 @@ const MylistTabs = ({ setListingSteps }) => {
                       },
                     }}
                     renderValue={(selected) => {
-                      console.log(selected);
+                      // console.log(selected);
                       if (selected === "") {
                         return <p>Select</p>;
                       }
