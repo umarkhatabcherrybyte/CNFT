@@ -68,7 +68,6 @@ const MylistTabs = ({ setListingSteps }) => {
     validationSchema: addSingleListingSchema,
     onSubmit: async (values) => {
       try {
-
         console.log(values);
         if (connected) {
           let connectedWallet = window.localStorage.getItem("connectedWallet")

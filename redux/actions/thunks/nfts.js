@@ -4,16 +4,16 @@ import api from "/core/api";
 
 export const fetchNftsBreakdown = (authorId) => async (dispatch, getState) => {
   //access the state
+  console.log(authorId, "SDfsdf");
   const state = getState();
+  console.log(state);
   dispatch(actions.getNftBreakdown.request(Canceler.cancel));
-
   try {
     let filter = authorId ? "author=" + authorId : "";
     const { data } = await Axios.get(`${api.baseUrl}${api.nfts}?${filter}`, {
       cancelToken: Canceler.token,
       params: {},
     });
-
     dispatch(actions.getNftBreakdown.success(data));
   } catch (err) {
     dispatch(actions.getNftBreakdown.failure(err));
