@@ -47,7 +47,7 @@ const names = [
 
 const MylistTabs = ({ setListingSteps }) => {
   const listing = useSelector((state) => state.listing.data);
-  console.log(listing);
+  // console.log(listing);
   const dispatch = useDispatch();
   const router = useRouter();
   const [tabValue, setTabValue] = useState("add");
@@ -88,12 +88,6 @@ const MylistTabs = ({ setListingSteps }) => {
             const uploaded_image = await client.add(values.file);
             if (uploaded_image) {
               console.log(uploaded_image, 'img')
-              const transferLucid = await Lucid.new(
-                new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
-                "Preprod"
-              );
-
-              transferLucid.selectWalletFromSeed("cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise");
 
               const lucidBrowser = await Lucid.new(
                 new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
