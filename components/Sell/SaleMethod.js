@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PaymentHeader from "../shared/header/PaymentHeader";
 import {
   Box,
@@ -19,12 +19,24 @@ import BarHeading from "../../components/shared/headings/BarHeading";
 import CaptionHeading from "../shared/headings/CaptionHeading";
 import AssetInputField from "./AssetInputField";
 import LightText from "../shared/headings/LightText";
-import { ArrowDropUp, ArrowDropDown } from "@mui/icons-material";
+import { ArrowDropUp, ArrowDropDown, PriceChange } from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
 import { saleMethodSchema } from "../../schema/Index";
 import { useFormik } from "formik";
 import Image from "next/image";
+import { useSelector } from "react-redux";
+import Fixed from "./FixedPrice";
+import AuctionDeal from "./Auction";
+import { INSTANCE } from "../../config/axiosInstance";
+import { useDispatch } from "react-redux";
+import { setListing } from "../../redux/listing/ListingActions";
+import { setAuction } from "../../redux/listing/ListingActions";
 const SaleMethod = ({ setListingSteps }) => {
+  const dispatch = useDispatch();
+  const { data: listing, auction } = useSelector((state) => state.listing);
+  // useEffect(() => {}, [auction]);
+  console.log(auction);
+  console.log(listing);
   const [paymentValue, setPaymentValue] = useState("fixed");
   const [auctionDuration, setAuctionDuration] = useState({
     days: "",
@@ -35,7 +47,7 @@ const SaleMethod = ({ setListingSteps }) => {
   const onPaymentChange = (event, newValue) => {
     setPaymentValue(newValue);
   };
-  const [value, setValue] = React.useState(new Date());
+
   const onAuctionDurationChange = (e, type) => {
     // let form = ev.currentTarget;
     setAuctionDuration({
@@ -43,44 +55,28 @@ const SaleMethod = ({ setListingSteps }) => {
       [e.target.name]: e.target.value,
     });
   };
-  const onAuctionArrowChange = (e, val) => {
-    if (val === "up") {
-      if (auctionDuration.days || auctionDuration.days === 1) {
-        console.log("if");
-        setAuctionDuration({
-          ...auctionDuration,
-          days: parseInt(auctionDuration.days) + 1,
+  const submitData = async () => {
+    const stored_one = localStorage.getItem("listing");
+    const stored_two = localStorage.getItem("auction");
+    const data_one = stored_one ? JSON.parse(stored_one) : {};
+    const data_two = stored_two ? JSON.parse(stored_two) : {};
+
+    // console.log(data_one);
+    // console.log(data_two);
+    if (data_one && data_two) {
+      try {
+        const res = await INSTANCE.post("/list/create", {
+          ...data_two,
+          user_id: data_one?.user_id,
+          nft_ids: [data_one._id],
         });
-      } else {
-        console.log("else");
-        setAuctionDuration({
-          ...auctionDuration,
-          days: 1,
-        });
+      } catch (e) {
+        console.log(e);
       }
-    } else {
-      setAuctionDuration({
-        ...auctionDuration,
-        days: parseInt(auctionDuration.days) - 1,
-      });
     }
   };
-  const formik = useFormik({
-    initialValues: {
-      asset_name: "",
-      asset_id: "",
-      policy_id: "",
-      quantity: "",
-      minted_on: "",
-      creator: "",
-    },
-    validationSchema: saleMethodSchema,
-    onSubmit: (values) => {
-      console.log(values);
-    },
-  });
   return (
-    <form onSubmit={formik.handleSubmit}>
+    <>
       {/* <Button
         className="btn2"
         sx={{ my: 2 }}
@@ -146,238 +142,10 @@ const SaleMethod = ({ setListingSteps }) => {
                   />
                 </Tabs>
                 <TabPanel value="fixed" sx={{ px: 0 }}>
-                  <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} lg={6}>
-                      <CaptionHeading heading="Set you price" />
-                    </Grid>
-                    <Grid item xs={12} lg={6}>
-                      <AssetInputField placeholder="Price" ada />
-                    </Grid>
-                  </Grid>
-                  <FormGroup
-                    sx={{
-                      label: {
-                        color: "#fff",
-                      },
-                    }}
-                  >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          defaultChecked
-                          size="small"
-                          sx={{
-                            color: "#fff",
-                            "&.Mui-checked": {
-                              color: "#fff",
-                            },
-                          }}
-                        />
-                      }
-                      label="I am open to offers"
-                    />
-                  </FormGroup>
-                  <Box sx={{ py: 2 }}>
-                    <Button className="btn2" sx={{ width: "150px" }}>
-                      Set Price
-                    </Button>
-                  </Box>
+                  <Fixed />
                 </TabPanel>
                 <TabPanel value="auction" sx={{ px: 0 }}>
-                  <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} lg={6}>
-                      <CaptionHeading heading="Set you price" />
-                    </Grid>
-                    <Grid item xs={12} lg={6}>
-                      <AssetInputField placeholder="Price" />
-                    </Grid>
-                    <Grid item xs={12} lg={6}>
-                      <CaptionHeading heading="Minimum price" />
-                      <LightText heading="(Optional)" />
-                    </Grid>
-                    <Grid item xs={12} lg={6}>
-                      <AssetInputField placeholder="Price" />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <LightText heading="(Your listing will not sell unless it reached your minimum price)" />
-                    </Grid>
-                    <Grid item xs={12} lg={4}>
-                      <CaptionHeading heading="Auction Duration" />
-                    </Grid>
-                    <Grid
-                      item
-                      xs={12}
-                      lg={8}
-                      sx={{ display: "flex", justifyContent: "end" }}
-                    >
-                      {/* <AssetInputField
-                        type="number"
-                        // placeholder="2 Days 00:00 Min"
-                        placeholder="Day"
-                        label="Day"
-                      /> */}
-                      <Box
-                        sx={{
-                          pl: 2,
-                          pr: 6,
-                          position: "relative",
-                          width: "fit-content",
-                          display: "flex",
-                          alignItems: "center",
-                          background: "var(--box-color)",
-                          borderRadius: "15px 0  0 15px",
-                        }}
-                      >
-                        {/* <form
-                          id="time_form"
-                          onInput={(e) => onAuctionDurationChange(e)}
-                        > */}
-                        <TextField
-                          type="text"
-                          // min="0"
-                          // max="30"
-                          // step="1"
-                          autocomplete="off"
-                          // label="Days"
-                          placeholder="0"
-                          value={auctionDuration.days}
-                          onChange={(e) => onAuctionDurationChange(e, "days")}
-                          InputLabelProps={{
-                            style: {
-                              color: "#fff",
-                            },
-                          }}
-                          name="days"
-                          sx={{
-                            width: "18px",
-                            fieldset: {
-                              border: "none",
-                            },
-                            "& .MuiOutlinedInput-root": {
-                              color: "#ffff",
-                              background: "transparent",
-                              borderRadius: "15px 0  0 15px",
-                            },
-
-                            input: {
-                              padding: "16.5px  0px",
-                              "&::placeholder": {
-                                color: "#fff",
-                              },
-                            },
-                          }}
-                        />
-                        <Box sx={{ pl: 0.5, pr: 0.5 }}>
-                          <CaptionHeading heading="days" font="montserrat" />
-                        </Box>
-                        <TextField
-                          type="text"
-                          autocomplete="off"
-                          // label="hours"
-                          placeholder="00"
-                          value={auctionDuration.hours}
-                          onChange={(e) => onAuctionDurationChange(e, "hours")}
-                          InputLabelProps={{
-                            readOnly: true,
-
-                            style: {
-                              color: "#fff",
-                            },
-                          }}
-                          name="hours"
-                          sx={{
-                            width: "18px",
-                            fieldset: {
-                              border: "none",
-                            },
-                            "& .MuiOutlinedInput-root": {
-                              color: "#ffff",
-                              background: "transparent",
-                              borderRadius: "0",
-                            },
-
-                            input: {
-                              padding: "16.5px  0px",
-
-                              "&::placeholder": {
-                                color: "#fff",
-                              },
-                            },
-                          }}
-                        />
-                        <Box sx={{ px: 0.5 }}>
-                          <CaptionHeading heading=":" font="montserrat" />
-                        </Box>
-                        <TextField
-                          type="text"
-                          autocomplete="off"
-                          // label="min"
-                          placeholder="00"
-                          value={auctionDuration.minutes}
-                          onChange={(e) =>
-                            onAuctionDurationChange(e, "minutes")
-                          }
-                          InputLabelProps={{
-                            readOnly: true,
-                            style: {
-                              color: "#fff",
-                            },
-                          }}
-                          name="minutes"
-                          sx={{
-                            width: "18px",
-                            fieldset: {
-                              border: "none",
-                            },
-                            "& .MuiOutlinedInput-root": {
-                              color: "#ffff",
-                              background: "transparent",
-                              borderRadius: "0",
-                            },
-                            input: {
-                              padding: "16.5px  0px",
-                              "&::placeholder": {
-                                color: "#fff",
-                              },
-                            },
-                          }}
-                        />
-                        <Box sx={{ px: 1 }}>
-                          <CaptionHeading
-                            heading="hours/min"
-                            font="montserrat"
-                          />
-                        </Box>
-                        <Box
-                          sx={{
-                            background: "var(--box-color)",
-                            position: "absolute",
-                            top: 0,
-                            right: 0,
-                            height: "100%",
-                            display: "flex",
-                            flexDirection: "column",
-                          }}
-                        >
-                          <IconButton
-                            sx={{ height: "24px" }}
-                            onClick={(e) => onAuctionArrowChange(e, "up")}
-                          >
-                            <ArrowDropUp sx={{ color: "#fff" }} />
-                          </IconButton>
-                          <IconButton
-                            sx={{ height: "24px" }}
-                            onClick={(e) => onAuctionArrowChange(e, "down")}
-                          >
-                            <ArrowDropDown sx={{ color: "#fff" }} />
-                          </IconButton>
-                        </Box>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                  <Button className="btn2" sx={{ width: "100%", my: 2 }}>
-                    Set Price
-                  </Button>
+                  <AuctionDeal />
                 </TabPanel>
               </TabContext>
             </Box>
@@ -435,10 +203,11 @@ const SaleMethod = ({ setListingSteps }) => {
               <AssetInputField
                 placeholder="Enter Asset Name"
                 name="asset_name"
+                // value={listing?.assets[0]?.asset_name}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={6}>
+          {/* <Grid item xs={12} md={6}>
             <Box>
               <CaptionHeading heading="Asset ID" font="montserrat" />
               <AssetInputField
@@ -447,7 +216,7 @@ const SaleMethod = ({ setListingSteps }) => {
                 name="asset_id"
               />
             </Box>
-          </Grid>
+          </Grid> */}
           <Grid item xs={12} md={6}>
             <Box>
               <CaptionHeading heading="Policy ID" font="montserrat" />
@@ -455,13 +224,18 @@ const SaleMethod = ({ setListingSteps }) => {
                 placeholder="Enter policy ID"
                 copy
                 name="policy_id"
+                value={listing?.policy_id}
               />
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
               <CaptionHeading heading="Quantity" font="montserrat" />
-              <AssetInputField placeholder="Enter Quantity" name="quantity" />
+              <AssetInputField
+                placeholder="Enter Quantity"
+                name="quantity"
+                // value={listing?.assets[0]?.asset_quantity}
+              />
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
@@ -470,10 +244,11 @@ const SaleMethod = ({ setListingSteps }) => {
               <AssetInputField
                 placeholder="Enter Minted Date"
                 name="minted_on"
+                value={listing?.createdAt}
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={6}>
+          {/* <Grid item xs={12} md={6}>
             <Box>
               <CaptionHeading heading="Creator" font="montserrat" />
 
@@ -483,15 +258,19 @@ const SaleMethod = ({ setListingSteps }) => {
                 name="creator"
               />
             </Box>
-          </Grid>
+          </Grid> */}
           <Grid item xs={12} className="flex">
-            <Button sx={{ width: "150px" }} className="btn2" type="submit">
+            <Button
+              sx={{ width: "150px" }}
+              className="btn2"
+              onClick={submitData}
+            >
               Sell
             </Button>
           </Grid>
         </Grid>
       </Box>
-    </form>
+    </>
   );
 };
 

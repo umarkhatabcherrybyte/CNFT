@@ -31,6 +31,14 @@ export const saleMethodSchema = yup.object({
   minted_on: yup.string().required("Please enter minted on"),
   creator: yup.string().required("Please enter creator"),
 });
+export const fixedPriceSchema = yup.object({
+  price: yup.string().required("Please enter price"),
+});
+export const auctionDealSchema = yup.object({
+  price: yup.string().required("Please enter price"),
+  min_price: yup.string(),
+  duration: yup.string().required("Please enter price"),
+});
 const validationSchema = yup.object({
   platform_url: yup
     .string()

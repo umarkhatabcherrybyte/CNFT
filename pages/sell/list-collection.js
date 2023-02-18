@@ -23,8 +23,13 @@ import { List } from "@mui/icons-material";
 import { mintCollectionStep2 } from "/components/Routes/constants";
 import { useRouter } from "next/router";
 import { create } from "ipfs-http-client";
-
+import { INSTANCE } from "../../config/axiosInstance";
+import { setStep } from "../../redux/listing/ListingActions";
+import { useDispatch, useSelector } from "react-redux";
 const ListCollectionStep2 = () => {
+  const dispatch = useDispatch();
+  const { step } = useSelector((store) => store.listing);
+  console.log(step, "step");
   const router = useRouter();
   const [selectedFiles, setSeletedFiles] = useState([]);
   const [metaFile, setMetaFile] = useState(undefined);
@@ -331,7 +336,19 @@ const ListCollectionStep2 = () => {
   const viewImagesPaths = () => {
     console.log(imagePaths, "o");
   };
-
+  const onMintCollection = async () => {
+    try {
+      const res = await INSTANCE.post("url", {});
+      window.localStorage.setItem("listing", JSON.stringify(res?.data.data));
+      dispatch(setStep("step2"));
+      router.push({
+        pathname: "/sell",
+        query: {
+          type: "add-listing",
+        },
+      });
+    } catch (e) {}
+  };
   return (
     <Step1Styled>
       <ContainerLayout>
@@ -636,6 +653,11 @@ const ListCollectionStep2 = () => {
                 </Button>
               </Grid>
             </Grid>
+          </Box>
+          <Box sx={{ py: 2 }}>
+            <Button className="btn2" onClick={onMintCollection}>
+              Next
+            </Button>
           </Box>
         </Layout>
       </ContainerLayout>
