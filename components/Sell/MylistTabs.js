@@ -57,7 +57,7 @@ const MylistTabs = ({ setListingSteps }) => {
     getAddress();
   }, [wallet]);
   const listing = useSelector((state) => state.listing.data);
-  console.log(listing);
+  // console.log(listing);
   const dispatch = useDispatch();
   const router = useRouter();
   const [tabValue, setTabValue] = useState("add");
@@ -78,34 +78,24 @@ const MylistTabs = ({ setListingSteps }) => {
       try {
         console.log(values);
         if (connected) {
-          let connectedWallet = window.localStorage.getItem("connectedWallet");
-          const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
-          const projectSecret = "136393a5b7f4e47a9e153a88eb636003";
-          const auth = `Basic ${Buffer.from(
-            `${projectId}:${projectSecret}`
-          ).toString("base64")}`;
-          const client = create({
-            host: "ipfs.infura.io",
-            port: 5001,
-            protocol: "https",
-            headers: {
-              authorization: auth,
-            },
-          });
-          const uploaded_image = await client.add(values.file);
-          if (uploaded_image) {
-            console.log(uploaded_image, "img");
-            const transferLucid = await Lucid.new(
-              new Blockfrost(
-                "https://cardano-preprod.blockfrost.io/api/v0",
-                "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
-              ),
-              "Preprod"
-            );
-
-            transferLucid.selectWalletFromSeed(
-              "cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise"
-            );
+          let connectedWallet = window.localStorage.getItem("connectedWallet")
+          if (values.file != null || values.file != undefined) {
+            const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
+            const projectSecret = "136393a5b7f4e47a9e153a88eb636003";
+            const auth = `Basic ${Buffer.from(
+              `${projectId}:${projectSecret}`
+            ).toString("base64")}`;
+            const client = create({
+              host: "ipfs.infura.io",
+              port: 5001,
+              protocol: "https",
+              headers: {
+                authorization: auth,
+              },
+            });
+            const uploaded_image = await client.add(values.file);
+            if (uploaded_image) {
+              console.log(uploaded_image, 'img')
 
             const lucidBrowser = await Lucid.new(
               new Blockfrost(
