@@ -21,7 +21,6 @@ const Sell = () => {
   const { type } = router.query;
   const [tabValue, setTabValue] = useState("list");
   const [listTabValue, setListTabValue] = useState("add");
-  const [listingSteps, setListingSteps] = useState("step1");
   const onListTabChange = (event, newValue) => {
     setListTabValue(newValue);
   };
@@ -102,12 +101,8 @@ const Sell = () => {
             <TabPanel value="list" sx={{ p: 0, py: 2 }}>
               {type === "add-listing" ? (
                 <>
-                  {step === "step1" && (
-                    <MylistTabs setListingSteps={setListingSteps} />
-                  )}
-                  {step === "step2" && (
-                    <SellMethod setListingSteps={setListingSteps} />
-                  )}
+                  {step === "step1" && <MylistTabs />}
+                  {step === "step2" && <SellMethod />}
                 </>
               ) : (
                 <MyListCard />

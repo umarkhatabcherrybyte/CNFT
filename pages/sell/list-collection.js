@@ -29,7 +29,6 @@ import { useDispatch, useSelector } from "react-redux";
 const ListCollectionStep2 = () => {
   const dispatch = useDispatch();
   const { step } = useSelector((store) => store.listing);
-  console.log(step, "step");
   const router = useRouter();
   const [selectedFiles, setSeletedFiles] = useState([]);
   const [metaFile, setMetaFile] = useState(undefined);
@@ -58,8 +57,6 @@ const ListCollectionStep2 = () => {
       // window.localStorage.getItem("metadataObjects", metadataObjects);
     }
   }, []);
-  console.log("selectedFiles.length", selectedFiles.length);
-  console.log("metadataObjects.length", metadataObjects.length);
 
   const onDeleteFile = (index_num) => {
     const files = selectedFiles.filter((item, index) => {
@@ -194,7 +191,7 @@ const ListCollectionStep2 = () => {
     }
   }
 
-  function onNextStep() {
+  async function onNextStep() {
     let objs = convertMetadataObjects();
     console.log(
       objs.length != imagePaths.length,
@@ -204,14 +201,14 @@ const ListCollectionStep2 = () => {
     if (imagePaths.length == 0) {
       Toast("error", "please upload NFT files first");
       return;
-    } else if (checked && objs.length != imagePaths.length) {
+    } else if (isWebform && objs.length != imagePaths.length) {
       Toast("error", "missing metadata of some Files");
       return;
-    } else if (!checked && metadataObjects.length != imagePaths.length) {
+    } else if (!isWebform && metadataObjects.length != imagePaths.length) {
       Toast("error", "missing metadata of some Files");
       return;
     } else if (
-      !checked &&
+      !isWebform &&
       metadataObjects.length == imagePaths.length &&
       typeof window !== "undefined" &&
       metadataFileUploaded
@@ -225,15 +222,17 @@ const ListCollectionStep2 = () => {
         "metadataObjectsProperties",
         JSON.stringify(metadataObjectProperties)
       );
-      router.push(mintCollectionStep2);
-    } else if (checked && typeof window !== "undefined") {
+      onMintCollection();
+      // router.push(mintCollectionStep2);
+    } else if (isWebform && typeof window !== "undefined") {
+      onMintCollection();
       window.localStorage.setItem("images", JSON.stringify(imagePaths));
       window.localStorage.setItem("metadataObjects", JSON.stringify(objs));
       window.localStorage.setItem(
         "metadataObjectsProperties",
         JSON.stringify(metadataObjectProperties)
       );
-      router.push(mintCollectionStep2);
+      // router.push(mintCollectionStep2);
     }
   }
 
@@ -512,49 +511,49 @@ const ListCollectionStep2 = () => {
                   </>
                 ))}
               {/* <div className="row file-list">
-              {fileInfos && !metaData.length ? (
-                <table className="table text-white file-list-table">
-                  <tbody>
-                    {fileInfos.map((file, index) => (
-                      <tr key={index}>
-                        <td>{file.name}</td>
-                        <td style={{ width: "50px" }}>
-                          <DeleteForever
-                            onClick={() => onRemoveImage(file.name)}
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <table className="table text-white file-list-table">
-                  <thead>
-                    <tr>
-                      <td>Image</td>
-                      {Object.keys(metaData[0].attributes).map(
-                        (attr, index) => (
-                          <td key={index}>{attr}</td>
-                        )
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {metaData.length &&
-                      metaData.map((row, index) => (
+                {fileInfos && !metaData.length ? (
+                  <table className="table text-white file-list-table">
+                    <tbody>
+                      {fileInfos.map((file, index) => (
                         <tr key={index}>
-                          <td>{row.ImageName}</td>
-                          {Object.values(row.attributes).map(
-                            (attr, index) => (
-                              <td key={index}>{attr}</td>
-                            )
-                          )}
+                          <td>{file.name}</td>
+                          <td style={{ width: "50px" }}>
+                            <DeleteForever
+                              onClick={() => onRemoveImage(file.name)}
+                            />
+                          </td>
                         </tr>
                       ))}
-                  </tbody>
-                </table>
-              )}
-            </div> */}
+                    </tbody>
+                  </table>
+                ) : (
+                  <table className="table text-white file-list-table">
+                    <thead>
+                      <tr>
+                        <td>Image</td>
+                        {Object.keys(metaData[0].attributes).map(
+                          (attr, index) => (
+                            <td key={index}>{attr}</td>
+                          )
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {metaData.length &&
+                        metaData.map((row, index) => (
+                          <tr key={index}>
+                            <td>{row.ImageName}</td>
+                            {Object.values(row.attributes).map(
+                              (attr, index) => (
+                                <td key={index}>{attr}</td>
+                              )
+                            )}
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                )}
+              </div> */}
             </Box>
             <Box>
               <Header
@@ -572,7 +571,7 @@ const ListCollectionStep2 = () => {
                 },
               }}
             >
-              <Grid xs={12} md={9} item>
+              <Grid xs={12} md={8} item>
                 <div className="col-9 file-input-wrapper">
                   <div
                     className="file-select-button"
@@ -643,7 +642,7 @@ const ListCollectionStep2 = () => {
                   />
                 </div>
               </Grid>
-              <Grid item md={3} xs={12}>
+              <Grid item md={4} xs={12}>
                 <Button
                   className="btn  w_100"
                   // disabled={!metaFile}
@@ -652,12 +651,43 @@ const ListCollectionStep2 = () => {
                   Upload
                 </Button>
               </Grid>
+              {/* <Grid item md={2} xs={12}>
+                <Button onClick={viewImagesPaths} className="btn w_100">
+                  Verify
+                </Button>
+              </Grid> */}
+              <Grid xs={12} item>
+                <label className="form-check-label">
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    checked={isWebform}
+                    onChange={() => setIsWebform(!isWebform)}
+                  />
+                  Use a webform
+                </label>
+              </Grid>
+
+              <ExcelSpreadSheet
+                metadataObjects={metadataObjects}
+                setMetadataObjects={setMetadataObjects}
+                metadataObjectProperties={metadataObjectProperties}
+                setMetadataObjectProperties={setMetadataObjectProperties}
+                isWebform={isWebform}
+              />
+              <Grid item xs={12} sx={{ marginTop: 5, display: "flex" }}>
+                {/* <Box className="max_btn w_100" sx={{ mr: 2 }}>
+                  <Button className="btn2 w_100 " onClick={() => onBackStep()}>
+                    Back
+                  </Button>
+                </Box> */}
+                <Box className="max_btn w_100">
+                  <Button className="btn2 w_100" onClick={() => onNextStep()}>
+                    Next
+                  </Button>
+                </Box>
+              </Grid>
             </Grid>
-          </Box>
-          <Box sx={{ py: 2 }}>
-            <Button className="btn2" onClick={onMintCollection}>
-              Next
-            </Button>
           </Box>
         </Layout>
       </ContainerLayout>

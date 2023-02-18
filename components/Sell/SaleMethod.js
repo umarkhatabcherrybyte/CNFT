@@ -31,7 +31,8 @@ import { INSTANCE } from "../../config/axiosInstance";
 import { useDispatch } from "react-redux";
 import { setListing } from "../../redux/listing/ListingActions";
 import { setAuction } from "../../redux/listing/ListingActions";
-const SaleMethod = ({ setListingSteps }) => {
+import { getObjData } from "../../helper/localStorage";
+const SaleMethod = () => {
   const dispatch = useDispatch();
   const { data: listing, auction } = useSelector((state) => state.listing);
   // useEffect(() => {}, [auction]);
@@ -56,19 +57,24 @@ const SaleMethod = ({ setListingSteps }) => {
     });
   };
   const submitData = async () => {
-    const stored_one = localStorage.getItem("listing");
-    const stored_two = localStorage.getItem("auction");
-    const data_one = stored_one ? JSON.parse(stored_one) : {};
-    const data_two = stored_two ? JSON.parse(stored_two) : {};
-
-    // console.log(data_one);
-    // console.log(data_two);
-    if (data_one && data_two) {
+    const listing_data = getObjData("listing");
+    const auction_data = getObjData("auction");
+    if (listing_data && auction_data) {
+      // collection data
+      const data =
+        listing_data.type === "single"
+          ? {
+              user_id: listing_data?.user_id,
+              nft_ids: [listing_data._id],
+            }
+          : {
+              user_id: listing_data?.type,
+            };
+      console.log(data);
       try {
         const res = await INSTANCE.post("/list/create", {
-          ...data_two,
-          user_id: data_one?.user_id,
-          nft_ids: [data_one._id],
+          ...auction_data,
+          ...data,
         });
       } catch (e) {
         console.log(e);

@@ -44,7 +44,7 @@ const names = [
   "Carlos Abbott",
 ];
 
-const MylistTabs = ({ setListingSteps }) => {
+const MylistTabs = () => {
   const { wallet, connected } = useWallet();
   const [recipientAddress, setRecipientAddress] = useState("");
   React.useEffect(() => {
