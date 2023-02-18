@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PaymentHeader from "../shared/header/PaymentHeader";
 import {
   Box,
@@ -28,8 +28,13 @@ import { useSelector } from "react-redux";
 import Fixed from "./FixedPrice";
 import AuctionDeal from "./Auction";
 import { INSTANCE } from "../../config/axiosInstance";
+import { useDispatch } from "react-redux";
+import { setListing } from "../../redux/listing/ListingActions";
+import { setAuction } from "../../redux/listing/ListingActions";
 const SaleMethod = ({ setListingSteps }) => {
+  const dispatch = useDispatch();
   const { data: listing, auction } = useSelector((state) => state.listing);
+  // useEffect(() => {}, [auction]);
   console.log(auction);
   console.log(listing);
   const [paymentValue, setPaymentValue] = useState("fixed");
@@ -51,20 +56,23 @@ const SaleMethod = ({ setListingSteps }) => {
     });
   };
   const submitData = async () => {
-    try {
-      // nft_ids ;[]
-      // user_id :
-      // minttpyr
-      // PriceChange
-      // is_open_for_offer
+    const stored_one = localStorage.getItem("listing");
+    const stored_two = localStorage.getItem("auction");
+    const data_one = stored_one ? JSON.parse(stored_one) : {};
+    const data_two = stored_two ? JSON.parse(stored_two) : {};
 
-      const res = await INSTANCE.post("/list/create", {
-        ...auction,
-        user_id: "63ee18bd4080ce6fa6ad8291",
-        nft_ids: ["63ee69dfc6f07b9215240289"],
-      });
-    } catch (e) {
-      console.log(e);
+    // console.log(data_one);
+    // console.log(data_two);
+    if (data_one && data_two) {
+      try {
+        const res = await INSTANCE.post("/list/create", {
+          ...data_two,
+          user_id: data_one?.user_id,
+          nft_ids: [data_one._id],
+        });
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
   return (
@@ -255,7 +263,6 @@ const SaleMethod = ({ setListingSteps }) => {
             <Button
               sx={{ width: "150px" }}
               className="btn2"
-              type="submit"
               onClick={submitData}
             >
               Sell

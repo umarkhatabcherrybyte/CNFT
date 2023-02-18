@@ -40,7 +40,7 @@ const FixedPrice = () => {
     },
     validationSchema: fixedPriceSchema,
     onSubmit: (values) => {
-      dispatch(setAuction(values));
+      window.localStorage.setItem("auction", JSON.stringify(values));
     },
   });
   return (

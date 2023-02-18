@@ -179,14 +179,17 @@ const MylistTabs = ({ setListingSteps }) => {
                   // asset_hex_name: unit,
                 };
                 const res = await INSTANCE.post("/collection/single", data);
-                dispatch(setListing(res?.data.data));
-                setListingSteps("step2");
-
-                console.log(res);
+                // dispatch(setListing(res?.data.data));
+                // setListingSteps("step2");
+                dispatch(setStep("step2"));
+                window.localStorage.setItem(
+                  "listing",
+                  JSON.stringify(res?.data.data)
+                );
               } catch (e) {
                 console.log(e);
               }
-              // window.localStorage.setItem("policy", mintingPolicy.script);
+              //
               // window.localStorage.setItem("policy-id", policyId);
               // window.localStorage.setItem(
               //   "minting-script",

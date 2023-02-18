@@ -13,8 +13,11 @@ import MyListCard from "../../components/Sell/MyListCard";
 import Ballon from "../../components/Design/Ballon";
 import Strips from "../../components/Design/Strips";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
 const Sell = () => {
   const router = useRouter();
+  const { step } = useSelector((store) => store.listing);
+  console.log("step", step);
   const { type } = router.query;
   const [tabValue, setTabValue] = useState("list");
   const [listTabValue, setListTabValue] = useState("add");
@@ -99,10 +102,10 @@ const Sell = () => {
             <TabPanel value="list" sx={{ p: 0, py: 2 }}>
               {type === "add-listing" ? (
                 <>
-                  {listingSteps === "step1" && (
+                  {step === "step1" && (
                     <MylistTabs setListingSteps={setListingSteps} />
                   )}
-                  {listingSteps === "step2" && (
+                  {step === "step2" && (
                     <SellMethod setListingSteps={setListingSteps} />
                   )}
                 </>

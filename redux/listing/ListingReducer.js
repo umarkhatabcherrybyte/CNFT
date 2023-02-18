@@ -1,18 +1,22 @@
-import { SET_LISTING, SET_AUCTION } from "./ListingConstants";
+import { SET_LISTING, SET_AUCTION, SET_STEP } from "./ListingConstants";
 const INIT_STATE = {
   data: {},
   auction: {},
+  step: "step1",
 };
 
 export const listingreducer = (state = INIT_STATE, action) => {
+  console.log(action.payload);
   switch (action.type) {
+    case SET_STEP:
+      return { step: action.payload };
     case SET_LISTING:
-      // return {action.payload};
-      return { data: action.payload };
-    // return { ...state, products: action.payload };
-    case SET_AUCTION:
-      return { auction: action.payload };
+      const stored = localStorage.getItem("listing");
+      return { data: stored ? JSON.parse(stored) : {} };
 
+    case SET_AUCTION:
+      const stored_two = localStorage.getItem("auction");
+      return stored_two ? JSON.parse(stored_two) : {};
     case "ADD_CART":
       const IteamIndex = state.data.findIndex(
         (iteam) => iteam.id === action.payload.id

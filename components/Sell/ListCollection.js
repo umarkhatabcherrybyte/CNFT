@@ -98,10 +98,9 @@ const ListCollection = () => {
     },
     validationSchema: addCollectioneListingSchema,
     onSubmit: (values) => {
-      // router.push(listCollectionRoute);
-      dispatch(setListing(values));
-
-      console.log(values);
+      router.push(listCollectionRoute);
+      // dispatch(setListing(values));
+      window.localStorage.setItem("listing", JSON.stringify(values));
     },
   });
   console.log(formik);
