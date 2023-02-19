@@ -29,18 +29,18 @@ import { useDispatch } from "react-redux";
 import { setAuction } from "../../redux/listing/ListingActions";
 const FixedPrice = () => {
   const { auction, data: listing } = useSelector((state) => state.listing);
-  console.log(auction);
-  console.log(listing);
+  // console.log(auction);
+  // console.log(listing);
   const dispatch = useDispatch();
   const formik = useFormik({
     initialValues: {
       price: "",
       is_open_for_offer: false,
-      mint_type: "fixed",
+      sell_type: "fixed",
     },
     validationSchema: fixedPriceSchema,
     onSubmit: (values) => {
-      window.localStorage.setItem("auction", JSON.stringify(values));
+      window.localStorage.setItem("list-item-fixed", JSON.stringify(values));
     },
   });
   return (

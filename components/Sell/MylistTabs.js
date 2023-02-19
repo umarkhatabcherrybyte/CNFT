@@ -22,6 +22,7 @@ import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { create } from "ipfs-http-client";
 import { setListing } from "../../redux/listing/ListingActions";
+import { setStep } from "../../redux/listing/ListingActions";
 import { CardanoWallet, useWallet } from "@meshsdk/react";
 import { Toast } from "../shared/Toast";
 import { INSTANCE } from "../../config/axiosInstance";
@@ -75,6 +76,7 @@ const MylistTabs = () => {
     },
     validationSchema: addSingleListingSchema,
     onSubmit: async (values) => {
+      console.log(values, 'sef')
       try {
         if (connected) {
           let connectedWallet = window.localStorage.getItem("connectedWallet");
@@ -95,6 +97,13 @@ const MylistTabs = () => {
             const uploaded_image = await client.add(values.file);
             if (uploaded_image) {
               console.log(uploaded_image, "img");
+
+              const transferLucid = await Lucid.new(
+                new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
+                "Preprod"
+              );
+
+              transferLucid.selectWalletFromSeed("cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise");
 
               const lucidBrowser = await Lucid.new(
                 new Blockfrost(
@@ -173,6 +182,7 @@ const MylistTabs = () => {
                   const res = await INSTANCE.post("/collection/single", data);
 
                   dispatch(setStep("step2"));
+                  // dispatch(setListing())
                   window.localStorage.setItem(
                     "listing",
                     JSON.stringify(res?.data.data)
@@ -192,8 +202,11 @@ const MylistTabs = () => {
             Toast("error", "Please connect your wallet first");
           }
         }
+        else {
+          Toast("error", "Connect Your Wallet First");
+        }
       } catch (error) {
-        console.log(error, err);
+        console.log(error, "err");
         Toast("error", "Error Occured During Minting");
       }
     },
@@ -361,7 +374,7 @@ const MylistTabs = () => {
                     className="btn2"
                     sx={{ width: "150px" }}
                     type="submit"
-                    // onClick={() => setListingSteps("step2")}
+                  // onClick={() => setListingSteps("step2")}
                   >
                     Next
                   </Button>

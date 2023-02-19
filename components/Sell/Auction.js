@@ -70,7 +70,7 @@ const Auction = () => {
     validationSchema: auctionDealSchema,
     onSubmit: (values) => {
       console.log(values);
-      window.localStorage.setItem("auction", JSON.stringify(values));
+      window.localStorage.setItem("list-item-auction", JSON.stringify(values));
     },
   });
   return (

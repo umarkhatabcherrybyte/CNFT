@@ -34,10 +34,14 @@ import { setAuction } from "../../redux/listing/ListingActions";
 import { getObjData } from "../../helper/localStorage";
 const SaleMethod = () => {
   const dispatch = useDispatch();
-  const { data: listing, auction } = useSelector((state) => state.listing);
-  // useEffect(() => {}, [auction]);
-  console.log(auction);
-  console.log(listing);
+  const [listing, setListing] = useState()
+  const { auction } = useSelector((state) => state.listing);
+  useEffect(() => {
+    const listing_data = getObjData("listing");
+    setListing(listing_data)
+  }, []);
+  // console.log(auction);
+  // console.log(listing);
   const [paymentValue, setPaymentValue] = useState("fixed");
   const [auctionDuration, setAuctionDuration] = useState({
     days: "",
@@ -57,29 +61,42 @@ const SaleMethod = () => {
     });
   };
   const submitData = async () => {
+    // console.log(data, 'list')
     const listing_data = getObjData("listing");
-    const auction_data = getObjData("auction");
-    if (listing_data && auction_data) {
-      // collection data
-      const data =
-        listing_data.type === "single"
-          ? {
-              user_id: listing_data?.user_id,
-              nft_ids: [listing_data._id],
-            }
-          : {
-              user_id: listing_data?.type,
-            };
-      console.log(data);
-      try {
-        const res = await INSTANCE.post("/list/create", {
-          ...auction_data,
-          ...data,
-        });
-      } catch (e) {
-        console.log(e);
-      }
-    }
+    const fixed_data = getObjData("list-item-fixed");
+    // if (listing_data && fixed_data) {
+    //   // collection data
+    //   const data =
+    //     listing_data.type === "single"
+    //       ? {
+    //         user_id: listing_data?.user_id,
+    //         nft_ids: [listing_data._id],
+    //       }
+    //       : {
+    //         user_id: listing_data?.type,
+    //       };
+    //   console.log(data);
+    //   try {
+    //     // {"price":"150","is_open_for_offer":true,"sell_type":"fixed"}
+    //     let formData = new FormData()
+    //     formData.append('price', fixed_data['price'])
+    //     formData.append('is_open_for_offer', fixed_data['is_open_for_offer'])
+    //     formData.append('sell_type', fixed_data['sell_type'])
+    //     formData.append('user_id', listing_data?.user_id)
+    //     formData.append('nft_ids', JSON.stringify([listing_data._id]))
+    //     formData.append('mint_type', listing_data.type)
+    //     // formData.append('logo', listing_data.type)
+    //     const res = await INSTANCE.post(
+    //       listing_data.type === "single" ?
+    //         "/list/create/single" :
+    //         "/list/create/collection", formData);
+    //     if (res) {
+    //       console.log(res, 'response')
+    //     }
+    //   } catch (e) {
+    //     console.log(e);
+    //   }
+    // }
   };
   return (
     <>
@@ -171,16 +188,16 @@ const SaleMethod = () => {
                 <CaptionHeading heading="To CNFT Genie" font="montserrat" />
                 <CaptionHeading heading="2.5%" font="montserrat" />
               </Box>
-              <Box className="space_between" sx={{ py: 1 }}>
+              {/* <Box className="space_between" sx={{ py: 1 }}>
                 <Box>
                   <CaptionHeading heading="To Creator" font="montserrat" />
                   <LightText heading="(If royalty fee is set by the artist)" />
                 </Box>
                 <CaptionHeading heading="10%" font="montserrat" />
-              </Box>
+              </Box> */}
               <Box className="space_between" sx={{ py: 1 }}>
                 <CaptionHeading heading="Total %" font="montserrat" />
-                <CaptionHeading heading="12.5%" font="montserrat" />
+                <CaptionHeading heading="2.5%" font="montserrat" />
               </Box>
             </Box>
             <Box
@@ -193,7 +210,7 @@ const SaleMethod = () => {
               }}
             >
               <CaptionHeading heading="Total ADA" font="montserrat" />
-              <CaptionHeading heading="XX ADA" font="montserrat" />
+              <CaptionHeading heading={`XX ADA`} font="montserrat" />
             </Box>
           </Grid>
 
@@ -209,7 +226,7 @@ const SaleMethod = () => {
               <AssetInputField
                 placeholder="Enter Asset Name"
                 name="asset_name"
-                // value={listing?.assets[0]?.asset_name}
+                value={listing?.assets[0]?.asset_name}
               />
             </Box>
           </Grid>
@@ -240,7 +257,7 @@ const SaleMethod = () => {
               <AssetInputField
                 placeholder="Enter Quantity"
                 name="quantity"
-                // value={listing?.assets[0]?.asset_quantity}
+                value={listing?.assets?.length}
               />
             </Box>
           </Grid>
@@ -254,17 +271,6 @@ const SaleMethod = () => {
               />
             </Box>
           </Grid>
-          {/* <Grid item xs={12} md={6}>
-            <Box>
-              <CaptionHeading heading="Creator" font="montserrat" />
-
-              <AssetInputField
-                formik={formik}
-                placeholder="Enter Creator"
-                name="creator"
-              />
-            </Box>
-          </Grid> */}
           <Grid item xs={12} className="flex">
             <Button
               sx={{ width: "150px" }}

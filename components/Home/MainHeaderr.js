@@ -22,17 +22,17 @@ const MainHeaderr = () => {
       .then((response) => {
         setAdaInfo(response.data[0]);
       })
-      .catch(() => {});
+      .catch(() => { });
     const interval = setInterval(() => {
       GetAdaPriceService.getPrice()
         .then((response) => {
           setAdaInfo(response.data[0]);
         })
-        .catch(() => {});
+        .catch(() => { });
     }, 30000);
     return () => clearInterval(interval);
   }, []);
-  console.log(router.isReady);
+  // console.log(router.isReady);
   // if (!router.isReady) {
   //   // return;
   // }

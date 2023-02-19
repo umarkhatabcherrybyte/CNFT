@@ -6,8 +6,9 @@ const AssetInputField = ({ placeholder, ada, copy, label, name, value }) => {
   console.log(value);
   return (
     <>
+      {/* <h1>{value || 'dd'}</h1> */}
       <TextField
-        placeholder={placeholder}
+        // placeholder={placeholder}
         label={label && label}
         fullWidth
         name={name}
