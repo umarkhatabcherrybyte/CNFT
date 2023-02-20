@@ -4,12 +4,12 @@ import { ArrowForwardIos } from "@mui/icons-material";
 import styled from "styled-components";
 import { useRouter } from "next/router";
 import { buyDetailRoute } from "../Routes/constants";
-const NftCard = () => {
+const NftCard = ({ card }) => {
   const router = useRouter();
   return (
     <NftCardStyled>
       <Card
-        onClick={() => router.push(`${buyDetailRoute}/2323`)}
+        onClick={() => router.push(`${buyDetailRoute}/${card?._id}`)}
         sx={{
           boxShadow: "none",
           background: "var(--main-color)",
@@ -30,10 +30,10 @@ const NftCard = () => {
           <CardMedia
             component="img"
             height="290"
-            image="/images/Buy Our Tokens/Layer 61.png"
+            image={`https://ipfs.io/ipfs/${card?.collection_ids[0]?.assets[0]?.ipfs}`}
             alt="green iguana"
           />
-          <Box
+          {/* <Box
             sx={{
               position: "absolute",
               bottom: "10px",
@@ -63,7 +63,7 @@ const NftCard = () => {
                 Created by@Julian
               </Typography>
             </Box>
-          </Box>
+          </Box> */}
         </Box>
         <CardContent>
           <Box className="flex">
@@ -74,7 +74,7 @@ const NftCard = () => {
               className="bold"
               sx={{ textTransform: "uppercase" }}
             >
-              iNDUSTRIAL REvolution
+              {card?.collection_ids[0]?.assets[0]?.asset_name}
             </Typography>
             <Typography
               gutterBottom
@@ -83,7 +83,8 @@ const NftCard = () => {
               sx={{ color: "var(--secondary-color)" }}
               className="bold"
             >
-              1000{" "}
+              {card?.sell_type_id?.price}
+
               <Typography
                 variant="caption"
                 component="div"
@@ -95,7 +96,7 @@ const NftCard = () => {
               </Typography>
             </Typography>
           </Box>
-          <Box className="flex">
+          {/* <Box className="flex">
             <Box
               sx={{
                 display: "flex",
@@ -118,7 +119,7 @@ const NftCard = () => {
                 <ArrowForwardIos sx={{ color: "var(--secondary-color)" }} />
               </Box>
             </Box>
-          </Box>
+          </Box> */}
         </CardContent>
       </Card>
     </NftCardStyled>

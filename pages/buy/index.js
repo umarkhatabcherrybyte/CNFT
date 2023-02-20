@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Box, Tab, Grid } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
@@ -8,11 +8,37 @@ import ContainerLayout from "../../components/shared/ContainerLayout";
 import Filter from "../../components/shared/Filter";
 import BuyCards from "../../components/Buy/BuyCards";
 import { useRouter } from "next/router";
-
+import FullScreenLoader from "../../components/shared/FullScreenLoader";
+import { INSTANCE } from "../../config/axiosInstance";
 const Buy = () => {
   const router = useRouter();
-  const [tabValue, setTabValue] = useState("items");
+  const [tabValue, setTabValue] = useState("single");
+  const [filter, setFilter] = useState({
+    price_range: {
+      min: "0",
+      max: "99999999999999999999999999999",
+    },
+    sort: "",
+    type: "",
+  });
+  const [buy, setBuy] = useState([]);
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const res = await INSTANCE.post("/list/find/single/fixed", {
+          mint_type: tabValue,
+          ...filter,
+        });
+        console.log("filter");
 
+        setBuy([...res?.data?.data]);
+      } catch (e) {
+        setBuy([]);
+        console.log("filter error");
+      }
+    };
+    getData();
+  }, [tabValue, filter]);
   const onTabChange = (event, newValue) => {
     setTabValue(newValue);
     // if (newValue === "collections") {
@@ -48,7 +74,7 @@ const Buy = () => {
                       fontWeight: "bold",
                     },
                     "& 	.MuiTabs-flexContainer": {
-                      flexWrap: "wrap",
+                      flexWrap: { xs: "wrap", lg: "nowrap" },
                     },
                     "& .tab_btn": {
                       color: "#ffff",
@@ -63,35 +89,35 @@ const Buy = () => {
                 >
                   <Tab
                     label="Items"
-                    value="items"
+                    value="single"
                     className="tab_btn initialcase"
                   />
                   <Tab
                     label="Collections "
-                    value="collections"
+                    value="collection"
                     className="tab_btn initialcase"
                   />
-                  <Tab
+                  {/* <Tab
                     label="Trending"
                     value="trending"
                     className="tab_btn initialcase"
-                  />
+                  /> */}
                 </TabList>
               </Grid>
               <Grid item xs={12} md={8}>
-                <Filter />
+                <Filter setFilter={setFilter} filter={filter} />
               </Grid>
             </Grid>
           </Box>
-          <TabPanel value="items">
-            <BuyCards tabValue={tabValue} />
+          <TabPanel value="single">
+            <BuyCards tabValue={tabValue} buy={buy} />
           </TabPanel>
-          <TabPanel value="collections">
-            <BuyCards tabValue={tabValue} />
+          <TabPanel value="collection">
+            <BuyCards tabValue={tabValue} buy={buy} />
           </TabPanel>
-          <TabPanel value="trending">
+          {/* <TabPanel value="trending">
             <BuyCards tabValue={tabValue} />
-          </TabPanel>
+          </TabPanel> */}
         </TabContext>
       </ContainerLayout>
     </BuyStyled>

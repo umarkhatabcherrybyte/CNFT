@@ -2,7 +2,8 @@ import React from "react";
 import OptionMenu from "./OptionMenu";
 // import heartImg from "/images/heart.png";
 import { Box } from "@mui/material";
-const Filter = () => {
+import { price_range_data, recent_listing } from "../../data/Index";
+const Filter = ({ setFilter, filter }) => {
   return (
     <>
       <>
@@ -15,17 +16,33 @@ const Filter = () => {
             flexWrap: { md: "nowrap", xs: "wrap" },
           }}
         >
+          {/* <Box className="w_100">
+            <OptionMenu
+              placeholder="Projects"
+              setFilter={setFilter}
+              name="project"
+            />
+          </Box> */}
+          {/* <Box className="w_100">
+            <OptionMenu placeholder="Type" setFilter={setFilter} name="type" />
+          </Box> */}
           <Box className="w_100">
-            <OptionMenu placeholder="Projects" />
+            <OptionMenu
+              placeholder="Price Range"
+              setFilter={setFilter}
+              name="price_range"
+              data={price_range_data}
+              filter={filter}
+            />
           </Box>
           <Box className="w_100">
-            <OptionMenu placeholder="Type" />
-          </Box>
-          <Box className="w_100">
-            <OptionMenu placeholder="Price Range" />
-          </Box>
-          <Box className="w_100">
-            <OptionMenu placeholder="Recent Listing" />
+            <OptionMenu
+              placeholder="Recent Listing"
+              setFilter={setFilter}
+              name="sort"
+              data={recent_listing}
+              filter={filter}
+            />
           </Box>
           <Box className="w_100" sx={{ width: "18% !important" }}>
             <img

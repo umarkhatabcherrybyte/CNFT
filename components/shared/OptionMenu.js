@@ -4,11 +4,12 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-const OptionMenu = ({ placeholder }) => {
-  const [age, setAge] = React.useState("");
-
+const OptionMenu = ({ placeholder, setFilter, name, data, filter }) => {
   const onMenuChange = (event) => {
-    setAge(event.target.value);
+    setFilter({
+      ...filter,
+      [event.target.name]: event.target.value,
+    });
   };
 
   return (
@@ -26,7 +27,8 @@ const OptionMenu = ({ placeholder }) => {
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
-          value={age}
+          // value={age}
+          name={name}
           label={placeholder}
           onChange={onMenuChange}
           sx={{
@@ -46,9 +48,10 @@ const OptionMenu = ({ placeholder }) => {
             },
           }}
         >
-          <MenuItem value={10}>Ten</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem>
+          {data &&
+            data.map((item, index) => (
+              <MenuItem value={item.value}>{item.title}</MenuItem>
+            ))}
         </Select>
       </FormControl>
     </>

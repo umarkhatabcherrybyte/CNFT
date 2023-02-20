@@ -41,15 +41,8 @@ const wallets = [
 ];
 
 const WalletDropdown = () => {
-  const {
-    wallet,
-    connected,
-    name,
-    connecting,
-    connect,
-    disconnect,
-    error
-  } = useWallet();
+  const { wallet, connected, name, connecting, connect, disconnect, error } =
+    useWallet();
 
   const lovelace = useLovelace();
 
@@ -59,7 +52,7 @@ const WalletDropdown = () => {
   }, []);
 
   useEffect(() => {
-    signIn()
+    signIn();
   }, [connected, wallet]);
   useEffect(() => {
     if (error) {
@@ -75,26 +68,31 @@ const WalletDropdown = () => {
     try {
       if (connected) {
         // console.log(wallet, 'weawdas')
-        let addrss = await wallet?.getUsedAddresses()
+        let addrss = await wallet?.getUsedAddresses();
         // console.log('here', await wallet?.getUsedAddress(), await wallet?.getUsedAddresses())
-        let res = await UserService.signIn(addrss[0])
+        window.localStorage.setItem("user_address", addrss[0]);
+
+        let res = await UserService.signIn(addrss[0]);
         if (res.data) {
-          console.log(res.data)
-          window.localStorage.setItem("userid", res.data.data._id);
+          console.log(res.data);
+          window.localStorage.setItem("user_id", res.data.data._id);
         }
       }
     } catch (error) {
-      console.log(error, 'err')
+      console.log(error, "err");
     }
-  }
+  };
 
   const handleWalletClick = async (event, walletV) => {
     if (walletV.value === walletName) {
       setWalletName("default");
       disconnect();
     } else {
-      connect(walletV.value)
-      window.localStorage.setItem("connectedWallet", String(walletV.value).toLowerCase());
+      connect(walletV.value);
+      window.localStorage.setItem(
+        "connectedWallet",
+        String(walletV.value).toLowerCase()
+      );
     }
   };
 
@@ -141,7 +139,7 @@ const WalletDropdown = () => {
         }}
         inputProps={{
           "aria-label": "Without label",
-          "className": "root",
+          className: "root",
         }}
         MenuProps={{
           PaperProps: {

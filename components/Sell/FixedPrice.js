@@ -36,11 +36,11 @@ const FixedPrice = () => {
     initialValues: {
       price: "",
       is_open_for_offer: false,
-      mint_type: "fixed",
+      sell_type: "fixed",
     },
     validationSchema: fixedPriceSchema,
     onSubmit: (values) => {
-      window.localStorage.setItem("auction", JSON.stringify(values));
+      window.localStorage.setItem("list-item-fixed", JSON.stringify(values));
     },
   });
   return (

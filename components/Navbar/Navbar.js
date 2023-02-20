@@ -88,7 +88,7 @@ const Navbar = () => {
   //   window.addEventListener("scroll", function () {
   //     if (window.pageYOffset > 0) {
   //       setNavScroll("active");
-  //     } else { 
+  //     } else {
   //       setNavScroll("");
   //     }
   //   });
@@ -113,7 +113,7 @@ const Navbar = () => {
           boxShadow: "none",
           padding: "8px 0",
         }}
-      // className={`${navScroll}`}
+        // className={`${navScroll}`}
       >
         <Container maxWidth="xl">
           <Toolbar
@@ -162,7 +162,7 @@ const Navbar = () => {
                         display: "none",
                       },
                       "& .Mui-selected": {
-                        color: "var(--secondary-color) !important",
+                        color: "#fff !important",
                       },
                     }}
                   >
