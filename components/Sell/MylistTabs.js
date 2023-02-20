@@ -76,7 +76,6 @@ const MylistTabs = () => {
     },
     validationSchema: addSingleListingSchema,
     onSubmit: async (values) => {
-      console.log(values, "sef");
       try {
         if (connected) {
           let connectedWallet = window.localStorage.getItem("connectedWallet");

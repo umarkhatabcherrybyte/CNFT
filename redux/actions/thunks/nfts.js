@@ -4,9 +4,9 @@ import api from "/core/api";
 
 export const fetchNftsBreakdown = (authorId) => async (dispatch, getState) => {
   //access the state
-  console.log(authorId, "SDfsdf");
+  // console.log(authorId, "SDfsdf");
   const state = getState();
-  console.log(state);
+  // console.log(state);
   dispatch(actions.getNftBreakdown.request(Canceler.cancel));
   try {
     let filter = authorId ? "author=" + authorId : "";

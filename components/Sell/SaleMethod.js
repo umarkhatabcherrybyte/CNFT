@@ -61,6 +61,7 @@ const SaleMethod = () => {
     });
   };
   const submitData = async () => {
+    // console.log(data, 'list')
     const listing_data = getObjData("listing");
     const fixed_data = getObjData("list-item-fixed");
     if (listing_data && fixed_data) {

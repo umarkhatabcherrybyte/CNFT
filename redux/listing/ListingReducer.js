@@ -6,7 +6,7 @@ const INIT_STATE = {
 };
 
 export const listingreducer = (state = INIT_STATE, action) => {
-  console.log(action.payload);
+  // console.log(action.payload);
   switch (action.type) {
     case SET_STEP:
       return { step: action.payload };
@@ -52,7 +52,7 @@ export const listingreducer = (state = INIT_STATE, action) => {
 
       if (state.data[IteamIndex_dec].qnty >= 1) {
         const dltiteams = (state.data[IteamIndex_dec].qnty -= 1);
-        console.log([...state.data, dltiteams]);
+        // console.log([...state.data, dltiteams]);
 
         return {
           ...state,

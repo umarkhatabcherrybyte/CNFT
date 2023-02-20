@@ -29,8 +29,8 @@ import { useDispatch } from "react-redux";
 import { setAuction } from "../../redux/listing/ListingActions";
 const FixedPrice = () => {
   const { auction, data: listing } = useSelector((state) => state.listing);
-  console.log(auction);
-  console.log(listing);
+  // console.log(auction);
+  // console.log(listing);
   const dispatch = useDispatch();
   const formik = useFormik({
     initialValues: {
