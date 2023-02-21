@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PaymentHeader from "../shared/header/PaymentHeader";
 import {
   Box,
@@ -27,11 +27,14 @@ import { useSelector } from "react-redux";
 import PriceInputField from "./PriceInputField";
 import { useDispatch } from "react-redux";
 import { setAuction } from "../../redux/listing/ListingActions";
-const FixedPrice = () => {
-  const { auction, data: listing } = useSelector((state) => state.listing);
+const FixedPrice = ({ setTotalAmount, setIsForm }) => {
+  // const { auction, data: listing } = useSelector((state) => state.listing);
   // console.log(auction);
   // console.log(listing);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
+  useEffect(() => {
+    setIsForm(false);
+  }, []);
   const formik = useFormik({
     initialValues: {
       price: "",
@@ -40,6 +43,8 @@ const FixedPrice = () => {
     },
     validationSchema: fixedPriceSchema,
     onSubmit: (values) => {
+      setTotalAmount(values.price * 0.025);
+      setIsForm(true);
       window.localStorage.setItem("list-item-fixed", JSON.stringify(values));
     },
   });

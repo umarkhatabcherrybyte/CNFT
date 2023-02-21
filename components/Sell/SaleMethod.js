@@ -32,76 +32,76 @@ import { useDispatch } from "react-redux";
 import { setListing } from "../../redux/listing/ListingActions";
 import { setAuction } from "../../redux/listing/ListingActions";
 import { getObjData } from "../../helper/localStorage";
+import FullScreenLoader from "../shared/FullScreenLoader";
+import moment from "moment";
+import { Toast } from "../shared/Toast";
+import { useRouter } from "next/router";
+import { buyDetailRoute, auctionRoute } from "../Routes/constants";
 const SaleMethod = () => {
-  const dispatch = useDispatch();
-  const [listing, setListing] = useState();
-  const { auction } = useSelector((state) => state.listing);
-  useEffect(() => {
-    const listing_data = getObjData("listing");
-    setListing(listing_data);
-  }, []);
+  const router = useRouter();
+  // const dispatch = useDispatch();
+  // const [listing, setListing] = useState();
+  // const { auction } = useSelector((state) => state.listing);
   // console.log(auction);
   // console.log(listing);
+  const listing_data = getObjData("listing");
   const [paymentValue, setPaymentValue] = useState("fixed");
-  const [auctionDuration, setAuctionDuration] = useState({
-    days: "",
-    hours: "",
-    minutes: "",
-  });
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [toalAmount, setTotalAmount] = useState("");
+  const [isForm, setIsForm] = useState(false);
+  console.log(toalAmount);
   const onPaymentChange = (event, newValue) => {
     setPaymentValue(newValue);
   };
 
-  const onAuctionDurationChange = (e, type) => {
-    // let form = ev.currentTarget;
-    setAuctionDuration({
-      ...auctionDuration,
-      [e.target.name]: e.target.value,
-    });
-  };
   const submitData = async () => {
-    // console.log(data, 'list')
-    const listing_data = getObjData("listing");
-    const fixed_data = getObjData("list-item-fixed");
-    if (listing_data && fixed_data) {
-      // collection data
-      const data =
-        listing_data.type === "single"
-          ? {
-              user_id: listing_data?.user_id,
-              nft_ids: [listing_data._id],
-            }
-          : {
-              user_id: listing_data?.type,
-            };
-      console.log(data);
-      try {
-        // {"price":"150","is_open_for_offer":true,"sell_type":"fixed"}
-        let formData = new FormData();
-        formData.append("price", fixed_data["price"]);
-        formData.append("is_open_for_offer", fixed_data["is_open_for_offer"]);
-        formData.append("sell_type", fixed_data["sell_type"]);
-        formData.append("user_id", listing_data?.user_id);
-        formData.append("nft_ids", JSON.stringify([listing_data._id]));
-        formData.append("mint_type", listing_data.type);
-        // formData.append('logo', listing_data.type)
-        const res = await INSTANCE.post(
+    if (isForm) {
+      setIsLoading(true);
+      const price_data =
+        paymentValue === "fixed"
+          ? getObjData("list-item-fixed")
+          : getObjData("list-item-auction");
+      if (listing_data && price_data) {
+        const data =
           listing_data.type === "single"
-            ? "/list/create/single"
-            : "/list/create/collection",
-          formData
-        );
-        if (res) {
+            ? {
+                user_id: listing_data?.user_id,
+                collection_id: listing_data._id,
+              }
+            : {
+                user_id: listing_data?.type,
+              };
+        try {
+          // let formData = new FormData();
+          // formData.append("price", fixed_data["price"]);
+          // formData.append("is_open_for_offer", fixed_data["is_open_for_offer"]);
+          // formData.append("sell_type", fixed_data["sell_type"]);
+          // formData.append("user_id", listing_data?.user_id);
+          // formData.append("nft_ids", JSON.stringify([listing_data._id]));
+          // formData.append("mint_type", listing_data.type);
+          const res = await INSTANCE.post(
+            listing_data.type === "single"
+              ? "/list/create/single"
+              : "/list/create/collection",
+            { ...price_data, ...data }
+          );
+          setIsLoading(false);
+          const route =
+            paymentValue === "fixed" ? buyDetailRoute : auctionRoute;
+          router.push(route);
           console.log(res, "response");
+        } catch (e) {
+          setIsLoading(false);
+          console.log(e);
         }
-      } catch (e) {
-        console.log(e);
       }
+    } else {
+      Toast("error", "Please set your price.");
     }
   };
   return (
     <>
+      {isLoading && <FullScreenLoader />}
       {/* <Button
         className="btn2"
         sx={{ my: 2 }}
@@ -167,10 +167,16 @@ const SaleMethod = () => {
                   />
                 </Tabs>
                 <TabPanel value="fixed" sx={{ px: 0 }}>
-                  <Fixed />
+                  <Fixed
+                    setTotalAmount={setTotalAmount}
+                    setIsForm={setIsForm}
+                  />
                 </TabPanel>
                 <TabPanel value="auction" sx={{ px: 0 }}>
-                  <AuctionDeal />
+                  <AuctionDeal
+                    setTotalAmount={setTotalAmount}
+                    setIsForm={setIsForm}
+                  />
                 </TabPanel>
               </TabContext>
             </Box>
@@ -182,7 +188,7 @@ const SaleMethod = () => {
                 mt: 3,
                 background: "var(--box-color)",
                 p: 3,
-                borderRadius: "15px 15px 0  0",
+                borderRadius: "15px ",
               }}
             >
               <LightText heading="Listing an items for sell is free, but once it sell you will pay the following fees:" />
@@ -202,7 +208,7 @@ const SaleMethod = () => {
                 <CaptionHeading heading="2.5%" font="montserrat" />
               </Box>
             </Box>
-            <Box
+            {/* <Box
               className="space_between"
               sx={{
                 p: 3,
@@ -212,8 +218,8 @@ const SaleMethod = () => {
               }}
             >
               <CaptionHeading heading="Total ADA" font="montserrat" />
-              <CaptionHeading heading={`XX ADA`} font="montserrat" />
-            </Box>
+              <CaptionHeading heading={`${toalAmount} ADA`} font="montserrat" />
+            </Box> */}
           </Grid>
 
           {/* form data  */}
@@ -228,7 +234,7 @@ const SaleMethod = () => {
               <AssetInputField
                 placeholder="Enter Asset Name"
                 name="asset_name"
-                value={listing?.assets[0]?.asset_name}
+                value={listing_data?.assets[0]?.asset_name}
               />
             </Box>
           </Grid>
@@ -249,7 +255,7 @@ const SaleMethod = () => {
                 placeholder="Enter policy ID"
                 copy
                 name="policy_id"
-                value={listing?.policy_id}
+                value={listing_data?.policy_id}
               />
             </Box>
           </Grid>
@@ -259,7 +265,7 @@ const SaleMethod = () => {
               <AssetInputField
                 placeholder="Enter Quantity"
                 name="quantity"
-                value={listing?.assets?.length}
+                value={listing_data?.assets?.length}
               />
             </Box>
           </Grid>
@@ -269,7 +275,9 @@ const SaleMethod = () => {
               <AssetInputField
                 placeholder="Enter Minted Date"
                 name="minted_on"
-                value={listing?.createdAt}
+                value={moment(new Date(listing_data?.createdAt)).format(
+                  "Do MMMM YYYY"
+                )}
               />
             </Box>
           </Grid>

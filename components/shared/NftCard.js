@@ -30,7 +30,7 @@ const NftCard = ({ card }) => {
           <CardMedia
             component="img"
             height="290"
-            image={`https://ipfs.io/ipfs/${card?.collection_ids[0]?.assets[0]?.ipfs}`}
+            image={`https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`}
             alt="green iguana"
           />
           {/* <Box
@@ -74,7 +74,7 @@ const NftCard = ({ card }) => {
               className="bold"
               sx={{ textTransform: "uppercase" }}
             >
-              {card?.collection_ids[0]?.assets[0]?.asset_name}
+              {card?.collection_id?.assets[0]?.asset_name}
             </Typography>
             <Typography
               gutterBottom

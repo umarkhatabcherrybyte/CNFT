@@ -101,8 +101,8 @@ const Sell = () => {
             <TabPanel value="list" sx={{ p: 0, py: 2 }}>
               {type === "add-listing" ? (
                 <>
-                  {step === "step1" && <MylistTabs />}
-                  {step === "step2" && <SellMethod />}
+                  {step === "step3" && <MylistTabs />}
+                  {step === "step1" && <SellMethod />}
                 </>
               ) : (
                 <MyListCard />

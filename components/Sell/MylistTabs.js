@@ -26,6 +26,7 @@ import { setStep } from "../../redux/listing/ListingActions";
 import { CardanoWallet, useWallet } from "@meshsdk/react";
 import { Toast } from "../shared/Toast";
 import { INSTANCE } from "../../config/axiosInstance";
+import FullScreenLoader from "../shared/FullScreenLoader";
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",
@@ -62,7 +63,7 @@ const MylistTabs = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const [tabValue, setTabValue] = useState("add");
-
+  const [isLoading, setIsLoading] = useState(false);
   const onTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -78,6 +79,7 @@ const MylistTabs = () => {
     onSubmit: async (values) => {
       try {
         if (connected) {
+          setIsLoading(true);
           let connectedWallet = window.localStorage.getItem("connectedWallet");
           if (values.file != null || values.file != undefined) {
             const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
@@ -141,7 +143,6 @@ const MylistTabs = () => {
 
               const policyId =
                 lucidBrowser.utils.mintingPolicyToId(mintingPolicy);
-
               console.log(mintingPolicy, policyId, "pm");
               let metadataX = {};
               let metadata = {
@@ -156,7 +157,7 @@ const MylistTabs = () => {
               metadataX[metadata.name] = metadata;
               console.log(metadataX, "dsadasd");
               const unit = policyId + fromText(metadata.name);
-              metadata["unit"] = unit;
+
               let obj = { [policyId]: metadataX };
               console.log(obj, "obj");
               const tx = await lucidBrowser
@@ -176,6 +177,7 @@ const MylistTabs = () => {
                 //  api call
                 try {
                   const user_id = window.localStorage.getItem("userid");
+                  metadata["unit"] = unit;
                   const data = {
                     metadata: [metadata],
                     user_id: user_id,
@@ -186,6 +188,7 @@ const MylistTabs = () => {
                     // asset_hex_name: unit,
                   };
                   const res = await INSTANCE.post("/collection/single", data);
+                  setIsLoading(false);
 
                   dispatch(setStep("step2"));
                   // dispatch(setListing())
@@ -194,6 +197,8 @@ const MylistTabs = () => {
                     JSON.stringify(res?.data.data)
                   );
                 } catch (e) {
+                  setIsLoading(false);
+
                   console.log(e);
                 }
                 //
@@ -212,6 +217,8 @@ const MylistTabs = () => {
         }
       } catch (error) {
         console.log(error, "err");
+        setIsLoading(false);
+
         Toast("error", "Error Occured During Minting");
       }
     },
@@ -219,6 +226,7 @@ const MylistTabs = () => {
 
   return (
     <>
+      {isLoading && <FullScreenLoader />}
       <TabContext value={tabValue}>
         <TabList
           onChange={onTabChange}
@@ -379,7 +387,7 @@ const MylistTabs = () => {
                     className="btn2"
                     sx={{ width: "150px" }}
                     type="submit"
-                  // onClick={() => setListingSteps("step2")}
+                    // onClick={() => setListingSteps("step2")}
                   >
                     Next
                   </Button>

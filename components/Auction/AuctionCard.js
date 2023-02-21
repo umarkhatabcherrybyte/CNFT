@@ -1,11 +1,36 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { ArrowForwardIos } from "@mui/icons-material";
 import { Box, Card, CardMedia, Typography, CardContent } from "@mui/material";
 import { auctionDetailRoute } from "../Routes/constants";
 import { useRouter } from "next/router";
-const AuctionCard = () => {
+import GetAdaPriceService from "/services/get-ada-price.service";
+
+// import DateCountdown from "react-date-countdown-timer";
+// import Countdown from "react-countdown";
+import dynamic from "next/dynamic";
+const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
+  ssr: false,
+});
+const AuctionCard = ({ data }) => {
   const router = useRouter();
+  const [adaInfo, setAdaInfo] = React.useState({});
+  const [date, setDate] = useState("");
+  useEffect(() => {
+    GetAdaPriceService.getPrice()
+      .then((response) => {
+        setAdaInfo(response.data[0]);
+      })
+      .catch(() => {});
+    const interval = setInterval(() => {
+      GetAdaPriceService.getPrice()
+        .then((response) => {
+          setAdaInfo(response.data[0]);
+        })
+        .catch(() => {});
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
   return (
     <AuctionCardStyled>
       <Card
@@ -25,13 +50,13 @@ const AuctionCard = () => {
             justifyContent: "space-between",
           },
         }}
-        onClick={() => router.push(`${auctionDetailRoute}/2323`)}
+        onClick={() => router.push(`${auctionDetailRoute}/${data._id}`)}
       >
         <Box sx={{ position: "relative" }}>
           <CardMedia
             component="img"
             height="290"
-            image="/images/Buy Our Tokens/Layer 61.png"
+            image={`https://ipfs.io/ipfs/${data?.collection_id?.assets[0]?.ipfs}`}
             alt="green iguana"
           />
           <Box sx={{ position: "absolute", bottom: "10px" }}></Box>
@@ -43,9 +68,9 @@ const AuctionCard = () => {
             component="div"
             className="uppercase poppin "
           >
-            iNDUSTRIAL REvolution
+            {data?.collection_id?.assets[0]?.asset_name}
           </Typography>
-          <Typography
+          {/* <Typography
             gutterBottom
             variant="caption"
             component="div"
@@ -56,16 +81,23 @@ const AuctionCard = () => {
             <span style={{ color: "var(--secondary-color)" }}>
               julian_jokey
             </span>
+          </Typography> */}
+          <Typography
+            sx={{ pt: 2 }}
+            variant="caption"
+            component="div"
+            className="bold uppercase poppin"
+          >
+            Base Price
           </Typography>
-
-          <Box className="space_between" sx={{ pt: 2 }}>
+          <Box className="space_between">
             <Typography
               variant="h6"
               component="div"
               sx={{ color: "var(--secondary-color)" }}
               className="bold flex poppin"
             >
-              1500
+              {data?.sell_type_id?.price}
               <Typography
                 variant="caption"
                 component="div"
@@ -80,7 +112,10 @@ const AuctionCard = () => {
               component="div"
               className="bold gray poppin"
             >
-              $199.53
+              $
+              {parseFloat(
+                adaInfo?.current_price * data?.sell_type_id?.price
+              ).toFixed(2)}
             </Typography>
           </Box>
         </CardContent>
@@ -88,8 +123,13 @@ const AuctionCard = () => {
           <Typography className="gray text_center poppin">
             Time Remaining
           </Typography>
+
           <Typography className="gray text_center bold poppin">
-            03D : 19H : 54M : 05S
+            <DateCountdown
+              dateTo={data?.sell_type_id?.end_time}
+              // callback={() => alert("Hello")}
+              locales_plural={["Y:", "M:", "D:", "H:", "M:", "S"]}
+            />
           </Typography>
         </CardContent>
       </Card>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ContainerLayout from "../../components/shared/ContainerLayout";
 import BreadCrumHeader from "../../components/shared/BreadCrumHeader";
 import styled from "styled-components";
@@ -12,34 +12,78 @@ import AuctionModal from "../../components/Auction/AuctionModal";
 import BarHeading from "../../components/shared/headings/BarHeading";
 import DetailCard from "../../components/Auction/DetailCard";
 import SuccessModal from "../../components/Auction/SuccessModal";
+import { useWallet, useLovelace } from "@meshsdk/react";
+import { useRouter } from "next/router";
+import GetAdaPriceService from "/services/get-ada-price.service";
+import { INSTANCE } from "/config/axiosInstance";
+import dynamic from "next/dynamic";
+const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
+  ssr: false,
+});
 const cardData = [{}, {}, {}, {}];
+
 const AuctionDetail = () => {
+  const router = useRouter();
+  const { id } = router.query;
   const [open, setOpen] = useState(false);
   const [isSuccessModal, setIsSuccessModal] = useState(false);
-  console.log(isSuccessModal, open);
+  const [detail, setDetail] = useState({});
+  const [adaInfo, setAdaInfo] = useState({});
+  const { wallet, connected, name, connecting, connect, disconnect, error } =
+    useWallet();
+  console.log(detail);
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const res = await INSTANCE.get(`/list/get/single/${id}`);
+        setDetail(res?.data?.data);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    if (id) {
+      getData();
+    }
+  }, [id]);
+  useEffect(() => {
+    GetAdaPriceService.getPrice()
+      .then((response) => {
+        setAdaInfo(response.data[0]);
+      })
+      .catch(() => {});
+    const interval = setInterval(() => {
+      GetAdaPriceService.getPrice()
+        .then((response) => {
+          setAdaInfo(response.data[0]);
+        })
+        .catch(() => {});
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
   return (
-    <AuctionDetailStyled>
-      <ContainerLayout>
-        <BreadCrumHeader heading="Live Action Details" />
-        <Box sx={{ py: 5 }}>
-          <Grid container spacing={4}>
-            <Grid xs={12} md={6} item>
-              <Box>
-                <img
-                  src="/images/Buy Our Tokens/Layer 61.png"
-                  alt=""
-                  className="w_100 br_15"
-                />
-              </Box>
-            </Grid>
-            <Grid xs={12} md={6} item>
-              <Typography
-                variant="h3"
-                className="uppercase text_white bold oswald"
-              >
-                Industrail revolution
-              </Typography>
-              <Box
+    Object.keys(detail).length > 0 && (
+      <AuctionDetailStyled>
+        <ContainerLayout>
+          <BreadCrumHeader heading="Live Action Details" />
+          <Box sx={{ py: 5 }}>
+            <Grid container spacing={4}>
+              <Grid xs={12} md={6} item>
+                <Box>
+                  <img
+                    src={`https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[0]?.ipfs}`}
+                    alt=""
+                    className="w_100 br_15"
+                  />
+                </Box>
+              </Grid>
+              <Grid xs={12} md={6} item>
+                <Typography
+                  variant="h3"
+                  className="uppercase text_white bold oswald"
+                >
+                  {detail.list?.collection_id?.assets[0]?.asset_name}
+                </Typography>
+                {/* <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
@@ -60,8 +104,8 @@ const AuctionDetail = () => {
                   <FavoriteBorderOutlined sx={{ mr: 1 }} />
                   <Typography>235</Typography>
                 </Box>
-              </Box>
-              <Box
+              </Box> */}
+                {/* <Box
                 sx={{ py: 1, px: 1.5, width: "13rem" }}
                 className="light_white_bg text_white br_15"
               >
@@ -69,78 +113,91 @@ const AuctionDetail = () => {
                 <Typography className="bold montserrat">
                   Ralph Garraway
                 </Typography>
-              </Box>
-              <Typography sx={{ py: 2 }} className="text_white montserrat">
-                Your text goes here this is just placeholder text. Your text
-                goes here this is just placeholder text. Your text goes here
-                this is just placeholder text. Your text goes here this is just
-                placeholder text. Your text goes here this is just placeholder
-                text.
-              </Typography>
-              <Grid container spacing={3}>
-                <Grid item md={6} xs={12}>
-                  <Box className="light_white_bg text_white br_15 montserrat">
-                    <Typography sx={{ py: 1.5, px: 1 }}>
-                      Curent Bid in USD : <span>1500 USD</span>
-                    </Typography>
-                  </Box>
+              </Box> */}
+                <Typography sx={{ py: 2 }} className="text_white montserrat">
+                  {detail.list?.collection_id?.assets[0]?.description}
+                </Typography>
+                <Grid container spacing={3}>
+                  <Grid item md={6} xs={12}>
+                    <Box className="light_white_bg text_white br_15 montserrat">
+                      <Typography sx={{ py: 1.5, px: 1 }}>
+                        Curent Bid in USD :{" "}
+                        <span>
+                          {" "}
+                          {parseFloat(
+                            adaInfo?.current_price *
+                              detail.list?.sell_type_id?.price
+                          ).toFixed(2)}{" "}
+                          USD
+                        </span>
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item md={6} xs={12}>
+                    <Box className="light_white_bg text_white br_15 montserrat">
+                      <Typography sx={{ py: 1.5, px: 1 }}>
+                        Curent Bid in ADA :{" "}
+                        <span>{detail.list?.sell_type_id?.price} ADA</span>
+                      </Typography>
+                    </Box>
+                  </Grid>
                 </Grid>
-                <Grid item md={6} xs={12}>
-                  <Box className="light_white_bg text_white br_15 montserrat">
-                    <Typography sx={{ py: 1.5, px: 1 }}>
-                      Curent Bid in ADA : <span>1500 ADA</span>
-                    </Typography>
-                  </Box>
-                </Grid>
+                <Box
+                  sx={{
+                    background: "#0e3b3b4d",
+                    color: "#ffff",
+                    py: 1.5,
+                    my: 1,
+                    mt: 2,
+                  }}
+                  className="flex br_15 montserrat"
+                >
+                  {/* sell_type_id */}
+                  <Typography sx={{ mr: 3 }}>Countdown</Typography>
+                  <Typography>
+                    <DateCountdown
+                      dateTo={detail?.list?.sell_type_id?.end_time}
+                      // callback={() => alert("Hello")}
+                      locales_plural={["Y:", "M:", "D:", "H:", "M:", "S"]}
+                    />
+                  </Typography>
+                </Box>
+                <Button
+                  sx={{
+                    border: "2px solid #fff",
+                    my: 1,
+                    "&:hover": {
+                      opacity: 0.7,
+                    },
+                  }}
+                  className="w_100 text_white br_50 montserrat"
+                  startIcon={<CalendarTodayOutlined />}
+                  onClick={() => setOpen(true)}
+                >
+                  Place Your Bid
+                </Button>
               </Grid>
-              <Box
-                sx={{
-                  background: "#0e3b3b4d",
-                  color: "#ffff",
-                  py: 1.5,
-                  my: 1,
-                  mt: 2,
-                }}
-                className="flex br_15 montserrat"
-              >
-                <Typography sx={{ mr: 3 }}>Countdown</Typography>
-                <Typography> 4 : 15 : 55 : 43</Typography>
-              </Box>
-              <Button
-                sx={{
-                  border: "2px solid #fff",
-                  my: 1,
-                  "&:hover": {
-                    opacity: 0.7,
-                  },
-                }}
-                className="w_100 text_white br_50 montserrat"
-                startIcon={<CalendarTodayOutlined />}
-                onClick={() => setOpen(true)}
-              >
-                Place Your Bid
-              </Button>
             </Grid>
-          </Grid>
-        </Box>
-        <Box sx={{ py: 5 }}>
-          <BarHeading heading="Live Auction" />
-          <Grid container spacing={3}>
-            {cardData.map((data) => (
-              <Grid item lg={3} md={4} sm={6} xs={12}>
-                <DetailCard />
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-      </ContainerLayout>
-      <AuctionModal
-        open={open}
-        setOpen={setOpen}
-        setIsSuccessModal={setIsSuccessModal}
-      />
-      <SuccessModal open={isSuccessModal} setOpen={setIsSuccessModal} />
-    </AuctionDetailStyled>
+          </Box>
+          <Box sx={{ py: 5 }}>
+            <BarHeading heading="Live Auction" />
+            <Grid container spacing={3}>
+              {cardData.map((data) => (
+                <Grid item lg={3} md={4} sm={6} xs={12}>
+                  <DetailCard />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </ContainerLayout>
+        <AuctionModal
+          open={open}
+          setOpen={setOpen}
+          setIsSuccessModal={setIsSuccessModal}
+        />
+        <SuccessModal open={isSuccessModal} setOpen={setIsSuccessModal} />
+      </AuctionDetailStyled>
+    )
   );
 };
 

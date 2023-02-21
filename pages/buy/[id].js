@@ -86,7 +86,7 @@ const BuyDetail = () => {
       try {
         const user_address = getKeyData("user_address");
         const connectedWallet = getKeyData("connectedWallet");
-        const address = detail.list?.collection_ids[0]?.recipient_address;
+        const address = detail.list?.collection_id?.recipient_address;
         const lovelace = detail.list?.sell_type_id?.price * 1000000;
         const user_value = Number(lovelace * 0.975);
         const owner_value = Number(lovelace * 0.025);
@@ -167,7 +167,7 @@ const BuyDetail = () => {
                 <Grid container spacing={3}>
                   <Grid xs={12} md={6} item>
                     <img
-                      src={`https://ipfs.io/ipfs/${detail?.list?.collection_ids[0]?.assets[0]?.ipfs}`}
+                      src={`https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[0]?.ipfs}`}
                       alt=""
                       className="w_100 br_15 item_img"
                     />
@@ -177,7 +177,7 @@ const BuyDetail = () => {
                       variant="h3"
                       className="uppercase text_white bold oswald"
                     >
-                      {detail.list?.collection_ids[0]?.assets[0]?.asset_name}
+                      {detail.list?.collection_id?.assets[0]?.asset_name}
                     </Typography>
                     {/* <Box
                     sx={{
@@ -289,7 +289,7 @@ const BuyDetail = () => {
                             Address
                           </Typography>
                           <Typography sx={{ pb: 1.5, px: 2 }} variant="caption">
-                            {detail.list?.collection_ids[0]?.recipient_address.slice(
+                            {detail.list?.collection_id?.recipient_address.slice(
                               0,
                               35
                             ) + "...."}
@@ -333,7 +333,7 @@ const BuyDetail = () => {
                             Policy Id
                           </Typography>
                           <Typography sx={{ pb: 1.5, px: 2 }} variant="caption">
-                            {detail.list?.collection_ids[0]?.policy_id}
+                            {detail.list?.collection_id?.policy_id}
                           </Typography>
                         </Box>
                       </Grid>

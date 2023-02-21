@@ -32,12 +32,37 @@ export const saleMethodSchema = yup.object({
   creator: yup.string().required("Please enter creator"),
 });
 export const fixedPriceSchema = yup.object({
-  price: yup.string().required("Please enter price"),
+  price: yup
+    .number()
+    .typeError("That doesn't look like a positive number")
+    .positive("A price number can't start with a minus")
+    .required("Please enter price"),
 });
 export const auctionDealSchema = yup.object({
-  price: yup.string().required("Please enter price"),
-  min_price: yup.string(),
-  duration: yup.string().required("Please enter price"),
+  sell_price: yup
+    .number()
+    .typeError("That doesn't look like a positive number")
+    .positive("A price number can't start with a minus")
+    .required("Please enter price"),
+  base_price: yup.string(),
+  days: yup
+    .number()
+    .typeError("you must specify a number")
+    .min(1, "Min value 1.")
+    .max(20, "Days should be maximum 20.")
+    .required("Please enter days"),
+  hours: yup
+    .number()
+    .typeError("you must specify a number")
+    .min(0, "Hours should be minimum 0.")
+    .max(23, "Hours should be maximum 23.")
+    .required("Please enter hours"),
+  minutes: yup
+    .number()
+    .typeError("you must specify a number")
+    .min(0, "Minutes should be maximum 0.")
+    .max(59, "Minutes should be maximum 59.")
+    .required("Please enter minutes"),
 });
 const validationSchema = yup.object({
   platform_url: yup

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PaymentHeader from "../shared/header/PaymentHeader";
 import {
   Box,
@@ -23,7 +23,10 @@ import { useSelector } from "react-redux";
 import PriceInputField from "./PriceInputField";
 import { setAuction } from "../../redux/listing/ListingActions";
 
-const Auction = () => {
+const Auction = ({ setIsForm, setTotalAmount }) => {
+  useEffect(() => {
+    setIsForm(false);
+  }, []);
   const auction = useSelector((state) => state.listing.auction);
   const [auctionDuration, setAuctionDuration] = useState({
     days: "",
@@ -63,14 +66,44 @@ const Auction = () => {
   };
   const formik = useFormik({
     initialValues: {
-      price: "",
-      min_price: "",
-      duration: "4",
+      sell_type: "auction",
+      start_time: new Date(),
+      base_price: "",
+      sell_price: "",
+      end_time: "",
+      days: "",
+      hours: "",
+      minutes: "",
     },
     validationSchema: auctionDealSchema,
     onSubmit: (values) => {
-      console.log(values);
-      window.localStorage.setItem("list-item-auction", JSON.stringify(values));
+      var date = new Date();
+      const date_reseult = new Date(
+        date.setDate(date.getDate() + parseInt(values.days))
+      );
+      // console.log(date_reseult, "day add");
+
+      const hour_result = new Date(
+        date_reseult.setHours(date_reseult.getHours() + parseInt(values.hours))
+      );
+      // console.log(hour_result, "hours add");
+
+      const min_result = new Date(
+        hour_result.setTime(
+          hour_result.getTime() + parseInt(values.minutes) * 60 * 1000
+        )
+      );
+      // console.log(min_result, "min add");
+      // =====================
+      // auctioon
+      // base price
+
+      setTotalAmount(values.price * 0.025);
+      setIsForm(true);
+      window.localStorage.setItem(
+        "list-item-auction",
+        JSON.stringify({ ...values, end_time: min_result })
+      );
     },
   });
   return (
@@ -81,7 +114,11 @@ const Auction = () => {
             <CaptionHeading heading="Set you price" />
           </Grid>
           <Grid item xs={12} lg={6}>
-            <PriceInputField placeholder="Price" name="price" formik={formik} />
+            <PriceInputField
+              placeholder="Price"
+              name="sell_price"
+              formik={formik}
+            />
           </Grid>
           <Grid item xs={12} lg={6}>
             <CaptionHeading heading="Minimum price" />
@@ -90,7 +127,7 @@ const Auction = () => {
           <Grid item xs={12} lg={6}>
             <PriceInputField
               placeholder="Price"
-              name="min_price"
+              name="base_price"
               formik={formik}
             />
           </Grid>
@@ -129,21 +166,25 @@ const Auction = () => {
                           onInput={(e) => onAuctionDurationChange(e)}
                         > */}
               <TextField
-                type="text"
                 // min="0"
                 // max="30"
                 // step="1"
-                autocomplete="off"
                 // label="Days"
+                // value={auctionDuration.days}
+                // onChange={(e) => onAuctionDurationChange(e, "days")}
                 placeholder="0"
-                value={auctionDuration.days}
-                onChange={(e) => onAuctionDurationChange(e, "days")}
+                autocomplete="off"
+                type="text"
+                name="days"
+                value={formik?.values.days}
+                onChange={formik?.handleChange}
+                // error={formik?.touched.days && Boolean(formik?.errors.days)}
+                // helperText={formik?.touched.days && formik?.errors.days}
                 InputLabelProps={{
                   style: {
                     color: "#fff",
                   },
                 }}
-                name="days"
                 sx={{
                   width: "18px",
                   fieldset: {
@@ -163,16 +204,21 @@ const Auction = () => {
                   },
                 }}
               />
+
               <Box sx={{ pl: 0.5, pr: 0.5 }}>
                 <CaptionHeading heading="days" font="montserrat" />
               </Box>
               <TextField
                 type="text"
                 autocomplete="off"
-                // label="hours"
                 placeholder="00"
-                value={auctionDuration.hours}
-                onChange={(e) => onAuctionDurationChange(e, "hours")}
+                // value={auctionDuration.hours}
+                // onChange={(e) => onAuctionDurationChange(e, "hours")}
+                name="hours"
+                value={formik?.values.hours}
+                onChange={formik?.handleChange}
+                // error={formik?.touched.hours && Boolean(formik?.errors.hours)}
+                // helperText={formik?.touched.hours && formik?.errors.hours}
                 InputLabelProps={{
                   readOnly: true,
 
@@ -180,7 +226,6 @@ const Auction = () => {
                     color: "#fff",
                   },
                 }}
-                name="hours"
                 sx={{
                   width: "18px",
                   fieldset: {
@@ -209,15 +254,19 @@ const Auction = () => {
                 autocomplete="off"
                 // label="min"
                 placeholder="00"
-                value={auctionDuration.minutes}
-                onChange={(e) => onAuctionDurationChange(e, "minutes")}
+                // value={auctionDuration.minutes}
+                // onChange={(e) => onAuctionDurationChange(e, "minutes")}
+                name="minutes"
+                value={formik?.values.minutes}
+                onChange={formik?.handleChange}
+                // error={formik?.touched.min && Boolean(formik?.errors.min)}
+                // helperText={formik?.touched.min && formik?.errors.min}
                 InputLabelProps={{
                   readOnly: true,
                   style: {
                     color: "#fff",
                   },
                 }}
-                name="minutes"
                 sx={{
                   width: "18px",
                   fieldset: {
@@ -264,6 +313,17 @@ const Auction = () => {
                 </IconButton>
               </Box>
             </Box>
+          </Grid>
+          <Grid item xs={12}>
+            <p className="font_12 error bold">
+              {formik?.touched.days && formik?.errors.days}
+            </p>
+            <p className="font_12 error bold">
+              {formik?.touched.hours && formik?.errors.hours}
+            </p>
+            <p className="font_12 error bold">
+              {formik?.touched.minutes && formik?.errors.minutes}
+            </p>
           </Grid>
         </Grid>
         <Button className="btn2" sx={{ width: "100%", my: 2 }} type="submit">
