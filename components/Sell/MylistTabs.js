@@ -156,6 +156,7 @@ const MylistTabs = () => {
               metadataX[metadata.name] = metadata;
               console.log(metadataX, "dsadasd");
               const unit = policyId + fromText(metadata.name);
+              metadata["unit"] = unit;
               let obj = { [policyId]: metadataX };
               console.log(obj, "obj");
               const tx = await lucidBrowser
@@ -378,7 +379,7 @@ const MylistTabs = () => {
                     className="btn2"
                     sx={{ width: "150px" }}
                     type="submit"
-                    // onClick={() => setListingSteps("step2")}
+                  // onClick={() => setListingSteps("step2")}
                   >
                     Next
                   </Button>
