@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Typography,
   TextField,
@@ -85,6 +85,9 @@ const AddImage = ({ heading, desc, width, formik, name }) => {
 const ListCollection = () => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const myData = JSON.parse(localStorage.getItem("listing"));
+  console.log(myData);
+  useEffect(() => {}, []);
   const data = useSelector((state) => state.listing.data);
   console.log(data);
   const formik = useFormik({
@@ -98,9 +101,43 @@ const ListCollection = () => {
     },
     validationSchema: addCollectioneListingSchema,
     onSubmit: (values) => {
-      router.push(listCollectionRoute);
+      console.log(values);
       // dispatch(setListing(values));
-      window.localStorage.setItem("listing", JSON.stringify(values));
+      // window.localStorage.setItem("listing", JSON.stringify(values));
+
+      // ======================
+
+      const reader = new FileReader();
+
+      // Read file1 as data URL
+      reader.readAsDataURL(values.logo_image);
+      reader.onload = () => {
+        const file1DataURL = reader.result;
+
+        // Read file2 as data URL
+        reader.readAsDataURL(values.feature_image);
+        reader.onload = () => {
+          const file2DataURL = reader.result;
+
+          // Read file3 as data URL
+          reader.readAsDataURL(values.banner_image);
+          reader.onload = () => {
+            const file3DataURL = reader.result;
+
+            // Create a new object with the form data and file data URLs
+            const dataWithFiles = {
+              ...values,
+              logo_image: file1DataURL,
+              feature_image: file2DataURL,
+              banner_image: file3DataURL,
+            };
+
+            // Store the object in local storage
+            localStorage.setItem("listing", JSON.stringify(dataWithFiles));
+            router.push(listCollectionRoute);
+          };
+        };
+      };
     },
   });
   console.log(formik);

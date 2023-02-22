@@ -26,6 +26,8 @@ import { useWallet, useLovelace } from "@meshsdk/react";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { Toast } from "../../components/shared/Toast";
 import { getKeyData } from "../../helper/localStorage";
+import FullScreenLoader from "../../components/shared/FullScreenLoader";
+
 // import { BigInt } from "lucid-cardano/types/src/core/wasm_modules/cardano_multiplatform_lib_web/cardano_multiplatform_lib";
 const List = [{}, {}, {}, {}];
 
@@ -51,15 +53,21 @@ const BuyDetail = () => {
   const [tabValue, setTabValue] = useState("ada");
   const [detail, setDetail] = useState({});
   const [adaInfo, setAdaInfo] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
   console.log(detail);
   useEffect(() => {
     const getData = async () => {
+      setIsLoading(true);
       try {
         const res = await INSTANCE.get(`/list/get/single/${id}`);
         setDetail(res?.data?.data);
-      } catch (e) {}
+        setIsLoading(false);
+      } catch (e) {
+        setIsLoading(false);
+        setDetail([]);
+      }
     };
     if (id) {
       getData();
@@ -136,298 +144,304 @@ const BuyDetail = () => {
     }
   };
   return (
-    Object.keys(detail).length > 0 && (
-      <BuyDetailStyled>
-        <ContainerLayout>
-          <Strips />
-          <Ballon />
-          <BreadCrumHeader heading="Buy with ADA" />
-          <TabContext value={tabValue}>
-            <Box sx={{ pb: 4, pt: 10 }}>
-              <Box sx={{ borderBottom: 1, borderColor: "white" }}>
-                <Grid container spacing={2} alignItems="center ">
-                  <Grid item xs={12} md={8}>
-                    <LineTab tabData={tabData} setTabValue={setTabValue} />
-                  </Grid>
-                  <Grid item xs={12} md={4}>
-                    <Box
-                      className="flex_align"
-                      sx={{ justifyContent: { xs: "start", md: "end" } }}
-                    >
-                      <Button className="btn2" sx={{ my: 2 }}>
-                        Connect Your Wallet
-                      </Button>
-                    </Box>
-                  </Grid>
+    <BuyDetailStyled>
+      <ContainerLayout>
+        {isLoading && <FullScreenLoader />}
+        <Strips />
+        <Ballon />
+        <BreadCrumHeader heading="Buy with ADA" />
+        <TabContext value={tabValue}>
+          <Box sx={{ pb: 4, pt: 10 }}>
+            <Box sx={{ borderBottom: 1, borderColor: "white" }}>
+              <Grid container spacing={2} alignItems="center ">
+                <Grid item xs={12} md={8}>
+                  <LineTab tabData={tabData} setTabValue={setTabValue} />
                 </Grid>
-              </Box>
-            </Box>
-            <TabPanel value="ada" sx={{ p: 0 }}>
-              <Box sx={{ py: 10 }}>
-                <Grid container spacing={3}>
-                  <Grid xs={12} md={6} item>
-                    <img
-                      src={`https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[0]?.ipfs}`}
-                      alt=""
-                      className="w_100 br_15 item_img"
-                    />
-                  </Grid>
-                  <Grid xs={12} md={6} item>
-                    <Typography
-                      variant="h3"
-                      className="uppercase text_white bold oswald"
-                    >
-                      {detail.list?.collection_id?.assets[0]?.asset_name}
-                    </Typography>
-                    {/* <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      flexWrap: "wrap",
-                      py: 2,
-                      "& .detial": {
-                        py: 0.5,
-                        px: 2,
-                        display: "flex",
-                      },
-                    }}
-                    className="text_white "
+                <Grid item xs={12} md={4}>
+                  <Box
+                    className="flex_align"
+                    sx={{ justifyContent: { xs: "start", md: "end" } }}
                   >
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={3.5}>
-                        <Box className="flex_align">
-                          <Typography
-                            variant="h6"
-                            className="bold text_white montserrat"
-                          >
-                            Julian Jokey
-                          </Typography>
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <Box sx={{ px: 1 }}>
-                              <CheckCircle
-                                sx={{
-                                  color: "var(--secondary-color)",
-                                  padding: "3px",
-                                }}
-                              />
-                            </Box>
-                          </Box>
-                        </Box>
-                      </Grid>
-                      <Grid xs={4} md={2.4} item>
-                        <Box
-                          className="light_white_bg  detial br_15"
-                          sx={{ mr: 2 }}
-                        >
-                          <RemoveRedEyeOutlined sx={{ mr: 1 }} />
-                          <Typography>150</Typography>
-                        </Box>
-                      </Grid>
-                      <Grid xs={3.7} md={2.4} item>
-                        <Box className="light_white_bg  detial br_15">
-                          <FavoriteBorderOutlined sx={{ mr: 1 }} />
-                          <Typography>235</Typography>
-                        </Box>
-                      </Grid>
+                    <Button className="btn2" sx={{ my: 2 }}>
+                      Connect Your Wallet
+                    </Button>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Box>
+          </Box>
+          <TabPanel value="ada" sx={{ p: 0 }}>
+            <Box sx={{ py: 10 }}>
+              <Box sx={{ minHeight: "7rem" }}>
+                {Object.keys(detail).length > 0 && (
+                  <Grid container spacing={3}>
+                    <Grid xs={12} md={6} item>
+                      <img
+                        src={`https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[0]?.ipfs}`}
+                        alt=""
+                        className="w_100 br_15 item_img"
+                      />
                     </Grid>
-                  </Box> */}
-                    <Grid
-                      container
-                      spacing={2}
-                      alignItems="center"
-                      sx={{ py: 1 }}
-                    >
-                      <Grid item xs={12} md={6}>
-                        <Box
-                          sx={{ py: 2.5, px: 2 }}
-                          className="light_white_bg text_white br_15"
+                    <Grid xs={12} md={6} item>
+                      <Typography
+                        variant="h3"
+                        className="uppercase text_white bold oswald"
+                      >
+                        {detail.list?.collection_id?.assets[0]?.asset_name}
+                      </Typography>
+                      {/* <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                            py: 2,
+                            "& .detial": {
+                              py: 0.5,
+                              px: 2,
+                              display: "flex",
+                            },
+                          }}
+                          className="text_white "
                         >
-                          <Typography className="bold montserrat">
-                            Price: {detail.list?.sell_type_id?.price}
-                            ADA
-                          </Typography>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Box
-                          sx={{ py: 2.5, px: 2 }}
-                          className="light_white_bg text_white br_15 montserrat"
-                        >
-                          <Typography className="bold montserrat">
-                            Price:{" "}
-                            {parseFloat(
-                              adaInfo?.current_price *
-                                detail.list?.sell_type_id?.price
-                            ).toFixed(2)}
-                            USD
-                          </Typography>
-                        </Box>
-                      </Grid>
-
-                      <Grid xs={12} md={9} item>
-                        <Typography
-                          sx={{ py: 0 }}
-                          className="text_white bold montserrat"
-                        >
-                          Make Payment
-                        </Typography>
-                        <Typography
-                          sx={{ pb: 2 }}
-                          variant="caption"
-                          className="text_white montserrat"
-                        >
-                          Please follow the instruction given below and make the
-                          payment with the chosen payment method.
-                        </Typography>
-                      </Grid>
-                      <Grid item md={6} xs={12}>
-                        <Box className="light_white_bg text_white br_15">
-                          <Typography
-                            sx={{ pt: 1.5, px: 2 }}
-                            className="font_12 light_text"
+                          <Grid container spacing={2}>
+                            <Grid item xs={12} md={3.5}>
+                              <Box className="flex_align">
+                                <Typography
+                                  variant="h6"
+                                  className="bold text_white montserrat"
+                                >
+                                  Julian Jokey
+                                </Typography>
+                                <Box sx={{ display: "flex", alignItems: "center" }}>
+                                  <Box sx={{ px: 1 }}>
+                                    <CheckCircle
+                                      sx={{
+                                        color: "var(--secondary-color)",
+                                        padding: "3px",
+                                      }}
+                                    />
+                                  </Box>
+                                </Box>
+                              </Box>
+                            </Grid>
+                            <Grid xs={4} md={2.4} item>
+                              <Box
+                                className="light_white_bg  detial br_15"
+                                sx={{ mr: 2 }}
+                              >
+                                <RemoveRedEyeOutlined sx={{ mr: 1 }} />
+                                <Typography>150</Typography>
+                              </Box>
+                            </Grid>
+                            <Grid xs={3.7} md={2.4} item>
+                              <Box className="light_white_bg  detial br_15">
+                                <FavoriteBorderOutlined sx={{ mr: 1 }} />
+                                <Typography>235</Typography>
+                              </Box>
+                            </Grid>
+                          </Grid>
+                        </Box> */}
+                      <Grid
+                        container
+                        spacing={2}
+                        alignItems="center"
+                        sx={{ py: 1 }}
+                      >
+                        <Grid item xs={12} md={6}>
+                          <Box
+                            sx={{ py: 2.5, px: 2 }}
+                            className="light_white_bg text_white br_15"
                           >
-                            Address
-                          </Typography>
-                          <Typography sx={{ pb: 1.5, px: 2 }} variant="caption">
-                            {detail.list?.collection_id?.recipient_address.slice(
-                              0,
-                              35
-                            ) + "...."}
-                          </Typography>
-                        </Box>
-                      </Grid>
-                      {/* <Grid item md={6} xs={12}>
-                        <Box className="light_white_bg text_white br_15 light_text">
-                          <Typography
-                            sx={{ pt: 1.5, px: 2 }}
-                            className="font_12"
-                          >
-                            Timer
-                          </Typography>
-                          <Typography sx={{ pb: 1.5, px: 2 }} variant="caption">
-                            19 : 20
-                          </Typography>
-                        </Box>
-                      </Grid> */}
-
-                      <Grid item md={6} xs={12}>
-                        <Box className="light_white_bg text_white br_15">
-                          <Typography
-                            sx={{ pt: 1.5, px: 2 }}
-                            className="font_12 light_text "
-                          >
-                            Asset ID
-                          </Typography>
-                          <Typography sx={{ pb: 1.5, px: 2 }} variant="caption">
-                            {detail.asset_details?.fingerprint.slice(0, 35) +
-                              "...."}
-                          </Typography>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Box className="light_white_bg text_white br_15">
-                          <Typography
-                            sx={{ pt: 1.5, px: 2 }}
-                            className="font_12 light_text"
-                          >
-                            Policy Id
-                          </Typography>
-                          <Typography sx={{ pb: 1.5, px: 2 }} variant="caption">
-                            {detail.list?.collection_id?.policy_id}
-                          </Typography>
-                        </Box>
-                      </Grid>
-                      {/* <Grid item md={6} xs={12}>
-                        <Box className="light_white_bg text_white br_15">
-                          <Typography
-                            sx={{ pt: 1.5, px: 2 }}
-                            className="font_12 light_text"
-                          >
-                            Project
-                          </Typography>
-                          <Typography sx={{ pb: 1.5, px: 2 }} variant="caption">
-                            Julian Jokey
-                          </Typography>
-                        </Box>
-                      </Grid> */}
-                      {/* <Grid md={12} xs={12} item>
-                        <Box
-                          className="light_white_bg text_white br_15"
-                          sx={{ px: 2, py: 1.5 }}
-                        >
-                          <Box className="space_between">
-                            <Typography
-                              variant="caption"
-                              className="light_text font_12"
-                            >
-                              Instructions
+                            <Typography className="bold montserrat">
+                              Price: {detail.list?.sell_type_id?.price}
+                              ADA
                             </Typography>
-                            <ContentCopy
-                              className="text_white"
-                              sx={{ p: 0.5 }}
-                            />
                           </Box>
-                          <Box sx={{ py: 0.5 }}>
-                            {List.map((item) => (
-                              <Box sx={{ display: "flex" }}>
-                                <Circle sx={{ mr: 1, width: "0.5em" }} />
-                                <Typography variant="caption">
-                                  Your text goes here, This is placeholder text.
-                                  Your text goes here
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Box
+                            sx={{ py: 2.5, px: 2 }}
+                            className="light_white_bg text_white br_15 montserrat"
+                          >
+                            <Typography className="bold montserrat">
+                              Price:{" "}
+                              {parseFloat(
+                                adaInfo?.current_price *
+                                  detail.list?.sell_type_id?.price
+                              ).toFixed(2)}
+                              USD
+                            </Typography>
+                          </Box>
+                        </Grid>
+
+                        <Grid xs={12} md={9} item>
+                          <Typography
+                            sx={{ py: 0 }}
+                            className="text_white bold montserrat"
+                          >
+                            Make Payment
+                          </Typography>
+                          <Typography
+                            sx={{ pb: 2 }}
+                            variant="caption"
+                            className="text_white montserrat"
+                          >
+                            Please follow the instruction given below and make
+                            the payment with the chosen payment method.
+                          </Typography>
+                        </Grid>
+                        <Grid item md={6} xs={12}>
+                          <Box className="light_white_bg text_white br_15">
+                            <Typography
+                              sx={{ pt: 1.5, px: 2 }}
+                              className="font_12 light_text"
+                            >
+                              Address
+                            </Typography>
+                            <Typography
+                              sx={{ pb: 1.5, px: 2 }}
+                              variant="caption"
+                            >
+                              {detail.list?.collection_id?.recipient_address.slice(
+                                0,
+                                35
+                              ) + "...."}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                        {/* <Grid item md={6} xs={12}>
+                              <Box className="light_white_bg text_white br_15 light_text">
+                                <Typography
+                                  sx={{ pt: 1.5, px: 2 }}
+                                  className="font_12"
+                                >
+                                  Timer
+                                </Typography>
+                                <Typography sx={{ pb: 1.5, px: 2 }} variant="caption">
+                                  19 : 20
                                 </Typography>
                               </Box>
-                            ))}
+                            </Grid> */}
+
+                        <Grid item md={6} xs={12}>
+                          <Box className="light_white_bg text_white br_15">
+                            <Typography
+                              sx={{ pt: 1.5, px: 2 }}
+                              className="font_12 light_text "
+                            >
+                              Asset ID
+                            </Typography>
+                            <Typography
+                              sx={{ pb: 1.5, px: 2 }}
+                              variant="caption"
+                            >
+                              {detail.asset_details?.fingerprint.slice(0, 35) +
+                                "...."}
+                            </Typography>
                           </Box>
-                        </Box>
-                      </Grid> */}
-                    </Grid>
-                    <Grid item xs={12} md={6} sx={{ py: 1 }}>
-                      <Button
-                        className="btn2 w_100 montserrat initialcase"
-                        // onClick={() => router.push(`${buyPaymentRoute}`)}
-                        onClick={onBuy}
-                      >
-                        Buy Now
-                      </Button>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Box className="light_white_bg text_white br_15">
+                            <Typography
+                              sx={{ pt: 1.5, px: 2 }}
+                              className="font_12 light_text"
+                            >
+                              Policy Id
+                            </Typography>
+                            <Typography
+                              sx={{ pb: 1.5, px: 2 }}
+                              variant="caption"
+                            >
+                              {detail.list?.collection_id?.policy_id}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                        {/* <Grid item md={6} xs={12}>
+                              <Box className="light_white_bg text_white br_15">
+                                <Typography
+                                  sx={{ pt: 1.5, px: 2 }}
+                                  className="font_12 light_text"
+                                >
+                                  Project
+                                </Typography>
+                                <Typography sx={{ pb: 1.5, px: 2 }} variant="caption">
+                                  Julian Jokey
+                                </Typography>
+                              </Box>
+                            </Grid> */}
+                        {/* <Grid md={12} xs={12} item>
+                              <Box
+                                className="light_white_bg text_white br_15"
+                                sx={{ px: 2, py: 1.5 }}
+                              >
+                                <Box className="space_between">
+                                  <Typography
+                                    variant="caption"
+                                    className="light_text font_12"
+                                  >
+                                    Instructions
+                                  </Typography>
+                                  <ContentCopy
+                                    className="text_white"
+                                    sx={{ p: 0.5 }}
+                                  />
+                                </Box>
+                                <Box sx={{ py: 0.5 }}>
+                                  {List.map((item) => (
+                                    <Box sx={{ display: "flex" }}>
+                                      <Circle sx={{ mr: 1, width: "0.5em" }} />
+                                      <Typography variant="caption">
+                                        Your text goes here, This is placeholder text.
+                                        Your text goes here
+                                      </Typography>
+                                    </Box>
+                                  ))}
+                                </Box>
+                              </Box>
+                            </Grid> */}
+                      </Grid>
+                      <Grid item xs={12} md={6} sx={{ py: 1 }}>
+                        <Button
+                          className="btn2 w_100 montserrat initialcase"
+                          // onClick={() => router.push(`${buyPaymentRoute}`)}
+                          onClick={onBuy}
+                        >
+                          Buy Now
+                        </Button>
+                      </Grid>
                     </Grid>
                   </Grid>
-                </Grid>
+                )}
+              </Box>
+              {!isLoading && detail?.lists_by_user.length > 0 && (
                 <Box>
                   <BarHeading heading="Explore more from this artist" />
                   <Box sx={{ py: 5 }}>
                     <Grid container spacing={3}>
-                      {cardData.map((item) => (
+                      {detail?.lists_by_user?.map((card) => (
                         <Grid xs={12} sm={6} md={3} item>
-                          <ClientCard />
+                          <ClientCard card={card} />
                         </Grid>
                       ))}
                     </Grid>
                   </Box>
                 </Box>
-              </Box>
-            </TabPanel>
-            <TabPanel value="credit">
-              <Typography
-                sx={{}}
-                variant="h1"
-                className="text_white text_center"
-              >
-                coming soon
-              </Typography>
-            </TabPanel>
-            <TabPanel value="check">
-              <Typography
-                sx={{}}
-                variant="h1"
-                className="text_white text_center"
-              >
-                coming soon
-              </Typography>
-            </TabPanel>
-          </TabContext>
-        </ContainerLayout>
-      </BuyDetailStyled>
-    )
+              )}
+            </Box>
+          </TabPanel>
+          <TabPanel value="credit">
+            <Typography sx={{}} variant="h1" className="text_white text_center">
+              coming soon
+            </Typography>
+          </TabPanel>
+          <TabPanel value="check">
+            <Typography sx={{}} variant="h1" className="text_white text_center">
+              coming soon
+            </Typography>
+          </TabPanel>
+        </TabContext>
+      </ContainerLayout>
+    </BuyDetailStyled>
   );
 };
 
@@ -436,6 +450,8 @@ export default BuyDetail;
 const BuyDetailStyled = styled.section`
   .item_img {
     height: 100%;
-    object-fit: cover;
+    /* object-fit: cover; */
+    object-fit: fill;
+    max-height: 31rem;
   }
 `;

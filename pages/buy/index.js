@@ -10,9 +10,12 @@ import BuyCards from "../../components/Buy/BuyCards";
 import { useRouter } from "next/router";
 import FullScreenLoader from "../../components/shared/FullScreenLoader";
 import { INSTANCE } from "../../config/axiosInstance";
+
 const Buy = () => {
   const router = useRouter();
   const [tabValue, setTabValue] = useState("single");
+  const [isLoading, setIsLoading] = useState(true);
+
   const [filter, setFilter] = useState({
     price_range: {
       min: "0",
@@ -24,6 +27,8 @@ const Buy = () => {
   const [buy, setBuy] = useState([]);
   useEffect(() => {
     const getData = async () => {
+      setIsLoading(true);
+
       try {
         const res = await INSTANCE.post("/list/find/single/fixed", {
           mint_type: tabValue,
@@ -32,8 +37,11 @@ const Buy = () => {
         console.log("filter");
 
         setBuy([...res?.data?.data]);
+        setIsLoading(false);
       } catch (e) {
         setBuy([]);
+        setIsLoading(false);
+
         console.log("filter error");
       }
     };
@@ -47,6 +55,8 @@ const Buy = () => {
   };
   return (
     <BuyStyled>
+      {isLoading && <FullScreenLoader />}
+
       <Box>
         <img
           src="/images/balloon-right-1.png"
