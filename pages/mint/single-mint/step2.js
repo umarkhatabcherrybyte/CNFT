@@ -23,7 +23,7 @@ const SingleMintStep2 = () => {
   const [loading, setLoading] = React.useState(false);
 
   const [metadata, setMetadata] = React.useState({
-    image: `ipfs://${typeof window !== "undefined" && window.localStorage.getItem("img")}`,
+    image: `ipfs://${window.localStorage.getItem("img")}`,
     mediaType: "image/jpg",
     description: "",
     name: "",
@@ -43,7 +43,7 @@ const SingleMintStep2 = () => {
 
   const onNextButton = async () => {
     setLoading(true);
-    let img = typeof window !== "undefined" && window.localStorage.getItem("img")
+    let img = window.localStorage.getItem("img")
     if (!metadata.name || metadata.name === null || metadata.name === "") {
       Toast("error", "Name is invalid.");
       setLoading(false);

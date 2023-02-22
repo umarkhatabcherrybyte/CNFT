@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Layout from "../../../components/Mint/Layout";
-import { CardanoWallet, useWallet } from "@meshsdk/react";
-import { createTransaction, signTransaction } from "../../../backend";
 import {
 	Box,
 	Container,
@@ -19,12 +17,9 @@ import QRCode from "react-qr-code";
 import { Toast } from "../../../components/shared/Toast";
 import Strips from "/components/Design/Strips";
 import Baloon from "/components/Design/Ballon";
+import { useWallet } from "@meshsdk/react";
 import { useRouter } from "next/router";
-import { singleMintStep1 } from '../../../components/Routes/constants'
-import { Transaction, ForgeScript, resolveSlotNo, resolvePaymentKeyHash, largestFirst } from '@meshsdk/core';
-import { costLovelace, bankWalletAddress } from "../../../config/utils";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
-import { isAwaitExpression } from "typescript";
 
 const payData = [
 	{
@@ -59,7 +54,7 @@ const CollectionStep3 = () => {
 		try {
 			let connectedWallet = window.localStorage.getItem("connectedWallet")
 
-			let img = typeof window !== "undefined" && window.localStorage.getItem("img")
+			let img = window.localStorage.getItem("img")
 			if (selectedValue == undefined || selectedValue == null) {
 				Toast("error", "Please Select an Option for Minting");
 			} else if (img && connected) {

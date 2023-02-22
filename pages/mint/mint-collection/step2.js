@@ -32,11 +32,10 @@ const CollectionStep2 = () => {
     console.log(params, 'lolxxx')
     if (metadata?.item_name == undefined || metadata?.item_name == null) {
       Toast('error', 'Name Field is Missing')
+      return
     }
-    else if (typeof window !== "undefined") {
-      window.localStorage.setItem("params", JSON.stringify(params));
-      router.push(mintCollectionStep3);
-    }
+    window.localStorage.setItem("params", JSON.stringify(params));
+    router.push(mintCollectionStep3);
   };
 
   return (
