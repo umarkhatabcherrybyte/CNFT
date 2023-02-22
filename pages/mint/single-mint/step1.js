@@ -58,13 +58,11 @@ const SingleMint = () => {
         });
         const uploaded_image = await client.add(mintFile);
         if (uploaded_image) {
-          if (typeof window !== "undefined") {
-            Toast("success", "Uploading succeed.");
-            setIsUploading(false);
-            window.localStorage.setItem("img", uploaded_image.path);
-            window.localStorage.setItem("file_mimeType", mintFile.type);
-            router.push(mintSingleStep2);
-          }
+          Toast("success", "Uploading succeed.");
+          setIsUploading(false);
+          window.localStorage.setItem("img", uploaded_image.path);
+          window.localStorage.setItem("file_mimeType", mintFile.type);
+          router.push(mintSingleStep2);
         }
       } catch (error) {
         setIsUploading(false);

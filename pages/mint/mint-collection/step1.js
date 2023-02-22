@@ -99,7 +99,7 @@ const CollectionStep1 = () => {
       const path = connectedWallet + "_" + walletAddress;
       UploadService.uploadMeta(file, path, (event) => { })
         .then((response) => {
-          if (typeof window !== "undefined" && response.data.data.length > 0) {
+          if (response.data.data.length > 0) {
             setMetadataObjects(response.data.data || []);
             window.localStorage.setItem(
               "metadataObjects",
@@ -204,14 +204,13 @@ const CollectionStep1 = () => {
     }
     else if (!isWebform &&
       metadataObjects.length == imagePaths.length &&
-      typeof window !== "undefined" &&
       metadataFileUploaded) {
       window.localStorage.setItem("metadataObjects", JSON.stringify(metadataObjects));
       window.localStorage.setItem("images", JSON.stringify(imagePaths));
       window.localStorage.setItem("metadataObjectsProperties", JSON.stringify(metadataObjectProperties));
       router.push(mintCollectionStep2);
     }
-    else if (isWebform && typeof window !== "undefined") {
+    else if (isWebform) {
       window.localStorage.setItem("images", JSON.stringify(imagePaths));
       window.localStorage.setItem("metadataObjects", JSON.stringify(objs));
       window.localStorage.setItem("metadataObjectsProperties", JSON.stringify(metadataObjectProperties));

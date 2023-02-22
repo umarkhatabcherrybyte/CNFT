@@ -3,30 +3,26 @@ import ContainerLayout from "/components/shared/ContainerLayout";
 import Header from "/components/Mint/shared/Header";
 import Layout from "/components/Mint/Layout";
 import styled from "styled-components";
-import VerifyMetaFileService from "/services/verify-metafile.service";
 import UploadService from "/services/upload-files.service";
-import MintService from "/services/mint.service";
 import { Toast } from "/components/shared/Toast";
-import imageCompression from "browser-image-compression";
 import download from "js-file-download";
 import {
-  Delete,
-  DeleteForever,
-  DeleteForeverOutlined,
+  Delete
 } from "@mui/icons-material";
 import ExcelSpreadSheet from "/components/Mint/Mint Collection/ExcelSpreadSheet";
 import { Box, Button, Grid } from "@mui/material";
 import CaptionHeading from "/components/shared/headings/CaptionHeading";
 import LightText from "/components/shared/headings/LightText";
-import Heading from "/components/shared/headings/Heading";
-import { List } from "@mui/icons-material";
-import { mintCollectionStep2 } from "/components/Routes/constants";
 import { useRouter } from "next/router";
 import { create } from "ipfs-http-client";
 import { INSTANCE } from "../../config/axiosInstance";
 import { setStep } from "../../redux/listing/ListingActions";
 import { useDispatch, useSelector } from "react-redux";
+import { useWallet } from "@meshsdk/react";
+import { Lucid, fromText, Blockfrost } from "lucid-cardano";
+
 const ListCollectionStep2 = () => {
+
   const dispatch = useDispatch();
   const { step } = useSelector((store) => store.listing);
   const router = useRouter();
@@ -50,6 +46,10 @@ const ListCollectionStep2 = () => {
   const hiddenFileInputRef = useRef(null);
   const metaFileLabelRef = useRef(null);
   const selectedFilesLabelRef = useRef(null);
+
+  const { wallet, connected } = useWallet();
+  const [currentAddr, setCurrentAddr] = useState("");
+  const [selectedValue, setSelectedValue] = React.useState();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -101,9 +101,9 @@ const ListCollectionStep2 = () => {
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => {})
+      UploadService.uploadMeta(file, path, (event) => { })
         .then((response) => {
-          if (typeof window !== "undefined" && response.data.data.length > 0) {
+          if (response.data.data.length > 0) {
             setMetadataObjects(response.data.data || []);
             window.localStorage.setItem(
               "metadataObjects",
@@ -210,28 +210,12 @@ const ListCollectionStep2 = () => {
     } else if (
       !isWebform &&
       metadataObjects.length == imagePaths.length &&
-      typeof window !== "undefined" &&
       metadataFileUploaded
     ) {
-      window.localStorage.setItem(
-        "metadataObjects",
-        JSON.stringify(metadataObjects)
-      );
-      window.localStorage.setItem("images", JSON.stringify(imagePaths));
-      window.localStorage.setItem(
-        "metadataObjectsProperties",
-        JSON.stringify(metadataObjectProperties)
-      );
-      onMintCollection();
+      mintCollection(objs);
       // router.push(mintCollectionStep2);
-    } else if (isWebform && typeof window !== "undefined") {
-      onMintCollection();
-      window.localStorage.setItem("images", JSON.stringify(imagePaths));
-      window.localStorage.setItem("metadataObjects", JSON.stringify(objs));
-      window.localStorage.setItem(
-        "metadataObjectsProperties",
-        JSON.stringify(metadataObjectProperties)
-      );
+    } else if (isWebform) {
+      mintCollection(objs);
       // router.push(mintCollectionStep2);
     }
   }
@@ -313,7 +297,7 @@ const ListCollectionStep2 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => {})
+    UploadService.downloadMetafile(path, (event) => { })
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
@@ -335,19 +319,104 @@ const ListCollectionStep2 = () => {
   const viewImagesPaths = () => {
     console.log(imagePaths, "o");
   };
-  const onMintCollection = async () => {
+
+  const mintCollection = async (metadataObjects) => {
     try {
-      const res = await INSTANCE.post("url", {});
-      window.localStorage.setItem("listing", JSON.stringify(res?.data.data));
-      dispatch(setStep("step2"));
-      router.push({
-        pathname: "/sell",
-        query: {
-          type: "add-listing",
-        },
-      });
-    } catch (e) {}
+      let connectedWallet = window.localStorage.getItem("connectedWallet")
+
+      let img = window.localStorage.getItem("img")
+      if (img && connected) {
+
+        const transferLucid = await Lucid.new(
+          new Blockfrost(
+            "https://cardano-preprod.blockfrost.io/api/v0",
+            "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+          ),
+          "Preprod"
+        );
+
+        transferLucid.selectWalletFromSeed(
+          "cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise"
+        );
+
+        const lucid = await Lucid.new(
+          new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
+          "Preprod"
+        );
+
+        const api = await window.cardano[String(connectedWallet)].enable();
+        lucid.selectWallet(api);
+
+        const { paymentCredential } = lucid.utils.getAddressDetails(
+          await lucid.wallet.address(),
+        );
+
+        const mintingPolicy = lucid.utils.nativeScriptFromJson(
+          {
+            type: "all",
+            scripts: [
+              { type: "sig", keyHash: paymentCredential?.hash },
+              {
+                type: "before",
+                slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
+              },
+            ],
+          },
+        );
+
+        const policyId = lucid.utils.mintingPolicyToId(
+          mintingPolicy,
+        );
+        let obj, assetObj = {}, metadataX = {}
+
+        console.log(metadataObjects, 'metadasd')
+
+        for (let index = 0; index < metadataObjects.length; index++) {
+          const element = metadataObjects[index];
+          console.log(element, 'elem')
+          let metadata = element
+          metadataX[metadata.name] = metadata
+          console.log(metadataX, 'dsadasd')
+          assetObj[String(policyId + fromText(metadata.name))] = 1n
+          obj = { [policyId]: metadataX };
+        }
+        // console.log(assetObj, 'onjf')
+        // debugger
+
+        const txL = await lucid
+          .newTx()
+          .validTo(Date.now() + 100000)
+          .attachMintingPolicy(mintingPolicy)
+          .mintAssets(
+            assetObj
+          )
+          .payToAddress(await transferLucid.wallet.address(), assetObj)
+          .attachMetadata('721', obj)
+          .complete()
+
+        const signedTxL = await txL.sign().complete();
+        const txHashL = await signedTxL.submit();
+        if (txHashL) {
+          const res = await INSTANCE.post("url", {});
+          window.localStorage.setItem("listing", JSON.stringify(res?.data.data));
+          dispatch(setStep("step2"));
+          router.push({
+            pathname: "/sell",
+            query: {
+              type: "add-listing",
+            },
+          });
+        }
+      } else {
+        Toast("error", "You are not Not Connected");
+      }
+    } catch (e) {
+      console.log('error', e)
+      Toast("error", "Error Occured while Minting");
+      // console.log(e)
+    }
   };
+
   return (
     <Step1Styled>
       <ContainerLayout>

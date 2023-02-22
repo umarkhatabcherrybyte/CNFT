@@ -237,13 +237,6 @@ const ExcelSpreadSheet = ({
                                 }}
                                 autoComplete="current-password"
                               />
-                              <h1
-                                style={{
-                                  color: "white"
-                                }}
-                                onClick={() => {
-                                  deleteTableCol(index)
-                                }}>{`${String(index)} ${String(val)}`}</h1>
                             </Box>
                           </TableCell>
                         )
