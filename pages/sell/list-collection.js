@@ -6,9 +6,7 @@ import styled from "styled-components";
 import UploadService from "/services/upload-files.service";
 import { Toast } from "/components/shared/Toast";
 import download from "js-file-download";
-import {
-  Delete
-} from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
 import ExcelSpreadSheet from "/components/Mint/Mint Collection/ExcelSpreadSheet";
 import { Box, Button, Grid } from "@mui/material";
 import CaptionHeading from "/components/shared/headings/CaptionHeading";
@@ -20,9 +18,8 @@ import { setStep } from "../../redux/listing/ListingActions";
 import { useDispatch, useSelector } from "react-redux";
 import { useWallet } from "@meshsdk/react";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
-
+import { getObjData } from "../../helper/localStorage";
 const ListCollectionStep2 = () => {
-
   const dispatch = useDispatch();
   const { step } = useSelector((store) => store.listing);
   const router = useRouter();
@@ -101,7 +98,7 @@ const ListCollectionStep2 = () => {
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => { })
+      UploadService.uploadMeta(file, path, (event) => {})
         .then((response) => {
           if (response.data.data.length > 0) {
             setMetadataObjects(response.data.data || []);
@@ -297,7 +294,7 @@ const ListCollectionStep2 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => { })
+    UploadService.downloadMetafile(path, (event) => {})
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
@@ -321,12 +318,12 @@ const ListCollectionStep2 = () => {
   };
 
   const mintCollection = async (metadataObjects) => {
+    const listing_previous = getObjData("listing");
     try {
-      let connectedWallet = window.localStorage.getItem("connectedWallet")
+      let connectedWallet = window.localStorage.getItem("connectedWallet");
 
-      let img = window.localStorage.getItem("img")
+      let img = window.localStorage.getItem("img");
       if (img && connected) {
-
         const transferLucid = await Lucid.new(
           new Blockfrost(
             "https://cardano-preprod.blockfrost.io/api/v0",
@@ -340,7 +337,10 @@ const ListCollectionStep2 = () => {
         );
 
         const lucid = await Lucid.new(
-          new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
+          new Blockfrost(
+            "https://cardano-preprod.blockfrost.io/api/v0",
+            "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+          ),
           "Preprod"
         );
 
@@ -348,39 +348,37 @@ const ListCollectionStep2 = () => {
         lucid.selectWallet(api);
 
         const { paymentCredential } = lucid.utils.getAddressDetails(
-          await lucid.wallet.address(),
+          await lucid.wallet.address()
         );
 
-        const mintingPolicy = lucid.utils.nativeScriptFromJson(
-          {
-            type: "all",
-            scripts: [
-              { type: "sig", keyHash: paymentCredential?.hash },
-              {
-                type: "before",
-                slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
-              },
-            ],
-          },
-        );
+        const mintingPolicy = lucid.utils.nativeScriptFromJson({
+          type: "all",
+          scripts: [
+            { type: "sig", keyHash: paymentCredential?.hash },
+            {
+              type: "before",
+              slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
+            },
+          ],
+        });
 
-        const policyId = lucid.utils.mintingPolicyToId(
-          mintingPolicy,
-        );
-        let obj, assetObj = {}, metadataX = {}
+        const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
+        let obj,
+          assetObj = {},
+          metadataX = {};
 
-        console.log(metadataObjects, 'metadasd')
+        console.log(metadataObjects, "metadasd");
 
-        let arr = []
+        let arr = [];
 
         for (let index = 0; index < metadataObjects.length; index++) {
           const element = metadataObjects[index];
-          metadataX[element.name] = element
+          metadataX[element.name] = element;
           // console.log(metadataX, 'dsadasd')
-          assetObj[String(policyId + fromText(element.name))] = 1n
+          assetObj[String(policyId + fromText(element.name))] = 1n;
           obj = { [policyId]: metadataX };
-          element["unit"] = String(policyId + fromText(element.name))
-          arr.push(element)
+          // element["unit"] = String(policyId + fromText(element.name))
+          // arr.push(element)
         }
         // console.log(assetObj, 'onjf')
         // debugger
@@ -389,21 +387,24 @@ const ListCollectionStep2 = () => {
           .newTx()
           .validTo(Date.now() + 100000)
           .attachMintingPolicy(mintingPolicy)
-          .mintAssets(
-            assetObj
-          )
+          .mintAssets(assetObj)
           .payToAddress(await transferLucid.wallet.address(), assetObj)
-          .attachMetadata('721', obj)
-          .complete()
+          .attachMetadata("721", obj)
+          .complete();
 
         const signedTxL = await txL.sign().complete();
         const txHashL = await signedTxL.submit();
         if (txHashL) {
-          const user_id = window.localStorage.getItem("userid");
+          const user_id = window.localStorage.getItem("user_id");
+          for (let index = 0; index < metadataObjects.length; index++) {
+            const element = metadataObjects[index];
+            element["unit"] = String(policyId + fromText(element.name));
+            arr.push(element);
+          }
           const data = {
             metadata: arr,
             user_id: user_id,
-            recipient_address: recipientAddress,
+            recipient_address: await lucid.wallet.address(),
             policy_id: policyId,
             type: "collection",
             minting_policy: JSON.stringify(mintingPolicy),
@@ -411,7 +412,10 @@ const ListCollectionStep2 = () => {
           };
           const res = await INSTANCE.post("/collection/create", data);
           if (res) {
-            window.localStorage.setItem("listing", JSON.stringify(res?.data.data));
+            window.localStorage.setItem(
+              "listing",
+              JSON.stringify({ ...listing_previous, ...res?.data.data })
+            );
             dispatch(setStep("step2"));
             router.push({
               pathname: "/sell",
@@ -425,7 +429,7 @@ const ListCollectionStep2 = () => {
         Toast("error", "You are not Not Connected");
       }
     } catch (e) {
-      console.log('error', e)
+      console.log("error", e);
       Toast("error", "Error Occured while Minting");
       // console.log(e)
     }

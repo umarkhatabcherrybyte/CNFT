@@ -85,8 +85,6 @@ const AddImage = ({ heading, desc, width, formik, name }) => {
 const ListCollection = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const myData = JSON.parse(localStorage.getItem("listing"));
-  console.log(myData);
   useEffect(() => {}, []);
   const data = useSelector((state) => state.listing.data);
   console.log(data);

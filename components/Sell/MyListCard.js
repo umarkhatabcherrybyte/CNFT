@@ -16,7 +16,10 @@ import Heading from "../shared/headings/Heading";
 const data = [{}, {}, {}, {}, {}, {}, {}, {}];
 import { INSTANCE } from "../../config/axiosInstance";
 import { getKeyData } from "../../helper/localStorage";
+import { MycollectionRoute, buyDetailRoute } from "../Routes/constants";
+import { useRouter } from "next/router";
 const MyListCard = () => {
+  const router = useRouter();
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
   const [listing, setListing] = useState([]);
@@ -38,6 +41,15 @@ const MyListCard = () => {
       getData();
     }
   }, [connected]);
+
+  const navigationHandler = (type, id) => {
+    console.log(type);
+    const route =
+      type === "single"
+        ? `${buyDetailRoute}/${id}`
+        : `${MycollectionRoute}/${id}`;
+    router.push(route);
+  };
   return (
     <MyListCardStyled>
       <Box sx={{ py: 5 }}>
@@ -47,9 +59,10 @@ const MyListCard = () => {
               {listing.map((card, index) => (
                 <Grid xs={12} md={4} lg={3} item key={index}>
                   <Card
-                    //   onClick={() => navigate(`${buyDetailRoute}/2323`)}
+                    onClick={(e) => navigationHandler(card.mint_type, card._id)}
                     sx={{
                       boxShadow: "none",
+                      height: "100%",
                       background: "var(--main-color)",
                       borderRadius: "20px",
                       border: "solid 1px #ddd",
@@ -68,10 +81,14 @@ const MyListCard = () => {
                       <CardMedia
                         component="img"
                         height="290"
-                        image={`https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`}
+                        image={`${
+                          card.mint_type === "collection"
+                            ? card.feature_image
+                            : `https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`
+                        }`}
                         alt="green iguana"
                       />
-                      <Box
+                      {/* <Box
                         sx={{
                           position: "absolute",
                           height: "4rem",
@@ -93,7 +110,7 @@ const MyListCard = () => {
                         >
                           <Settings sx={{ color: "#000000" }} />
                         </Box>
-                      </Box>
+                      </Box> */}
                     </Box>
                     <CardContent>
                       <Typography

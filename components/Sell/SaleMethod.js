@@ -65,12 +65,17 @@ const SaleMethod = () => {
         const data =
           listing_data.type === "single"
             ? {
-              user_id: listing_data?.user_id,
-              collection_id: listing_data._id,
-            }
+                user_id: listing_data?.user_id,
+                collection_id: listing_data._id,
+              }
             : {
-              user_id: listing_data?.type,
-            };
+                collection_id: listing_data?._id,
+                user_id: listing_data?.user_id,
+                logo_image: listing_data?.logo_image,
+                feature_image: listing_data?.feature_image,
+                mint_type: listing_data?.type,
+                mint_type: listing_data?.type,
+              };
         try {
           // let formData = new FormData();
           // formData.append("price", fixed_data["price"]);
@@ -79,18 +84,15 @@ const SaleMethod = () => {
           // formData.append("user_id", listing_data?.user_id);
           // formData.append("nft_ids", JSON.stringify([listing_data._id]));
           // formData.append("mint_type", listing_data.type);
-          const res = await INSTANCE.post(
-            listing_data.type === "single"
-              ? "/list/create/single"
-              : "/list/create/collection",
-            { ...price_data, ...data }
-          );
+          const res = await INSTANCE.post("/list/create", {
+            ...price_data,
+            ...data,
+          });
           if (res) {
             setIsLoading(false);
             const route =
               paymentValue === "fixed" ? buyDetailRoute : auctionRoute;
             router.push(route);
-            console.log(res, "response");
           }
         } catch (e) {
           setIsLoading(false);
@@ -227,16 +229,33 @@ const SaleMethod = () => {
           {/* form data  */}
           <Grid xs={12} item>
             <Box sx={{ pt: 0, pb: 1 }}>
-              <BarHeading heading="Asset Details" />
+              <BarHeading
+                heading={`${
+                  listing_data.type === "collection" ? "Collection" : "Asset"
+                } Details`}
+              />
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
-              <CaptionHeading heading="Asset Name" font="montserrat" />
+              <CaptionHeading
+                font="montserrat"
+                heading={`${
+                  listing_data.type === "collection" ? "Collection" : "Asset"
+                } Name`}
+              />
               <AssetInputField
-                placeholder="Enter Asset Name"
+                placeholder={`Enter ${
+                  listing_data.type === "collection"
+                    ? "Collection Name"
+                    : "Asset Name"
+                }`}
                 name="asset_name"
-                value={listing_data?.assets[0]?.asset_name}
+                value={
+                  listing_data.type === "collection"
+                    ? listing_data.name
+                    : listing_data?.assets[0]?.asset_name
+                }
               />
             </Box>
           </Grid>
