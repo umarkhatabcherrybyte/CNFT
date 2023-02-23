@@ -187,15 +187,16 @@ const MylistTabs = () => {
                     minting_policy: JSON.stringify(mintingPolicy),
                     // asset_hex_name: unit,
                   };
-                  const res = await INSTANCE.post("/collection/single", data);
-                  setIsLoading(false);
-
-                  dispatch(setStep("step2"));
-                  // dispatch(setListing())
-                  window.localStorage.setItem(
-                    "listing",
-                    JSON.stringify(res?.data.data)
-                  );
+                  const res = await INSTANCE.post("/collection/create", data);
+                  if (res) {
+                    setIsLoading(false);
+                    dispatch(setStep("step2"));
+                    // dispatch(setListing())
+                    window.localStorage.setItem(
+                      "listing",
+                      JSON.stringify(res?.data.data)
+                    );
+                  }
                 } catch (e) {
                   setIsLoading(false);
 
@@ -387,7 +388,7 @@ const MylistTabs = () => {
                     className="btn2"
                     sx={{ width: "150px" }}
                     type="submit"
-                    // onClick={() => setListingSteps("step2")}
+                  // onClick={() => setListingSteps("step2")}
                   >
                     Next
                   </Button>

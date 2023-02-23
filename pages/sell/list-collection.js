@@ -371,14 +371,16 @@ const ListCollectionStep2 = () => {
 
         console.log(metadataObjects, 'metadasd')
 
+        let arr = []
+
         for (let index = 0; index < metadataObjects.length; index++) {
           const element = metadataObjects[index];
-          console.log(element, 'elem')
-          let metadata = element
-          metadataX[metadata.name] = metadata
-          console.log(metadataX, 'dsadasd')
-          assetObj[String(policyId + fromText(metadata.name))] = 1n
+          metadataX[element.name] = element
+          // console.log(metadataX, 'dsadasd')
+          assetObj[String(policyId + fromText(element.name))] = 1n
           obj = { [policyId]: metadataX };
+          element["unit"] = String(policyId + fromText(element.name))
+          arr.push(element)
         }
         // console.log(assetObj, 'onjf')
         // debugger
@@ -397,15 +399,27 @@ const ListCollectionStep2 = () => {
         const signedTxL = await txL.sign().complete();
         const txHashL = await signedTxL.submit();
         if (txHashL) {
-          const res = await INSTANCE.post("url", {});
-          window.localStorage.setItem("listing", JSON.stringify(res?.data.data));
-          dispatch(setStep("step2"));
-          router.push({
-            pathname: "/sell",
-            query: {
-              type: "add-listing",
-            },
-          });
+          const user_id = window.localStorage.getItem("userid");
+          const data = {
+            metadata: arr,
+            user_id: user_id,
+            recipient_address: recipientAddress,
+            policy_id: policyId,
+            type: "collection",
+            minting_policy: JSON.stringify(mintingPolicy),
+            // asset_hex_name: unit,
+          };
+          const res = await INSTANCE.post("/collection/create", data);
+          if (res) {
+            window.localStorage.setItem("listing", JSON.stringify(res?.data.data));
+            dispatch(setStep("step2"));
+            router.push({
+              pathname: "/sell",
+              query: {
+                type: "add-listing",
+              },
+            });
+          }
         }
       } else {
         Toast("error", "You are not Not Connected");

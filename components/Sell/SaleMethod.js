@@ -65,12 +65,12 @@ const SaleMethod = () => {
         const data =
           listing_data.type === "single"
             ? {
-                user_id: listing_data?.user_id,
-                collection_id: listing_data._id,
-              }
+              user_id: listing_data?.user_id,
+              collection_id: listing_data._id,
+            }
             : {
-                user_id: listing_data?.type,
-              };
+              user_id: listing_data?.type,
+            };
         try {
           // let formData = new FormData();
           // formData.append("price", fixed_data["price"]);
@@ -85,11 +85,13 @@ const SaleMethod = () => {
               : "/list/create/collection",
             { ...price_data, ...data }
           );
-          setIsLoading(false);
-          const route =
-            paymentValue === "fixed" ? buyDetailRoute : auctionRoute;
-          router.push(route);
-          console.log(res, "response");
+          if (res) {
+            setIsLoading(false);
+            const route =
+              paymentValue === "fixed" ? buyDetailRoute : auctionRoute;
+            router.push(route);
+            console.log(res, "response");
+          }
         } catch (e) {
           setIsLoading(false);
           console.log(e);
