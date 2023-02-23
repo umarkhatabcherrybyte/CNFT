@@ -16,7 +16,11 @@ import Heading from "../shared/headings/Heading";
 const data = [{}, {}, {}, {}, {}, {}, {}, {}];
 import { INSTANCE } from "../../config/axiosInstance";
 import { getKeyData } from "../../helper/localStorage";
-import { MycollectionRoute, buyDetailRoute } from "../Routes/constants";
+import {
+  MycollectionRoute,
+  buyDetailRoute,
+  auctionDetailRoute,
+} from "../Routes/constants";
 import { useRouter } from "next/router";
 const MyListCard = () => {
   const router = useRouter();
@@ -42,12 +46,14 @@ const MyListCard = () => {
     }
   }, [connected]);
 
-  const navigationHandler = (type, id) => {
+  const navigationHandler = (type, id, model) => {
     console.log(type);
     const route =
       type === "single"
-        ? `${buyDetailRoute}/${id}`
-        : `${MycollectionRoute}/${id}`;
+        ? model === "Auction"
+          ? `${auctionDetailRoute}/0/${id}`
+          : `${buyDetailRoute}/0/${id}`
+        : `${MycollectionRoute}/${model}/${id}`;
     router.push(route);
   };
   return (
@@ -59,7 +65,13 @@ const MyListCard = () => {
               {listing.map((card, index) => (
                 <Grid xs={12} md={4} lg={3} item key={index}>
                   <Card
-                    onClick={(e) => navigationHandler(card.mint_type, card._id)}
+                    onClick={(e) =>
+                      navigationHandler(
+                        card.mint_type,
+                        card._id,
+                        card?.sell_model
+                      )
+                    }
                     sx={{
                       boxShadow: "none",
                       height: "100%",
@@ -123,7 +135,7 @@ const MyListCard = () => {
                         {card?.collection_id?.assets[0]?.asset_name}
                       </Typography>
                       <Box className="space_between">
-                        <CaptionHeading heading="julian_jokey" />
+                        {/* <CaptionHeading heading="julian_jokey" /> */}
                         <Typography
                           gutterBottom
                           variant="body"
