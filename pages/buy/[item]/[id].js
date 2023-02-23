@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Box, Grid, Typography, Button } from "@mui/material";
-import ContainerLayout from "../../components/shared/ContainerLayout";
-import BreadCrumHeader from "../../components/shared/BreadCrumHeader";
+import ContainerLayout from "/components/shared/ContainerLayout";
+import BreadCrumHeader from "/components/shared/BreadCrumHeader";
 
 import {
   RemoveRedEyeOutlined,
@@ -13,20 +13,20 @@ import {
 } from "@mui/icons-material";
 import { TabContext, TabPanel } from "@mui/lab";
 
-import Strips from "../../components/Design/Strips";
-import Ballon from "../../components/Design/Ballon";
-import BarHeading from "../../components/shared/headings/BarHeading";
-import ClientCard from "../../components/Cards/ClientCard";
-import LineTab from "../../components/Tabs/LineTab";
-import { buyPaymentRoute } from "../../components/Routes/constants";
+import Strips from "/components/Design/Strips";
+import Ballon from "/components/Design/Ballon";
+import BarHeading from "/components/shared/headings/BarHeading";
+import ClientCard from "/components/Cards/ClientCard";
+import LineTab from "/components/Tabs/LineTab";
+import { buyPaymentRoute } from "/components/Routes/constants";
 import { useRouter } from "next/router";
-import { INSTANCE } from "../../config/axiosInstance";
-import GetAdaPriceService from "../../services/get-ada-price.service";
+import { INSTANCE } from "/config/axiosInstance";
+import GetAdaPriceService from "/services/get-ada-price.service";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
-import { Toast } from "../../components/shared/Toast";
-import { getKeyData } from "../../helper/localStorage";
-import FullScreenLoader from "../../components/shared/FullScreenLoader";
+import { Toast } from "/components/shared/Toast";
+import { getKeyData } from "/helper/localStorage";
+import FullScreenLoader from "/components/shared/FullScreenLoader";
 
 // import { BigInt } from "lucid-cardano/types/src/core/wasm_modules/cardano_multiplatform_lib_web/cardano_multiplatform_lib";
 const List = [{}, {}, {}, {}];
@@ -48,7 +48,7 @@ const tabData = [
 ];
 const BuyDetail = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { id, item } = router.query;
   const [open, setOpen] = useState(false);
   const [tabValue, setTabValue] = useState("ada");
   const [detail, setDetail] = useState({});
@@ -61,7 +61,7 @@ const BuyDetail = () => {
     const getData = async () => {
       setIsLoading(true);
       try {
-        const res = await INSTANCE.get(`/list/get/single/${id}`);
+        const res = await INSTANCE.get(`/list/get/${item}/${id}`);
         setDetail(res?.data?.data);
         setIsLoading(false);
       } catch (e) {
@@ -157,7 +157,7 @@ const BuyDetail = () => {
                 <Grid item xs={12} md={8}>
                   <LineTab tabData={tabData} setTabValue={setTabValue} />
                 </Grid>
-                <Grid item xs={12} md={4}>
+                {/* <Grid item xs={12} md={4}>
                   <Box
                     className="flex_align"
                     sx={{ justifyContent: { xs: "start", md: "end" } }}
@@ -166,7 +166,7 @@ const BuyDetail = () => {
                       Connect Your Wallet
                     </Button>
                   </Box>
-                </Grid>
+                </Grid> */}
               </Grid>
             </Box>
           </Box>
@@ -177,7 +177,7 @@ const BuyDetail = () => {
                   <Grid container spacing={3}>
                     <Grid xs={12} md={6} item>
                       <img
-                        src={`https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[0]?.ipfs}`}
+                        src={`https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[item]?.ipfs}`}
                         alt=""
                         className="w_100 br_15 item_img"
                       />
@@ -187,7 +187,7 @@ const BuyDetail = () => {
                         variant="h3"
                         className="uppercase text_white bold oswald"
                       >
-                        {detail.list?.collection_id?.assets[0]?.asset_name}
+                        {detail.list?.collection_id?.assets[item]?.asset_name}
                       </Typography>
                       {/* <Box
                           sx={{
@@ -253,7 +253,11 @@ const BuyDetail = () => {
                             className="light_white_bg text_white br_15"
                           >
                             <Typography className="bold montserrat">
-                              Price: {detail.list?.sell_type_id?.price}
+                              Price:{" "}
+                              {detail.list?.mint_type === "single"
+                                ? detail.list?.sell_type_id?.price
+                                : detail.list?.collection_id?.assets[item]
+                                    ?.price}
                               ADA
                             </Typography>
                           </Box>
@@ -335,8 +339,9 @@ const BuyDetail = () => {
                               sx={{ pb: 1.5, px: 2 }}
                               variant="caption"
                             >
-                              {detail.asset_details?.fingerprint.slice(0, 35) +
-                                "...."}
+                              {/* {detail.asset_details?.fingerprint.slice(0, 35) +
+                                "...."} */}
+                              sssssssssssssssssssssssssssssssssss
                             </Typography>
                           </Box>
                         </Grid>

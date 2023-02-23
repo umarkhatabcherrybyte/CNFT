@@ -10,6 +10,7 @@ import BuyCards from "../../components/Buy/BuyCards";
 import { useRouter } from "next/router";
 import FullScreenLoader from "../../components/shared/FullScreenLoader";
 import { INSTANCE } from "../../config/axiosInstance";
+import NftCard from "../../components/shared/NftCard";
 
 const Buy = () => {
   const router = useRouter();

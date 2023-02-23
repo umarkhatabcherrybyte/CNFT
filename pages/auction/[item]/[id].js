@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import ContainerLayout from "../../components/shared/ContainerLayout";
-import BreadCrumHeader from "../../components/shared/BreadCrumHeader";
+import ContainerLayout from "../../../components/shared/ContainerLayout";
+import BreadCrumHeader from "../../../components/shared/BreadCrumHeader";
 import styled from "styled-components";
 import { Box, Button, Grid, Typography } from "@mui/material";
 import {
@@ -8,16 +8,16 @@ import {
   FavoriteBorderOutlined,
   CalendarTodayOutlined,
 } from "@mui/icons-material";
-import AuctionModal from "../../components/Auction/AuctionModal";
-import BarHeading from "../../components/shared/headings/BarHeading";
-import DetailCard from "../../components/Auction/DetailCard";
-import SuccessModal from "../../components/Auction/SuccessModal";
+import AuctionModal from "../../../components/Auction/AuctionModal";
+import BarHeading from "../../../components/shared/headings/BarHeading";
+import DetailCard from "../../../components/Auction/DetailCard";
+import SuccessModal from "../../../components/Auction/SuccessModal";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import { useRouter } from "next/router";
 import GetAdaPriceService from "/services/get-ada-price.service";
 import { INSTANCE } from "/config/axiosInstance";
 import dynamic from "next/dynamic";
-import FullScreenLoader from "../../components/shared/FullScreenLoader";
+import FullScreenLoader from "../../../components/shared/FullScreenLoader";
 const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
   ssr: false,
 });
@@ -25,7 +25,7 @@ const cardData = [{}, {}, {}, {}];
 
 const AuctionDetail = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { id, item } = router.query;
   const [open, setOpen] = useState(false);
   const [isSuccessModal, setIsSuccessModal] = useState(false);
   const [detail, setDetail] = useState({});
@@ -79,7 +79,7 @@ const AuctionDetail = () => {
                 <Grid xs={12} md={6} item>
                   <Box>
                     <img
-                      src={`https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[0]?.ipfs}`}
+                      src={`https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[item]?.ipfs}`}
                       alt=""
                       className="w_100 br_15 detail_img"
                     />
@@ -90,7 +90,7 @@ const AuctionDetail = () => {
                     variant="h3"
                     className="uppercase text_white bold oswald"
                   >
-                    {detail.list?.collection_id?.assets[0]?.asset_name}
+                    {detail.list?.collection_id?.assets[item]?.asset_name}
                   </Typography>
                   {/* <Box
                 sx={{
@@ -124,7 +124,7 @@ const AuctionDetail = () => {
                 </Typography>
               </Box> */}
                   <Typography sx={{ py: 2 }} className="text_white montserrat">
-                    {detail.list?.collection_id?.assets[0]?.description}
+                    {detail.list?.collection_id?.assets[item]?.description}
                   </Typography>
                   <Grid container spacing={3}>
                     <Grid item md={6} xs={12}>

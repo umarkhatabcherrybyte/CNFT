@@ -99,7 +99,7 @@ const ListCollectionStep2 = () => {
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => { })
+      UploadService.uploadMeta(file, path, (event) => {})
         .then((response) => {
           if (response.data.data.length > 0) {
             setMetadataObjects(response.data.data || []);
@@ -198,8 +198,8 @@ const ListCollectionStep2 = () => {
     // );
     // validateCollectionData(objs)
     if (!validateCollectionData(objs)) {
-      console.log('here')
-      return
+      console.log("here");
+      return;
     }
     if (imagePaths.length == 0) {
       Toast("error", "please upload NFT files first");
@@ -250,8 +250,9 @@ const ListCollectionStep2 = () => {
         obj[metadataObjectProperties[index]] =
           element[Object.keys(element)[index]];
       }
-      obj["image"] = imagePaths[index].path;
+      obj["ipfs"] = imagePaths[index].path;
       obj["mediaType"] = imagePaths[index].file_mimeType;
+      // ipfs: uploaded_image.path
       metadataArr.push(obj);
     }
     // console.log(metadataArr, "arr");
@@ -298,7 +299,7 @@ const ListCollectionStep2 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => { })
+    UploadService.downloadMetafile(path, (event) => {})
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
@@ -325,33 +326,42 @@ const ListCollectionStep2 = () => {
     if (objs.length > 0) {
       for (let index = 0; index < objs.length; index++) {
         if (
-          !(Object.keys(objs[index]).includes('name') || Object.keys(objs[index]).includes('Name')) ||
-          !(Object.keys(objs[index]).includes('price') || Object.keys(objs[index]).includes('Price'))
+          !(
+            Object.keys(objs[index]).includes("name") ||
+            Object.keys(objs[index]).includes("Name")
+          ) ||
+          !(
+            Object.keys(objs[index]).includes("price") ||
+            Object.keys(objs[index]).includes("Price")
+          )
         ) {
-          Toast("error", 'You need to have both name and price properties in the webform')
-          return false
+          Toast(
+            "error",
+            "You need to have both name and price properties in the webform"
+          );
+          return false;
         }
       }
 
-      var valueArr = objs.map(function (item) { return item.name });
-      var isDuplicate = valueArr.some(function (item, idx) {
-        return valueArr.indexOf(item) != idx
+      var valueArr = objs.map(function (item) {
+        return item.name;
       });
-      console.log(isDuplicate, 'dup')
+      var isDuplicate = valueArr.some(function (item, idx) {
+        return valueArr.indexOf(item) != idx;
+      });
+      console.log(isDuplicate, "dup");
       if (isDuplicate) {
         // console.log(isDup)
-        return false
+        return false;
+      } else {
+        return true;
       }
-      else {
-        return true
-      }
-    }
-    else {
+    } else {
       // console.log('no itemsd')
-      Toast("error", 'No Metadata Objects Found')
-      return false
+      Toast("error", "No Metadata Objects Found");
+      return false;
     }
-  }
+  };
 
   const mintCollection = async (metadataObjects) => {
     const listing_previous = getObjData("listing");
@@ -406,7 +416,7 @@ const ListCollectionStep2 = () => {
         console.log(metadataObjects, "metadasd");
 
         let arr = [];
-        let prices = []
+        let prices = [];
 
         for (let index = 0; index < metadataObjects.length; index++) {
           const element = metadataObjects[index];
@@ -414,8 +424,8 @@ const ListCollectionStep2 = () => {
           // console.log(metadataX, 'dsadasd')
           assetObj[String(policyId + fromText(element.name))] = 1n;
           obj = { [policyId]: metadataX };
-          prices.push(element.price)
-          delete element["price"]
+          prices.push(element.price);
+          delete element["price"];
           // element["unit"] = String(policyId + fromText(element.name))
           // arr.push(element)
         }
@@ -438,7 +448,8 @@ const ListCollectionStep2 = () => {
           for (let index = 0; index < metadataObjects.length; index++) {
             const element = metadataObjects[index];
             element["unit"] = String(policyId + fromText(element.name));
-            element["price"] = Number(prices[index])
+            element["price"] = Number(prices[index]);
+
             arr.push(element);
           }
           const data = {

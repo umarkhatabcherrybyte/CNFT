@@ -3,14 +3,14 @@ import { Box, Card, CardMedia, Typography, CardContent } from "@mui/material";
 import { ArrowForwardIos } from "@mui/icons-material";
 
 import styled from "styled-components";
-import { MycollectionRoute } from "../Routes/constants";
+import { MycollectionRoute, buyDetailRoute } from "../Routes/constants";
 import { useRouter } from "next/router";
 const ClientCard = ({ card }) => {
   const router = useRouter();
   return (
     <ClientCardStyled>
       <Card
-        onClick={() => router.push(MycollectionRoute)}
+        onClick={() => router.push(`${buyDetailRoute}/0/${card._id}`)}
         sx={{
           boxShadow: "none",
           background: "#193361",

@@ -64,6 +64,14 @@ export const auctionDealSchema = yup.object({
     .max(59, "Minutes should be maximum 59.")
     .required("Please enter minutes"),
 });
+
+export const placeYourBidSchema = yup.object({
+  price: yup
+    .number()
+    .typeError("That doesn't look like a positive number")
+    .positive("A price number can't start with a minus")
+    .required("Please enter price"),
+});
 const validationSchema = yup.object({
   platform_url: yup
     .string()

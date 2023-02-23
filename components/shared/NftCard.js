@@ -3,13 +3,26 @@ import { Box, Card, CardMedia, Typography, CardContent } from "@mui/material";
 import { ArrowForwardIos } from "@mui/icons-material";
 import styled from "styled-components";
 import { useRouter } from "next/router";
-import { buyDetailRoute } from "../Routes/constants";
+import {
+  buyDetailRoute,
+  MycollectionRoute,
+  auctionDetailRoute,
+} from "../Routes/constants";
 const NftCard = ({ card }) => {
+  const asset_detail = card?.collection_id?.assets[0];
+  const type = card.mint_type === "collection";
+  const sell_model = card.sell_model;
   const router = useRouter();
+  const navigationHanlder = () => {
+    const route = type
+      ? `${MycollectionRoute}/${sell_model}`
+      : `${buyDetailRoute}/0`;
+    router.push(`${route}/${card._id}`);
+  };
   return (
     <NftCardStyled>
       <Card
-        onClick={() => router.push(`${buyDetailRoute}/${card?._id}`)}
+        onClick={navigationHanlder}
         sx={{
           boxShadow: "none",
           background: "var(--main-color)",
@@ -30,7 +43,11 @@ const NftCard = ({ card }) => {
           <CardMedia
             component="img"
             height="290"
-            image={`https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`}
+            image={`${
+              type
+                ? card.feature_image
+                : `https://ipfs.io/ipfs/${asset_detail?.ipfs}`
+            }`}
             alt="green iguana"
           />
           {/* <Box
@@ -74,7 +91,7 @@ const NftCard = ({ card }) => {
               className="bold"
               sx={{ textTransform: "uppercase" }}
             >
-              {card?.collection_id?.assets[0]?.asset_name}
+              {type ? card.name : asset_detail?.asset_name}
             </Typography>
             <Typography
               gutterBottom

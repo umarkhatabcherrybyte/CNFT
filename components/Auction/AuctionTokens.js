@@ -8,9 +8,9 @@ const AuctionTokens = ({ auction }) => {
     <>
       {auction.length > 0 ? (
         <Grid container spacing={2}>
-          {auction.map((data) => (
+          {auction.map((data, index) => (
             <Grid item xs={12} sm={6} md={4} lg={3}>
-              <AuctionCard data={data} />
+              <AuctionCard data={data} index={index} />
             </Grid>
           ))}
         </Grid>

@@ -30,7 +30,7 @@ const DetailCard = ({ card }) => {
               justifyContent: "space-between",
             },
           }}
-          onClick={() => router.push(`${auctionDetailRoute}/${card?._id}`)}
+          onClick={() => router.push(`${auctionDetailRoute}/0/${card?._id}`)}
         >
           <Box sx={{ position: "relative" }}>
             <CardMedia

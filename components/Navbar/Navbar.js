@@ -57,11 +57,11 @@ const Navbar = () => {
       navigate: "/",
       icon: Home,
     },
-    {
-      value: "Collection",
-      navigate: collectionRoute,
-      icon: Apps,
-    },
+    // {
+    //   value: "Collection",
+    //   navigate: collectionRoute,
+    //   icon: Apps,
+    // },
     // {
     //   value: "sell",
     //   navigate: "/sell",

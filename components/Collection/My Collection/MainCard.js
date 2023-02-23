@@ -8,11 +8,15 @@ import {
   CardContent,
   Typography,
 } from "@mui/material";
-import { buyDetailRoute } from "../../Routes/constants";
+import { buyDetailRoute, auctionDetailRoute } from "../../Routes/constants";
 // const data = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
 import { useRouter } from "next/router";
-const MainCard = ({ data }) => {
+const MainCard = ({ data, type, id }) => {
   const router = useRouter();
+  const navigationHanlder = (index) => {
+    const route = type === "Auction" ? auctionDetailRoute : buyDetailRoute;
+    router.push(`${route}/${index}/${id}`);
+  };
   return (
     <>
       <>
@@ -22,7 +26,7 @@ const MainCard = ({ data }) => {
               data.map((card, index) => (
                 <Grid xs={12} sm={6} md={4} lg={2.4} item key={index}>
                   <Card
-                    onClick={() => router.push(`${buyDetailRoute}/${data._id}`)}
+                    onClick={(e) => navigationHanlder(index)}
                     sx={{
                       boxShadow: "none",
                       background: "#193361",
@@ -44,7 +48,7 @@ const MainCard = ({ data }) => {
                         component="img"
                         height="290"
                         // `https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`
-                        image={`https://ipfs.io/ipfs/${card?.image}`}
+                        image={`https://ipfs.io/ipfs/${card?.ipfs}`}
                         alt="green iguana"
                         sx={{
                           objectFit: "fill",
@@ -60,9 +64,9 @@ const MainCard = ({ data }) => {
                         className="bold poppin text_center "
                         sx={{ textTransform: "uppercase " }}
                       >
-                        iNDUSTRIAL REvolution
+                        {card?.asset_name}
                       </Typography>
-                      <Box className="space_between">
+                      <Box className="flex_align_center">
                         <Typography
                           gutterBottom
                           variant="body"
@@ -70,7 +74,8 @@ const MainCard = ({ data }) => {
                           sx={{ color: "var(--secondary-color)" }}
                           className="bold flex poppin"
                         >
-                          1500
+                          {card?.price}
+
                           <Typography
                             variant="caption"
                             component="div"
@@ -84,7 +89,7 @@ const MainCard = ({ data }) => {
                             Ada
                           </Typography>
                         </Typography>
-                        <CaptionHeading heading="julian_jokey" />
+                        {/* <CaptionHeading heading="julian_jokey" /> */}
                       </Box>
                     </CardContent>
                   </Card>

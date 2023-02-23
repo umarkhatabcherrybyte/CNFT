@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { ArrowForwardIos } from "@mui/icons-material";
 import { Box, Card, CardMedia, Typography, CardContent } from "@mui/material";
-import { auctionDetailRoute } from "../Routes/constants";
+import { auctionDetailRoute, MycollectionRoute } from "../Routes/constants";
 import { useRouter } from "next/router";
 import GetAdaPriceService from "/services/get-ada-price.service";
 
@@ -12,7 +12,7 @@ import dynamic from "next/dynamic";
 const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
   ssr: false,
 });
-const AuctionCard = ({ data }) => {
+const AuctionCard = ({ data, index }) => {
   const router = useRouter();
   const [adaInfo, setAdaInfo] = React.useState({});
   const [date, setDate] = useState("");
@@ -31,6 +31,16 @@ const AuctionCard = ({ data }) => {
     }, 30000);
     return () => clearInterval(interval);
   }, []);
+  const asset_detail = data?.collection_id?.assets[0];
+  const type = data.mint_type === "collection";
+  const sell_model = data?.sell_model;
+  console.log("model", sell_model);
+  const navigationHanlder = () => {
+    const route = type
+      ? `${MycollectionRoute}/${sell_model}`
+      : `${auctionDetailRoute}/0`;
+    router.push(`${route}/${data._id}`);
+  };
   return (
     <AuctionCardStyled>
       <Card
@@ -50,13 +60,13 @@ const AuctionCard = ({ data }) => {
             justifyContent: "space-between",
           },
         }}
-        onClick={() => router.push(`${auctionDetailRoute}/${data._id}`)}
+        onClick={navigationHanlder}
       >
         <Box sx={{ position: "relative" }}>
           <CardMedia
             component="img"
             height="290"
-            image={`https://ipfs.io/ipfs/${data?.collection_id?.assets[0]?.ipfs}`}
+            image={`https://ipfs.io/ipfs/${asset_detail?.ipfs}`}
             alt="green iguana"
           />
           <Box sx={{ position: "absolute", bottom: "10px" }}></Box>
@@ -68,7 +78,7 @@ const AuctionCard = ({ data }) => {
             component="div"
             className="uppercase poppin "
           >
-            {data?.collection_id?.assets[0]?.asset_name}
+            {asset_detail?.asset_name}
           </Typography>
           {/* <Typography
             gutterBottom
