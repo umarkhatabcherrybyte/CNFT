@@ -2,7 +2,7 @@ import axios from "axios";
 import { baseURL, testBaseURL } from "./endpoint";
 
 export const INSTANCE = axios.create({
-  baseURL: testBaseURL,
+  baseURL: baseURL,
   headers: {
     "Content-Type": "application/json",
 
@@ -50,7 +50,8 @@ const executeSilentRefresh = async (config) => {
     // else
   } catch (error) {
     return handleError(
-      `Error: [${error.response.status || 500}] ${error.response.data.msg || "SERVER_ERROR"
+      `Error: [${error.response.status || 500}] ${
+        error.response.data.msg || "SERVER_ERROR"
       }`
     );
   }
