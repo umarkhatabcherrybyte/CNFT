@@ -23,7 +23,9 @@ const SingleMintStep2 = () => {
   const [loading, setLoading] = React.useState(false);
 
   const [metadata, setMetadata] = React.useState({
-    image: `ipfs://${window.localStorage.getItem("img")}`,
+    image: `ipfs://${
+      typeof window !== "undefined" && window.localStorage.getItem("img")
+    }`,
     mediaType: "image/jpg",
     description: "",
     name: "",
@@ -43,7 +45,7 @@ const SingleMintStep2 = () => {
 
   const onNextButton = async () => {
     setLoading(true);
-    let img = window.localStorage.getItem("img")
+    let img = window.localStorage.getItem("img");
     if (!metadata.name || metadata.name === null || metadata.name === "") {
       Toast("error", "Name is invalid.");
       setLoading(false);
@@ -60,7 +62,7 @@ const SingleMintStep2 = () => {
       Toast("error", "Please Connect Your Wallet");
       setLoading(false);
     }
-  }
+  };
 
   return (
     <SingleMintStep2Styled>
@@ -182,7 +184,7 @@ const SingleMintStep2 = () => {
               ></TextField>
 
               <Box className="text_white">
-                <Typography variant="body" sx={{ pt: 1 }} component="div">
+                {/* <Typography variant="body" sx={{ pt: 1 }} component="div">
                   Set your royalties
                 </Typography>
                 <Box>
@@ -224,16 +226,16 @@ const SingleMintStep2 = () => {
                       <span className="form-label">&nbsp;15%</span>
                     </div>
                   </div>
-                </Box>
+                </Box> */}
                 <Box>
-                  <Typography variant="body" sx={{ pt: 1 }} component="div">
+                  {/* <Typography variant="body" sx={{ pt: 1 }} component="div">
                     You can set up 15% royalty and get paid every time your nft
                     sells.
                   </Typography>
                   <Typography variant="body" sx={{ pt: 1 }} component="div">
                     * We collect a 2.55 royalty fee each tome your NFT sells,
                     click here for more information
-                  </Typography>
+                  </Typography> */}
                   <Box
                     sx={{ display: "flex", justifyContent: "center", py: 3 }}
                   >

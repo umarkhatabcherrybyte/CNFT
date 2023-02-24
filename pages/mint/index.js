@@ -27,10 +27,10 @@ const Mint = () => {
           <Typography variant="h4" className="bold text_center" sx={{ py: 7 }}>
             What would you like to mint?
           </Typography>
-          <Grid container spacing={{ md: 50, xs: 3 }}>
+          <Grid container spacing={{ md: 2, xs: 3 }}>
             <Grid
               item
-              md={6}
+              md={4}
               xs={12}
               onClick={() => {
                 router.push(mintSingleStep1);
@@ -41,9 +41,10 @@ const Mint = () => {
                 <img src="/images/single_mint.png" alt="mint" />
               </Box>
             </Grid>
+            <Grid item md={4} xs={12}></Grid>
             <Grid
               item
-              md={6}
+              md={4}
               xs={12}
               onClick={() => {
                 router.push(mintCollectionStep1);

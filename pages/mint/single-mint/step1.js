@@ -29,18 +29,21 @@ const SingleMint = () => {
       const name = files?.name.toLowerCase();
       if (name.match(/\.(jpg|jpeg|png|gif)$/)) {
         setMintFileFormat("image");
-      } else if (name.match(/\.(mp3)$/)) {
-        setMintFileFormat("audio");
-      } else if (name.match(/\.(mp4)$/)) {
-        setMintFileFormat("video");
-      } else {
+      }
+
+      // else if (name.match(/\.(mp3)$/)) {
+      //   setMintFileFormat("audio");
+      // } else if (name.match(/\.(mp4)$/)) {
+      //   setMintFileFormat("video");
+      // }
+      else {
         setMintFileFormat("invalid");
       }
     }
   };
 
   const onNextButton = async () => {
-    if (mintFile !== null) {
+    if (mintFile !== null && mintFileFormat != "invalid") {
       setIsUploading(true);
       try {
         const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
@@ -90,9 +93,12 @@ const SingleMint = () => {
         >
           {!isUploading ? (
             <>
-              <Grid container spacing={{ md: 50, xs: 3 }}>
-                <Grid item md={6} xs={12}>
-                  <Box className="upload_panel">
+              <Grid container spacing={{ md: 3, xs: 3 }}>
+                <Grid item md={4} xs={12}>
+                  <Box
+                    className="upload_panel"
+                    sx={{ height: { xs: "auto", md: "100%" } }}
+                  >
                     <img src="/images/Upload_icon.png" alt="mint" />
                   </Box>
                   <Box
@@ -108,8 +114,12 @@ const SingleMint = () => {
                     </Button>
                   </Box>
                 </Grid>
-                <Grid item md={6} xs={12}>
-                  <Box className="upload_panel bg">
+                <Grid item md={4} xs={12}></Grid>
+                <Grid item md={4} xs={12}>
+                  <Box
+                    className="upload_panel bg"
+                    sx={{ height: { xs: "auto", md: "100%" } }}
+                  >
                     {mintFile ? (
                       <>
                         {mintFileFormat === "image" && (
@@ -180,7 +190,7 @@ const SingleMintStyled = styled.section`
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    /* height: 100%; */
     padding: 30px;
     border: 2px dashed rgba(255, 255, 255, 0.45);
     border-radius: 1rem;
