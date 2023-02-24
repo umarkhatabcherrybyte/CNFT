@@ -27,6 +27,7 @@ import {
 } from '@meshsdk/core';
 import { costLovelace, bankWalletAddress } from "../../../config/utils";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
+import { INSTANCE } from "/config/axiosInstance"
 
 
 const payData = [
@@ -111,7 +112,7 @@ const SingleMintStep3 = () => {
               .attachMetadata('721', obj)
               .mintAssets({ [unit]: 1n })
               .validTo(Date.now() + 100000)
-              .payToAddress(bankWalletAddress, { lovelace: 5000000n })
+              .payToAddress(bankWalletAddress, { [unit]: 1n })
               .attachMintingPolicy(mintingPolicy)
               .complete();
 
@@ -278,6 +279,7 @@ const SingleMintStep3 = () => {
                 };
                 const res = await INSTANCE.post("/collection/create", data);
                 if (res) {
+                  Toast("success", "Minted Token Successfully")
                   window.localStorage.setItem('policy', mintingPolicy.script)
                   window.localStorage.setItem('policy-id', policyId)
                   window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))

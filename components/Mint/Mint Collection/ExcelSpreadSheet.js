@@ -344,12 +344,6 @@ const ExcelSpreadSheet = ({
                   </Button> :
                   null
               }
-              <Button sx={{
-                width: '180px',
-                marginLeft: '10px'
-              }} className="btn2" onClick={viewMetaData}>
-                View Metadata
-              </Button>
             </Box>
           </ExcelSpreadSheetStyled >
         </div>

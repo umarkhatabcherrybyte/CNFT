@@ -13,7 +13,7 @@ import {
 import Layout from "/components/Mint/Layout";
 import { Toast } from "/components/shared/Toast";
 import { useRouter } from "next/router";
-import { mintSingleStep3 } from "../../../components/Routes/constants";
+import { mintSingleStep3, mintSingleStep1 } from "../../../components/Routes/constants";
 import CaptionHeading from "/components/shared/headings/CaptionHeading";
 
 const SingleMintStep2 = () => {
@@ -23,7 +23,7 @@ const SingleMintStep2 = () => {
   const [loading, setLoading] = React.useState(false);
 
   const [metadata, setMetadata] = React.useState({
-    image: `ipfs://${window.localStorage.getItem("img")}`,
+    image: `ipfs://${typeof window !== "undefined" && window.localStorage.getItem("img")}`,
     mediaType: "image/jpg",
     description: "",
     name: "",
@@ -60,6 +60,11 @@ const SingleMintStep2 = () => {
       Toast("error", "Please Connect Your Wallet");
       setLoading(false);
     }
+  }
+
+  const onBackButton = async () => {
+    // setLoading(true);
+    router.push(mintSingleStep1);
   }
 
   return (
@@ -237,7 +242,14 @@ const SingleMintStep2 = () => {
                   <Box
                     sx={{ display: "flex", justifyContent: "center", py: 3 }}
                   >
-                    <Button className="btn" onClick={onNextButton}>
+                    <Button style={{
+
+                    }} className="btn" onClick={onBackButton}>
+                      Back
+                    </Button>
+                    <Button style={{
+                      marginLeft: "10px"
+                    }} className="btn" onClick={onNextButton}>
                       Next
                     </Button>
                   </Box>

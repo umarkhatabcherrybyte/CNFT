@@ -13,6 +13,7 @@ export const collectionDetailRoute = "/collection";
 export const MycollectionRoute = "/collection/my-collection";
 export const termConditionRoute = "/terms-condition";
 export const loginRoute = "/login";
+export const mintRoute = "/mint";
 export const mintSingleStep1 = "/mint/single-mint/step1";
 export const mintSingleStep2 = "/mint/single-mint/step2";
 export const mintSingleStep3 = "/mint/single-mint/step3";
