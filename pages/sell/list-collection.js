@@ -99,7 +99,7 @@ const ListCollectionStep2 = () => {
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => {})
+      UploadService.uploadMeta(file, path, (event) => { })
         .then((response) => {
           if (response.data.data.length > 0) {
             setMetadataObjects(response.data.data || []);
@@ -299,7 +299,7 @@ const ListCollectionStep2 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => {})
+    UploadService.downloadMetafile(path, (event) => { })
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
@@ -351,6 +351,10 @@ const ListCollectionStep2 = () => {
       });
       console.log(isDuplicate, "dup");
       if (isDuplicate) {
+        Toast(
+          "error",
+          "You have duplicate names in the webform!"
+        );
         // console.log(isDup)
         return false;
       } else {
