@@ -21,15 +21,18 @@ const Sell = () => {
   const { type } = router.query;
   const [tabValue, setTabValue] = useState("list");
   const [listTabValue, setListTabValue] = useState("add");
+
   const onListTabChange = (event, newValue) => {
     setListTabValue(newValue);
   };
+
   const onTabChange = (event, newValue) => {
     setTabValue(newValue);
     if (newValue === "design") {
       navigate("/design");
     }
   };
+
   const validationSchema = yup.object({
     platform_url: yup
       .string()

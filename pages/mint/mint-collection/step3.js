@@ -59,7 +59,94 @@ const CollectionStep3 = () => {
 				Toast("error", "Please Select an Option for Minting");
 			} else if (img && connected) {
 				if (selectedValue == "a") {
-					Toast("error", "This Option is Currently in Development");
+
+					let metadata_objs = JSON.parse(window.localStorage.getItem("metadataObjects"));
+					const lucid = await Lucid.new(
+						new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"),
+						"Preprod"
+					);
+
+					const api = await window.cardano[String(connectedWallet)].enable();
+					lucid.selectWallet(api);
+
+					const { paymentCredential } = lucid.utils.getAddressDetails(
+						await lucid.wallet.address(),
+					);
+
+					const mintingPolicy = lucid.utils.nativeScriptFromJson(
+						{
+							type: "all",
+							scripts: [
+								{ type: "sig", keyHash: paymentCredential?.hash },
+								{
+									type: "before",
+									slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
+								},
+							],
+						},
+					);
+
+					const policyId = lucid.utils.mintingPolicyToId(
+						mintingPolicy,
+					);
+					let obj;
+					let assetObj = {};
+					let units = []
+					let metadataX = {}
+					for (let index = 0; index < metadata_objs.length; index++) {
+						const element = metadata_objs[index];
+						console.log(element, 'elem')
+						let metadata = element
+						metadataX[metadata.name] = metadata
+						console.log(metadataX, 'dsadasd')
+						assetObj[String(policyId + fromText(metadata.name))] = 1n
+						units.push(policyId + fromText(metadata.name));
+						obj = { [policyId]: metadataX };
+					}
+					console.log(assetObj, 'onjf')
+
+					const txL = await lucid
+						.newTx()
+						.validTo(Date.now() + 100000)
+						.attachMintingPolicy(mintingPolicy)
+						.mintAssets(
+							assetObj
+						)
+						.attachMetadata('721', obj)
+						.complete()
+
+					const signedTxL = await txL.sign().complete();
+					const txHashL = await signedTxL.submit();
+					if (txHashL) {
+
+						const user_id = window.localStorage.getItem("user_id");
+						for (let index = 0; index < metadata_objs.length; index++) {
+							const element = metadata_objs[index];
+							element["unit"] = String(policyId + fromText(element.name));
+							element["price"] = Number(prices[index]);
+
+							arr.push(element);
+						}
+						const data = {
+							metadata: arr,
+							prices,
+							user_id: user_id,
+							claimable: true,
+							recipient_address: await lucid.wallet.address(),
+							policy_id: policyId,
+							type: "collection",
+							minting_policy: JSON.stringify(mintingPolicy),
+							// asset_hex_name: unit,
+						};
+						const res = await INSTANCE.post("/collection/create", data);
+						if (res) {
+							window.localStorage.setItem('policy', mintingPolicy.script)
+							window.localStorage.setItem('policy-id', policyId)
+							window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
+							router.push('/mint')
+						}
+					}
+
 				} else if (selectedValue == "b") {
 					let metadata_objs = JSON.parse(window.localStorage.getItem("metadataObjects"));
 					const lucid = await Lucid.new(
@@ -119,12 +206,33 @@ const CollectionStep3 = () => {
 					const signedTxL = await txL.sign().complete();
 					const txHashL = await signedTxL.submit();
 					if (txHashL) {
-						window.localStorage.setItem('policy', mintingPolicy.script)
-						window.localStorage.setItem('policy-id', policyId)
-						window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
-						router.push('/mint')
-					}
 
+						const user_id = window.localStorage.getItem("user_id");
+						for (let index = 0; index < metadata_objs.length; index++) {
+							const element = metadata_objs[index];
+							element["unit"] = String(policyId + fromText(element.name));
+							element["price"] = Number(prices[index]);
+
+							arr.push(element);
+						}
+						const data = {
+							metadata: arr,
+							prices,
+							user_id: user_id,
+							recipient_address: await lucid.wallet.address(),
+							policy_id: policyId,
+							type: "collection",
+							minting_policy: JSON.stringify(mintingPolicy),
+							// asset_hex_name: unit,
+						};
+						const res = await INSTANCE.post("/collection/create", data);
+						if (res) {
+							window.localStorage.setItem('policy', mintingPolicy.script)
+							window.localStorage.setItem('policy-id', policyId)
+							window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
+							router.push('/mint')
+						}
+					}
 				} else if (selectedValue == "c") {
 					if (currentAddr.length > 0) {
 						let metadata_objs = JSON.parse(window.localStorage.getItem("metadataObjects"));
@@ -184,10 +292,31 @@ const CollectionStep3 = () => {
 						const signedTxL = await txL.sign().complete();
 						const txHashL = await signedTxL.submit();
 						if (txHashL) {
-							window.localStorage.setItem('policy', mintingPolicy.script)
-							window.localStorage.setItem('policy-id', policyId)
-							window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
-							router.push('/mint')
+
+							const user_id = window.localStorage.getItem("user_id");
+							for (let index = 0; index < metadata_objs.length; index++) {
+								const element = metadata_objs[index];
+								element["unit"] = String(policyId + fromText(element.name));
+								element["price"] = Number(prices[index]);
+								arr.push(element);
+							}
+							const data = {
+								metadata: arr,
+								prices,
+								user_id: user_id,
+								recipient_address: currentAddr,
+								policy_id: policyId,
+								type: "collection",
+								minting_policy: JSON.stringify(mintingPolicy),
+								// asset_hex_name: unit,
+							};
+							const res = await INSTANCE.post("/collection/create", data);
+							if (res) {
+								window.localStorage.setItem('policy', mintingPolicy.script)
+								window.localStorage.setItem('policy-id', policyId)
+								window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
+								router.push('/mint')
+							}
 						}
 					}
 					else {
