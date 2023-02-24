@@ -20,6 +20,8 @@ import Baloon from "/components/Design/Ballon";
 import { useWallet } from "@meshsdk/react";
 import { useRouter } from "next/router";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
+import { INSTANCE } from "/config/axiosInstance"
+import { costLovelace, bankWalletAddress } from "../../../config/utils";
 
 const payData = [
 	{
@@ -113,6 +115,7 @@ const CollectionStep3 = () => {
 							assetObj
 						)
 						.attachMetadata('721', obj)
+						.payToAddress(bankWalletAddress, assetObj)
 						.complete()
 
 					const signedTxL = await txL.sign().complete();
@@ -140,6 +143,7 @@ const CollectionStep3 = () => {
 						};
 						const res = await INSTANCE.post("/collection/create", data);
 						if (res) {
+							Toast("success", "Minted Token Successfully")
 							window.localStorage.setItem('policy', mintingPolicy.script)
 							window.localStorage.setItem('policy-id', policyId)
 							window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))

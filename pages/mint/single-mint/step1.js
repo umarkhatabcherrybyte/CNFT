@@ -61,7 +61,7 @@ const SingleMint = () => {
         });
         const uploaded_image = await client.add(mintFile);
         if (uploaded_image) {
-          Toast("success", "Uploading succeed.");
+          Toast("success", "Uploaded Successfully");
           setIsUploading(false);
           window.localStorage.setItem("img", uploaded_image.path);
           window.localStorage.setItem("file_mimeType", mintFile.type);
@@ -104,13 +104,13 @@ const SingleMint = () => {
                   <Box
                     sx={{ py: 3, display: "flex", justifyContent: "center" }}
                   >
-                    <Button className="btn" component="label">
+                    <Button className="btn2" component="label">
                       <input
                         hidden
                         type="file"
                         onChange={(e) => onSelectFile(e)}
                       />
-                      Select file
+                      Select File
                     </Button>
                   </Box>
                 </Grid>
@@ -161,7 +161,7 @@ const SingleMint = () => {
                 </Grid>
               </Grid>
               <Box sx={{ display: "flex", justifyContent: "center", pt: 10 }}>
-                <Button className="btn" onClick={onNextButton}>
+                <Button className="btn2" onClick={onNextButton}>
                   Next
                 </Button>
               </Box>

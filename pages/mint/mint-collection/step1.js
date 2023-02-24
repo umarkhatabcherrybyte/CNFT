@@ -20,7 +20,7 @@ import CaptionHeading from "/components/shared/headings/CaptionHeading";
 import LightText from "/components/shared/headings/LightText";
 import Heading from "/components/shared/headings/Heading";
 import { List } from "@mui/icons-material";
-import { mintCollectionStep2 } from "/components/Routes/constants";
+import { mintCollectionStep2, mintRoute } from "/components/Routes/constants";
 import { useRouter } from "next/router";
 import { create } from "ipfs-http-client";
 
@@ -62,7 +62,14 @@ const CollectionStep1 = () => {
   };
   const onSelectedFiles = (e) => {
     if (e.target.files) {
-      selectedFilesLabelRef.current.innerHTML = `${e.target.files.length} files choosen`;
+      var temp = selectedFiles ? [...selectedFiles] : [];
+      for (let i = 0; i < e.target.files.length; i++) {
+        const files = e.target.files[i];
+        temp.push(files);
+      }
+      console.log(e.target.files.length, temp.length, 'length')
+      setSeletedFiles(temp);
+      selectedFilesLabelRef.current.innerHTML = `${temp.length} files choosen`;
     } else {
       selectedFilesLabelRef.current.innerHTML = `No file choosen`;
     }
@@ -72,12 +79,12 @@ const CollectionStep1 = () => {
     //   files.push(e.target.files[index]);
     // }
     // setSeletedFiles(files);
-    var temp = selectedFiles ? [...selectedFiles] : [];
-    for (let i = 0; i < e.target.files.length; i++) {
-      const files = e.target.files[i];
-      temp.push(files);
-    }
-    setSeletedFiles(temp);
+    // var temp = selectedFiles ? [...selectedFiles] : [];
+    // for (let i = 0; i < e.target.files.length; i++) {
+    //   const files = e.target.files[i];
+    //   temp.push(files);
+    // }
+    // setSeletedFiles(temp);
   };
 
   const onSelectMetaFile = (e) => {
@@ -219,7 +226,7 @@ const CollectionStep1 = () => {
   }
 
   function onBackStep() {
-    navigate("/mint");
+    router.push(mintRoute);
   }
 
   function onRemoveImage(fileName) {
@@ -400,7 +407,7 @@ const CollectionStep1 = () => {
                         className="upload-file-label"
                         ref={selectedFilesLabelRef}
                       >
-                        No file choosen
+                        {selectedFiles.length > 0 ? `${selectedFiles.length} files choosen` : "No file chosen"}
                       </label>
                     </div>
                     <input
@@ -605,7 +612,9 @@ const CollectionStep1 = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="upload-file-label" ref={metaFileLabelRef}>
+                    <label style={{
+                      paddingLeft: "10px !important"
+                    }} ref={metaFileLabelRef}>
                       No file choosen
                     </label>
                   </div>
@@ -830,6 +839,10 @@ const Step1Styled = styled.section`
       border: none !important;
     }
     .upload-file-label {
+      color: white;
+      margin-left: 10px;
+    }
+    .upload-file-label-x {
       color: white;
       margin-left: 10px;
     }
