@@ -204,6 +204,7 @@ const AuctionDetail = () => {
         )}
       </ContainerLayout>
       <AuctionModal
+        detail={detail}
         open={open}
         setOpen={setOpen}
         setIsSuccessModal={setIsSuccessModal}

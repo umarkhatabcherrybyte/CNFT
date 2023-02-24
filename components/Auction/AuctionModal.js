@@ -4,6 +4,7 @@ import CustomModal from "../shared/CustomModal";
 import { CalendarTodayOutlined, Close } from "@mui/icons-material";
 import { useFormik } from "formik";
 import { placeYourBidSchema } from "/schema/Index";
+import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { INSTANCE } from "/config/axiosInstance";
 const style = {
   fieldset: {
@@ -16,7 +17,7 @@ const style = {
     mb: 2,
   },
 };
-const AuctionModal = ({ open, setOpen, setIsSuccessModal }) => {
+const AuctionModal = ({ open, setOpen, setIsSuccessModal, detail }) => {
   const [fee, setFee] = useState("0");
   const [total, setTotal] = useState("");
   const [inputVal, setInputVal] = useState("");
@@ -33,7 +34,42 @@ const AuctionModal = ({ open, setOpen, setIsSuccessModal }) => {
     onSubmit: async (values) => {
       console.log(values);
       try {
-        INSTANCE.post("", {});
+        const response = await INSTANCE.post("/list/validate/bid", {
+          price: "",
+          list_id: "",
+          unit: "",
+        });
+
+        const transferLucid = await Lucid.new(
+          new Blockfrost(
+            "https://cardano-preprod.blockfrost.io/api/v0",
+            "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+          ),
+          "Preprod"
+        );
+        transferLucid.selectWalletFromSeed(
+          "cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise"
+        );
+        const lucidBrowser = await Lucid.new(
+          new Blockfrost(
+            "https://cardano-preprod.blockfrost.io/api/v0",
+            "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+          ),
+          "Preprod"
+        );
+        // .payToAddress(address, { lovelace: BigInt(user_value) })
+        const tx = await lucidBrowser
+          .newTx()
+          .payToAddress(await transferLucid.wallet.address(), {
+            [unit]: 1n,
+          })
+          .validTo(Date.now() + 100000)
+          .complete();
+        const signedTx = await tx.sign().complete();
+        const txHash = await signedTx.submit();
+        if (txHash) {
+        }
+        const res = await INSTANCE.post("/list/add/bid", {});
       } catch (e) {
         console.log(e);
       }
