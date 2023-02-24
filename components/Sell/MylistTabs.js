@@ -149,7 +149,6 @@ const MylistTabs = () => {
                 name: values.name,
                 image: `ipfs://${uploaded_image.path}`,
                 mediaType: values.file.type,
-                ipfs: uploaded_image.path,
               };
               if (values.description.length > 0) {
                 metadata["description"] = values.description;
@@ -178,6 +177,7 @@ const MylistTabs = () => {
                 try {
                   const user_id = window.localStorage.getItem("userid");
                   metadata["unit"] = unit;
+                  metadata["ipfs"] = uploaded_image.path;
                   const data = {
                     metadata: [metadata],
                     user_id: user_id,

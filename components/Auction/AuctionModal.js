@@ -6,6 +6,8 @@ import { useFormik } from "formik";
 import { placeYourBidSchema } from "/schema/Index";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { INSTANCE } from "/config/axiosInstance";
+import { getKeyData } from "../../helper/localStorage";
+import { Toast } from "../shared/Toast";
 const style = {
   fieldset: {
     border: "none",
@@ -17,7 +19,7 @@ const style = {
     mb: 2,
   },
 };
-const AuctionModal = ({ open, setOpen, setIsSuccessModal, detail }) => {
+const AuctionModal = ({ open, setOpen, setIsSuccessModal, detail, listId }) => {
   const [fee, setFee] = useState("0");
   const [total, setTotal] = useState("");
   const [inputVal, setInputVal] = useState("");
@@ -35,42 +37,54 @@ const AuctionModal = ({ open, setOpen, setIsSuccessModal, detail }) => {
       console.log(values);
       try {
         const response = await INSTANCE.post("/list/validate/bid", {
-          price: "",
-          list_id: "",
-          unit: "",
+          price: values.price,
+          list_id: listId,
+          unit: detail?.list?.collection_id.policy_id + fromText(detail?.list?.collection_id.assets[item]?.asset_name),
         });
-
-        const transferLucid = await Lucid.new(
-          new Blockfrost(
-            "https://cardano-preprod.blockfrost.io/api/v0",
-            "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
-          ),
-          "Preprod"
-        );
-        transferLucid.selectWalletFromSeed(
-          "cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise"
-        );
-        const lucidBrowser = await Lucid.new(
-          new Blockfrost(
-            "https://cardano-preprod.blockfrost.io/api/v0",
-            "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
-          ),
-          "Preprod"
-        );
-        // .payToAddress(address, { lovelace: BigInt(user_value) })
-        const tx = await lucidBrowser
-          .newTx()
-          .payToAddress(await transferLucid.wallet.address(), {
-            [unit]: 1n,
-          })
-          .validTo(Date.now() + 100000)
-          .complete();
-        const signedTx = await tx.sign().complete();
-        const txHash = await signedTx.submit();
-        if (txHash) {
+        if (response.status) {
+          const transferLucid = await Lucid.new(
+            new Blockfrost(
+              "https://cardano-preprod.blockfrost.io/api/v0",
+              "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+            ),
+            "Preprod"
+          );
+          transferLucid.selectWalletFromSeed(
+            "cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise"
+          );
+          const lucidBrowser = await Lucid.new(
+            new Blockfrost(
+              "https://cardano-preprod.blockfrost.io/api/v0",
+              "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+            ),
+            "Preprod"
+          );
+          // .payToAddress(address, { lovelace: BigInt(user_value) })
+          const tx = await lucidBrowser
+            .newTx()
+            .payToAddress(await transferLucid.wallet.address(), {
+              [unit]: 1n,
+            })
+            .validTo(Date.now() + 100000)
+            .complete();
+          const signedTx = await tx.sign().complete();
+          const txHash = await signedTx.submit();
+          if (txHash) {
+            const res = await INSTANCE.post("/list/add/bid", {
+              user_id: getKeyData("user_id"),
+              list_id: listId,
+              price: values.price
+            });
+            if (res) {
+              Toast("success", "Bid Added Successfully")
+            }
+            else {
+              Toast("error", "Could Not Add Bid")
+            }
+          }
         }
-        const res = await INSTANCE.post("/list/add/bid", {});
       } catch (e) {
+        Toast("error", "Could Not Add Bid")
         console.log(e);
       }
     },
@@ -154,7 +168,7 @@ const AuctionModal = ({ open, setOpen, setIsSuccessModal, detail }) => {
             }}
             className=" br_50"
             disabled={formik.isSubmitting}
-            // onClick={onPLaceBid}
+          // onClick={onPLaceBid}
           >
             Place Your Bid
           </Button>

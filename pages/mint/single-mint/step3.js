@@ -122,6 +122,7 @@ const SingleMintStep3 = () => {
               try {
                 const user_id = window.localStorage.getItem("userid");
                 metadata["unit"] = unit;
+                metadata["ipfs"] = img;
                 const data = {
                   metadata: [metadata],
                   user_id: user_id,
@@ -194,6 +195,7 @@ const SingleMintStep3 = () => {
               try {
                 const user_id = window.localStorage.getItem("userid");
                 metadata["unit"] = unit;
+                metadata["ipfs"] = img;
                 const data = {
                   metadata: [metadata],
                   user_id: user_id,
@@ -268,6 +270,8 @@ const SingleMintStep3 = () => {
               try {
                 const user_id = window.localStorage.getItem("userid");
                 metadata["unit"] = unit;
+                metadata["ipfs"] = img;
+
                 const data = {
                   metadata: [metadata],
                   user_id: user_id,

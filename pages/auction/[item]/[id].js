@@ -56,13 +56,13 @@ const AuctionDetail = () => {
       .then((response) => {
         setAdaInfo(response.data[0]);
       })
-      .catch(() => {});
+      .catch(() => { });
     const interval = setInterval(() => {
       GetAdaPriceService.getPrice()
         .then((response) => {
           setAdaInfo(response.data[0]);
         })
-        .catch(() => {});
+        .catch(() => { });
     }, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -135,7 +135,7 @@ const AuctionDetail = () => {
                             {" "}
                             {parseFloat(
                               adaInfo?.current_price *
-                                detail.list?.sell_type_id?.price
+                              detail.list?.sell_type_id?.price
                             ).toFixed(2)}{" "}
                             USD
                           </span>
@@ -204,6 +204,7 @@ const AuctionDetail = () => {
         )}
       </ContainerLayout>
       <AuctionModal
+        listId={id}
         detail={detail}
         open={open}
         setOpen={setOpen}

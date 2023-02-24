@@ -127,7 +127,7 @@ const CollectionStep3 = () => {
 							const element = metadata_objs[index];
 							element["unit"] = String(policyId + fromText(element.name));
 							element["price"] = Number(prices[index]);
-
+							element["ipfs"] = element.image
 							arr.push(element);
 						}
 						const data = {
@@ -216,7 +216,7 @@ const CollectionStep3 = () => {
 							const element = metadata_objs[index];
 							element["unit"] = String(policyId + fromText(element.name));
 							element["price"] = Number(prices[index]);
-
+							element["ipfs"] = element.image
 							arr.push(element);
 						}
 						const data = {
@@ -302,6 +302,7 @@ const CollectionStep3 = () => {
 								const element = metadata_objs[index];
 								element["unit"] = String(policyId + fromText(element.name));
 								element["price"] = Number(prices[index]);
+								element["ipfs"] = element.image
 								arr.push(element);
 							}
 							const data = {
