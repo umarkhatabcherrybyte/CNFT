@@ -247,7 +247,7 @@ const CollectionStep1 = () => {
         obj[metadataObjectProperties[index]] =
           element[Object.keys(element)[index]];
       }
-      obj["image"] = imagePaths[index].path
+      obj["ipfs"] = imagePaths[index].path
       obj["mediaType"] = imagePaths[index].file_mimeType
       metadataArr.push(obj)
     }
