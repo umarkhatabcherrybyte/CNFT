@@ -43,7 +43,7 @@ const SingleMintStep2 = () => {
 
   const onNextButton = async () => {
     setLoading(true);
-    let img = window.localStorage.getItem("img")
+    let img = window.localStorage.getItem("img");
     if (!metadata.name || metadata.name === null || metadata.name === "") {
       Toast("error", "Name is invalid.");
       setLoading(false);
@@ -60,7 +60,7 @@ const SingleMintStep2 = () => {
       Toast("error", "Please Connect Your Wallet");
       setLoading(false);
     }
-  }
+  };
 
   const onBackButton = async () => {
     // setLoading(true);
@@ -187,7 +187,7 @@ const SingleMintStep2 = () => {
               ></TextField>
 
               <Box className="text_white">
-                <Typography variant="body" sx={{ pt: 1 }} component="div">
+                {/* <Typography variant="body" sx={{ pt: 1 }} component="div">
                   Set your royalties
                 </Typography>
                 <Box>
@@ -229,16 +229,16 @@ const SingleMintStep2 = () => {
                       <span className="form-label">&nbsp;15%</span>
                     </div>
                   </div>
-                </Box>
+                </Box> */}
                 <Box>
-                  <Typography variant="body" sx={{ pt: 1 }} component="div">
+                  {/* <Typography variant="body" sx={{ pt: 1 }} component="div">
                     You can set up 15% royalty and get paid every time your nft
                     sells.
                   </Typography>
                   <Typography variant="body" sx={{ pt: 1 }} component="div">
                     * We collect a 2.55 royalty fee each tome your NFT sells,
                     click here for more information
-                  </Typography>
+                  </Typography> */}
                   <Box
                     sx={{ display: "flex", justifyContent: "center", py: 3 }}
                   >
