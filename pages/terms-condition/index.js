@@ -439,9 +439,5 @@ const TermCondition = ({ message }) => {
     </>
   );
 };
-export function getServerSideProps() {
-  return {
-    props: { message: "Welcome to the About Page" },
-  };
-}
+
 export default TermCondition;

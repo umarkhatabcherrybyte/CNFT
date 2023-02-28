@@ -355,7 +355,7 @@ const MylistTabs = () => {
                         Collection
                       </Typography>
                       <LightText heading="if this is a part of collection select the collection." />
-                      <Select
+                      {/* <Select
                         // value={selectedValue}
                         value={formik.values.collection_name}
                         displayEmpty
@@ -390,7 +390,7 @@ const MylistTabs = () => {
                             {list.name}
                           </MenuItem>
                         ))}
-                      </Select>
+                      </Select> */}
                       <FormHelperText sx={{ color: "#d32f2f" }}>
                         {formik.touched.collection_name &&
                           formik.errors.collection_name}

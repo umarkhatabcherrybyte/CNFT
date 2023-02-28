@@ -17,7 +17,6 @@ import {
 } from "@mui/icons-material";
 import CaptionHeading from "../../components/shared/headings/CaptionHeading";
 import { useRouter } from "next/router";
-import { GetStaticPaths, GetStaticProps, GetServerSideProps } from "next";
 
 const List = [{}, {}, {}, {}];
 
@@ -122,7 +121,7 @@ const CollectionDetail = () => {
                 <Grid item xs={12} md={6}>
                   <Button
                     className="btn2 w_100"
-                    // onClick={() => navigate(`${buyPaymentRoute}/3434`)}
+                  // onClick={() => navigate(`${buyPaymentRoute}/3434`)}
                   >
                     Buy now
                   </Button>
