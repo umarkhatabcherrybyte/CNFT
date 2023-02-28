@@ -15,7 +15,7 @@ const OptionMenu = ({ placeholder, setFilter, name, data, filter }) => {
   return (
     <>
       <FormControl
-        fullWidth
+        fullWidth={true}
         size="small"
         sx={{
           label: {

@@ -54,7 +54,7 @@ const CollectionStep2 = () => {
             placeholder="Name your item"
             name="item_name"
             onChange={(e) => onInputChange(e)}
-            fullWidth
+            fullWidth={true}
             sx={{
               fieldset: {
                 border: "none",
@@ -78,7 +78,7 @@ const CollectionStep2 = () => {
             placeholder="Description(optional)"
             name="item_description"
             onChange={(e) => onInputChange(e)}
-            fullWidth
+            fullWidth={true}
             sx={{
               fieldset: {
                 border: "none",
@@ -104,7 +104,7 @@ const CollectionStep2 = () => {
             name="item_creator"
             placeholder="Creator(optional)"
             onChange={(e) => onInputChange(e)}
-            fullWidth
+            fullWidth={true}
             sx={{
               fieldset: {
                 border: "none",
@@ -128,7 +128,7 @@ const CollectionStep2 = () => {
             name="item_link"
             placeholder="Web link(optional)"
             onChange={(e) => onInputChange(e)}
-            fullWidth
+            fullWidth={true}
             sx={{
               fieldset: {
                 border: "none",
@@ -149,58 +149,7 @@ const CollectionStep2 = () => {
             }}
           ></TextField>
           <Box className="text_white">
-            <Typography variant="body" sx={{ pt: 1 }} component="div">
-              Set your royalties
-            </Typography>
             <Box>
-              <div align="left">
-                <div className="range-wrap">
-                  <div
-                    className="range-value"
-                    style={{
-                      left:
-                        25 -
-                        Math.floor(rangeValue / 10) * 19 -
-                        Math.floor(rangeValue / 12) * 3 -
-                        (1 - Math.floor(rangeValue / 10)) * rangeValue +
-                        (rangeValue / 15) * 300 +
-                        "px",
-                      position: "relative",
-                      top: "12px",
-                    }}
-                    id="rangeV"
-                  >
-                    <span>{rangeValue}%</span>
-                  </div>
-                  <div
-                    className="progress-bar"
-                    style={{ width: (rangeValue / 15) * 300 + "px" }}
-                  ></div>
-                  <span className="form-label">0%&nbsp;</span>
-                  <input
-                    type="range"
-                    className="slider"
-                    id="royalty_range"
-                    name="item_royalty"
-                    step="0.1"
-                    max="15"
-                    min="0"
-                    value={rangeValue}
-                    onChange={(e) => onInputRangeChange(e)}
-                  />
-                  <span className="form-label">&nbsp;15%</span>
-                </div>
-              </div>
-            </Box>
-            <Box>
-              <Typography variant="body" sx={{ pt: 1 }} component="div">
-                You can set up 15% royalty and get paid every time your nft
-                sells.
-              </Typography>
-              <Typography variant="body" sx={{ pt: 1 }} component="div">
-                * We collect a 2.55 royalty fee each tome your NFT sells, click
-                here for more information
-              </Typography>
               <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
                 <Button className="btn" onClick={onNextButton}>
                   Next

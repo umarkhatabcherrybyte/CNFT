@@ -27,7 +27,7 @@ const MyListCard = () => {
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
   const [listing, setListing] = useState([]);
-  console.log(listing);
+  // console.log(listing);
   useEffect(() => {
     const getData = async () => {
       try {
@@ -93,11 +93,10 @@ const MyListCard = () => {
                       <CardMedia
                         component="img"
                         height="290"
-                        image={`${
-                          card.mint_type === "collection"
+                        image={`${card.mint_type === "collection"
                             ? card.feature_image
                             : `https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`
-                        }`}
+                          }`}
                         alt="green iguana"
                       />
                       {/* <Box

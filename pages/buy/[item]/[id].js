@@ -78,13 +78,13 @@ const BuyDetail = () => {
       .then((response) => {
         setAdaInfo(response.data[0]);
       })
-      .catch(() => {});
+      .catch(() => { });
     const interval = setInterval(() => {
       GetAdaPriceService.getPrice()
         .then((response) => {
           setAdaInfo(response.data[0]);
         })
-        .catch(() => {});
+        .catch(() => { });
     }, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -257,7 +257,7 @@ const BuyDetail = () => {
                               {detail.list?.mint_type === "single"
                                 ? detail.list?.sell_type_id?.price
                                 : detail.list?.collection_id?.assets[item]
-                                    ?.price}
+                                  ?.price}
                               ADA
                             </Typography>
                           </Box>
@@ -271,7 +271,7 @@ const BuyDetail = () => {
                               Price:{" "}
                               {parseFloat(
                                 adaInfo?.current_price *
-                                  detail.list?.sell_type_id?.price
+                                detail.list?.sell_type_id?.price
                               ).toFixed(2)}
                               USD
                             </Typography>
@@ -339,9 +339,9 @@ const BuyDetail = () => {
                               sx={{ pb: 1.5, px: 2 }}
                               variant="caption"
                             >
-                              {/* {detail.asset_details?.fingerprint.slice(0, 35) +
-                                "...."} */}
-                              sssssssssssssssssssssssssssssssssss
+                              {detail.asset_details?.fingerprint.slice(0, 35) +
+                                "...."}
+                              {/* sssssssssssssssssssssssssssssssssss */}
                             </Typography>
                           </Box>
                         </Grid>
@@ -423,8 +423,8 @@ const BuyDetail = () => {
                   <BarHeading heading="Explore more from this artist" />
                   <Box sx={{ py: 5 }}>
                     <Grid container spacing={3}>
-                      {detail?.lists_by_user?.map((card) => (
-                        <Grid xs={12} sm={6} md={3} item>
+                      {detail?.lists_by_user?.map((card, index) => (
+                        <Grid key={index} xs={12} sm={6} md={3} item>
                           <ClientCard card={card} />
                         </Grid>
                       ))}

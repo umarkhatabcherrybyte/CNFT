@@ -13,7 +13,7 @@ const InputField = ({ placeholder, label, name, formik }) => {
         </Typography>
         <TextField
           placeholder={placeholder}
-          fullWidth
+          fullWidth={true}
           name={name}
           value={formik.values[name]}
           onChange={formik.handleChange}

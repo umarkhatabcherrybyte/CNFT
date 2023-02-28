@@ -95,8 +95,10 @@ const CollectionStep3 = () => {
 					let assetObj = {};
 					let units = []
 					let metadataX = {}
+					let prices = [];
 					for (let index = 0; index < metadata_objs.length; index++) {
 						const element = metadata_objs[index];
+						prices.push(element.price);
 						console.log(element, 'elem')
 						let metadata = element
 						metadataX[metadata.name] = metadata
@@ -104,6 +106,7 @@ const CollectionStep3 = () => {
 						assetObj[String(policyId + fromText(metadata.name))] = 1n
 						units.push(policyId + fromText(metadata.name));
 						obj = { [policyId]: metadataX };
+						delete element["price"];
 					}
 					console.log(assetObj, 'onjf')
 
@@ -121,7 +124,7 @@ const CollectionStep3 = () => {
 					const signedTxL = await txL.sign().complete();
 					const txHashL = await signedTxL.submit();
 					if (txHashL) {
-
+						let arr = []
 						const user_id = window.localStorage.getItem("user_id");
 						for (let index = 0; index < metadata_objs.length; index++) {
 							const element = metadata_objs[index];
@@ -185,8 +188,10 @@ const CollectionStep3 = () => {
 					let assetObj = {};
 					let units = []
 					let metadataX = {}
+					let prices = []
 					for (let index = 0; index < metadata_objs.length; index++) {
 						const element = metadata_objs[index];
+						prices.push(element.price);
 						console.log(element, 'elem')
 						let metadata = element
 						metadataX[metadata.name] = metadata
@@ -194,6 +199,7 @@ const CollectionStep3 = () => {
 						assetObj[String(policyId + fromText(metadata.name))] = 1n
 						units.push(policyId + fromText(metadata.name));
 						obj = { [policyId]: metadataX };
+						delete element["price"];
 					}
 					console.log(assetObj, 'onjf')
 
@@ -210,7 +216,7 @@ const CollectionStep3 = () => {
 					const signedTxL = await txL.sign().complete();
 					const txHashL = await signedTxL.submit();
 					if (txHashL) {
-
+						let arr = []
 						const user_id = window.localStorage.getItem("user_id");
 						for (let index = 0; index < metadata_objs.length; index++) {
 							const element = metadata_objs[index];
@@ -271,14 +277,18 @@ const CollectionStep3 = () => {
 						let obj;
 						let assetObj = {};
 						let metadataX = {}
+						let prices = []
 						for (let index = 0; index < metadata_objs.length; index++) {
 							const element = metadata_objs[index];
+
 							console.log(element, 'elem')
 							let metadata = element
 							metadataX[metadata.name] = metadata
-							console.log(metadataX, 'dsadasd')
+							// console.log(metadataX, 'dsadasd')
 							assetObj[String(policyId + fromText(metadata.name))] = 1n
 							obj = { [policyId]: metadataX };
+							prices.push(element.price);
+							delete element["price"];
 						}
 						console.log(assetObj, 'onjf')
 
@@ -296,7 +306,7 @@ const CollectionStep3 = () => {
 						const signedTxL = await txL.sign().complete();
 						const txHashL = await signedTxL.submit();
 						if (txHashL) {
-
+							let arr = []
 							const user_id = window.localStorage.getItem("user_id");
 							for (let index = 0; index < metadata_objs.length; index++) {
 								const element = metadata_objs[index];
@@ -354,8 +364,8 @@ const CollectionStep3 = () => {
 							defaultValue="female"
 							name="radio-buttons-group"
 						>
-							{payData.map((data) => (
-								<>
+							{payData.map((data, index) => (
+								<div key={index}>
 									<Box className="check_panel">
 										<FormControlLabel
 											value={data.value}
@@ -373,14 +383,17 @@ const CollectionStep3 = () => {
 											{data.value === "c" && (
 												<>
 													<Grid container spacing={3} sx={{ py: 2 }}>
-														<Grid item lg={5}>
+														{/* <Grid item lg={5}>
 															<QRCode value={currentAddr} />
-														</Grid>
-														<Grid item lg={7}>
-															<Typography variant="h6">Make Payment</Typography>
+														</Grid> */}
+														<Grid item xs={7}>
+															<Typography
+																sx={{
+																	mb: 1
+																}} variant="h6">Make Payment</Typography>
 															<TextField
 																placeholder="e.g addr1qykn8nchkf5ckg0clq6pa580a50t3zdc06prgwcaj605wpd2g0z6sy0pturmfuru097z3yxknjpnm7fymm96n2vyfxaq0gk62p"
-																fullWidth
+																fullWidth={true}
 																onChange={(e) => setCurrentAddr(e.target.value)}
 																defaultValue={currentAddr}
 																sx={{
@@ -401,7 +414,7 @@ const CollectionStep3 = () => {
 											)}
 										</Box>
 									</Box>
-								</>
+								</div>
 							))}
 						</RadioGroup>
 					</FormControl>

@@ -85,9 +85,9 @@ const AddImage = ({ heading, desc, width, formik, name }) => {
 const ListCollection = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
   const data = useSelector((state) => state.listing.data);
-  console.log(data);
+  // console.log(data);
   const formik = useFormik({
     initialValues: {
       type: "collection",
@@ -138,7 +138,7 @@ const ListCollection = () => {
       };
     },
   });
-  console.log(formik);
+  // console.log(formik);
   return (
     <form onSubmit={formik.handleSubmit}>
       <Typography
@@ -174,7 +174,7 @@ const ListCollection = () => {
       />
       <Box sx={{ py: 1 }}>
         <TextField
-          fullWidth
+          fullWidth={true}
           name="name"
           placeholder="Name*"
           value={formik.values.name}
@@ -215,7 +215,7 @@ const ListCollection = () => {
           Tell us about your collection. 0 of 1000 characters used. (Optional)
         </Typography>
         <TextField
-          fullWidth
+          fullWidth={true}
           multiline
           name="description"
           value={formik.values.description}

@@ -8,7 +8,7 @@ const PriceInputField = ({ placeholder, ada, copy, label, name, formik }) => {
       <TextField
         placeholder={placeholder}
         label={label && label}
-        fullWidth
+        fullWidth={true}
         name={name}
         value={formik?.values[name]}
         onChange={formik?.handleChange}

@@ -3,14 +3,14 @@ import { TextField, InputAdornment } from "@mui/material";
 import CaptionHeading from "../shared/headings/CaptionHeading";
 import { ContentCopy } from "@mui/icons-material";
 const AssetInputField = ({ placeholder, ada, copy, label, name, value }) => {
-  console.log(value);
+  // console.log(value);
   return (
     <>
       {/* <h1>{value || 'dd'}</h1> */}
       <TextField
         // placeholder={placeholder}
         label={label && label}
-        fullWidth
+        fullWidth={true}
         name={name}
         // value={formik?.values[name]}
         // onChange={formik?.handleChange}

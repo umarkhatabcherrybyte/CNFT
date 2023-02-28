@@ -73,18 +73,6 @@ const CollectionStep1 = () => {
     } else {
       selectedFilesLabelRef.current.innerHTML = `No file choosen`;
     }
-    // let files = [];
-    // var size = Object.keys(e.target.files).length;
-    // for (let index = 0; index < size; index++) {
-    //   files.push(e.target.files[index]);
-    // }
-    // setSeletedFiles(files);
-    // var temp = selectedFiles ? [...selectedFiles] : [];
-    // for (let i = 0; i < e.target.files.length; i++) {
-    //   const files = e.target.files[i];
-    //   temp.push(files);
-    // }
-    // setSeletedFiles(temp);
   };
 
   const onSelectMetaFile = (e) => {
@@ -195,11 +183,19 @@ const CollectionStep1 = () => {
   }
 
   function onNextStep() {
-    let objs = convertMetadataObjects()
-    console.log(objs.length != imagePaths.length, objs.length, imagePaths.length)
+    let objs = convertMetadataObjects();
+    console.log(
+      objs, 'onjs'
+    );
+    // debugger
     if (imagePaths.length == 0) {
+      console.log(objs.length != imagePaths.length, objs.length, imagePaths.length)
       Toast("error", 'please upload NFT files first');
       return
+    }
+    else if (!validateCollectionData(objs)) {
+      console.log("here");
+      return;
     }
     else if (isWebform && (objs.length != imagePaths.length)) {
       Toast("error", 'missing metadata of some Files');
@@ -254,7 +250,8 @@ const CollectionStep1 = () => {
         obj[metadataObjectProperties[index]] =
           element[Object.keys(element)[index]];
       }
-      obj["ipfs"] = imagePaths[index].path
+      obj["ipfs"] = imagePaths[index].path;
+      obj["image"] = `ipfs://${imagePaths[index].path}`;
       obj["mediaType"] = imagePaths[index].file_mimeType
       metadataArr.push(obj)
     }
@@ -312,6 +309,51 @@ const CollectionStep1 = () => {
       });
   };
 
+  const validateCollectionData = (objs) => {
+    if (objs.length > 0) {
+      for (let index = 0; index < objs.length; index++) {
+        if (
+          !(
+            Object.keys(objs[index]).includes("name") ||
+            Object.keys(objs[index]).includes("Name")
+          ) ||
+          !(
+            Object.keys(objs[index]).includes("price") ||
+            Object.keys(objs[index]).includes("Price")
+          )
+        ) {
+          Toast(
+            "error",
+            "You need to have both name and price properties in the webform"
+          );
+          return false;
+        }
+      }
+
+      var valueArr = objs.map(function (item) {
+        return item.name;
+      });
+      var isDuplicate = valueArr.some(function (item, idx) {
+        return valueArr.indexOf(item) != idx;
+      });
+      console.log(isDuplicate, "dup");
+      if (isDuplicate) {
+        Toast(
+          "error",
+          "You have duplicate names in the webform!"
+        );
+        // console.log(isDup)
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      // console.log('no itemsd')
+      Toast("error", "No Metadata Objects Found");
+      return false;
+    }
+  };
+
   const onFileInputButton = () => {
     console.log("onFileInputButton");
     hiddenFileInputRef.current.click();
@@ -350,7 +392,7 @@ const CollectionStep1 = () => {
                         onFileInputButton();
                       }}
                     >
-                      <label style={{ padding: "10px", fontSize: "14px" }}>
+                      <label style={{ fontSize: "14px" }}>
                         Choose File
                       </label>
                       <Box sx={{ padding: "10px" }}>
@@ -559,7 +601,7 @@ const CollectionStep1 = () => {
                     className="file-select-button"
                     onClick={() => onMetaFileInputButton()}
                   >
-                    <label style={{ padding: "10px", fontSize: "14px" }}>
+                    <label style={{ fontSize: "14px" }}>
                       Choose File
                     </label>
                     <div style={{ padding: "10px" }}>
@@ -612,9 +654,7 @@ const CollectionStep1 = () => {
                     </div>
                   </div>
                   <div>
-                    <label style={{
-                      paddingLeft: "10px !important"
-                    }} ref={metaFileLabelRef}>
+                    <label ref={metaFileLabelRef}>
                       No file choosen
                     </label>
                   </div>
@@ -701,6 +741,7 @@ const Step1Styled = styled.section`
     background: white;
     border-radius: 10px;
     height: 100%;
+    margin-right: 10px;
   }
   .file-input-button {
     display: flex;
@@ -840,7 +881,6 @@ const Step1Styled = styled.section`
     }
     .upload-file-label {
       color: white;
-      margin-left: 10px;
     }
     .upload-file-label-x {
       color: white;

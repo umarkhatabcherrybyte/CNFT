@@ -27,6 +27,7 @@ import { CardanoWallet, useWallet } from "@meshsdk/react";
 import { Toast } from "../shared/Toast";
 import { INSTANCE } from "../../config/axiosInstance";
 import FullScreenLoader from "../shared/FullScreenLoader";
+
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",
@@ -49,11 +50,21 @@ const names = [
 const MylistTabs = () => {
   const { wallet, connected } = useWallet();
   const [recipientAddress, setRecipientAddress] = useState("");
+  const [lists, setLists] = useState([]);
   React.useEffect(() => {
     async function getAddress() {
       if (connected) {
+        const user_id = window.localStorage.getItem("user_id");
         let address = await wallet?.getUsedAddresses();
         setRecipientAddress(address[0]);
+        let res = await INSTANCE.post("list/user/collection", {
+          user_id
+        });
+
+        if (res) {
+          console.log(res.data)
+          setLists(res.data.data)
+        }
       }
     }
     getAddress();
@@ -78,6 +89,7 @@ const MylistTabs = () => {
     validationSchema: addSingleListingSchema,
     onSubmit: async (values) => {
       try {
+        console.log(values, 'values')
         if (connected) {
           setIsLoading(true);
           let connectedWallet = window.localStorage.getItem("connectedWallet");
@@ -97,7 +109,7 @@ const MylistTabs = () => {
             });
             const uploaded_image = await client.add(values.file);
             if (uploaded_image) {
-              console.log(uploaded_image, "img");
+              // console.log(uploaded_image, "img");
 
               const transferLucid = await Lucid.new(
                 new Blockfrost(
@@ -143,7 +155,7 @@ const MylistTabs = () => {
 
               const policyId =
                 lucidBrowser.utils.mintingPolicyToId(mintingPolicy);
-              console.log(mintingPolicy, policyId, "pm");
+              // console.log(mintingPolicy, policyId, "pm");
               let metadataX = {};
               let metadata = {
                 name: values.name,
@@ -154,11 +166,11 @@ const MylistTabs = () => {
                 metadata["description"] = values.description;
               }
               metadataX[metadata.name] = metadata;
-              console.log(metadataX, "dsadasd");
+              // console.log(metadataX, "dsadasd");
               const unit = policyId + fromText(metadata.name);
 
               let obj = { [policyId]: metadataX };
-              console.log(obj, "obj");
+              // console.log(obj, "obj");
               const tx = await lucidBrowser
                 .newTx()
                 .attachMetadata("721", obj)
@@ -171,11 +183,11 @@ const MylistTabs = () => {
                 .complete();
               const signedTx = await tx.sign().complete();
               const txHash = await signedTx.submit();
-              console.log(txHash, "hasg");
+              // console.log(txHash, "hasg");
               if (txHash) {
                 //  api call
                 try {
-                  const user_id = window.localStorage.getItem("userid");
+                  const user_id = window.localStorage.getItem("user_id");
                   metadata["unit"] = unit;
                   metadata["ipfs"] = uploaded_image.path;
                   const data = {
@@ -336,53 +348,57 @@ const MylistTabs = () => {
                   />
                   <LightText heading="with policy ID we can verify your token" />
                 </Box> */}
-                <Box sx={{ py: 1 }}>
-                  <Typography className="text_white bold" variant="caption">
-                    Collection
-                  </Typography>
-                  <LightText heading="if this is a part of collection select the collection." />
-                  <Select
-                    // value={selectedValue}
-                    value={formik.values.collection_name}
-                    displayEmpty
-                    // onChange={onMenuChange}
-                    onChange={formik.handleChange("collection_name")}
-                    sx={{
-                      background: "var(--box-color)",
-                      color: "#fff",
-                      borderRadius: "15px",
-                      fieldset: {
-                        border: "none",
-                      },
-                      svg: {
-                        color: "#fff",
-                      },
-                    }}
-                    renderValue={(selected) => {
-                      // console.log(selected);
-                      if (selected === "") {
-                        return <p>Select</p>;
-                      }
-                      return selected;
-                    }}
-                    fullWidth
-                    placeholder="Age"
-                    inputProps={{ "aria-label": "Without label" }}
-                  >
-                    <MenuItem disabled value="">
-                      <em>Select</em>
-                    </MenuItem>
-                    {names.map((name) => (
-                      <MenuItem key={name} value={name}>
-                        {name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  <FormHelperText sx={{ color: "#d32f2f" }}>
-                    {formik.touched.collection_name &&
-                      formik.errors.collection_name}
-                  </FormHelperText>
-                </Box>
+                {
+                  lists && lists.length > 0 ?
+                    <Box sx={{ py: 1 }}>
+                      <Typography className="text_white bold" variant="caption">
+                        Collection
+                      </Typography>
+                      <LightText heading="if this is a part of collection select the collection." />
+                      <Select
+                        // value={selectedValue}
+                        value={formik.values.collection_name}
+                        displayEmpty
+                        // onChange={onMenuChange}
+                        onChange={formik.handleChange("collection_name")}
+                        sx={{
+                          background: "var(--box-color)",
+                          color: "#fff",
+                          borderRadius: "15px",
+                          fieldset: {
+                            border: "none",
+                          },
+                          svg: {
+                            color: "#fff",
+                          },
+                        }}
+                        renderValue={(selected) => {
+                          // console.log(selected);
+                          if (selected === "") {
+                            return <p>Select</p>;
+                          }
+                          return selected;
+                        }}
+                        placeholder="Age"
+                        inputProps={{ "aria-label": "Without label" }}
+                      >
+                        <MenuItem disabled value="">
+                          <em>Select</em>
+                        </MenuItem>
+                        {lists.map((list) => (
+                          <MenuItem key={list._id} value={list}>
+                            {list.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      <FormHelperText sx={{ color: "#d32f2f" }}>
+                        {formik.touched.collection_name &&
+                          formik.errors.collection_name}
+                      </FormHelperText>
+                    </Box> :
+                    <></>
+                }
+
                 <Box sx={{ py: 2 }}>
                   <Button
                     className="btn2"

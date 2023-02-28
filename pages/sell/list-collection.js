@@ -64,22 +64,17 @@ const ListCollectionStep2 = () => {
   };
   const onSelectedFiles = (e) => {
     if (e.target.files) {
-      selectedFilesLabelRef.current.innerHTML = `${e.target.files.length} files choosen`;
+      var temp = selectedFiles ? [...selectedFiles] : [];
+      for (let i = 0; i < e.target.files.length; i++) {
+        const files = e.target.files[i];
+        temp.push(files);
+      }
+      console.log(e.target.files.length, temp.length, 'length')
+      setSeletedFiles(temp);
+      selectedFilesLabelRef.current.innerHTML = `${temp.length} files choosen`;
     } else {
       selectedFilesLabelRef.current.innerHTML = `No file choosen`;
     }
-    // let files = [];
-    // var size = Object.keys(e.target.files).length;
-    // for (let index = 0; index < size; index++) {
-    //   files.push(e.target.files[index]);
-    // }
-    // setSeletedFiles(files);
-    var temp = selectedFiles ? [...selectedFiles] : [];
-    for (let i = 0; i < e.target.files.length; i++) {
-      const files = e.target.files[i];
-      temp.push(files);
-    }
-    setSeletedFiles(temp);
   };
 
   const onSelectMetaFile = (e) => {
@@ -191,20 +186,20 @@ const ListCollectionStep2 = () => {
 
   async function onNextStep() {
     let objs = convertMetadataObjects();
-    // console.log(
-    //   objs.length != imagePaths.length,
-    //   objs.length,
-    //   imagePaths.length
-    // );
+    console.log(
+      objs, 'onjs'
+    );
+    // debugger
     // validateCollectionData(objs)
-    if (!validateCollectionData(objs)) {
-      console.log("here");
-      return;
-    }
     if (imagePaths.length == 0) {
       Toast("error", "please upload NFT files first");
       return;
-    } else if (isWebform && objs.length != imagePaths.length) {
+    }
+    else if (!validateCollectionData(objs)) {
+      console.log("here");
+      return;
+    }
+    else if (isWebform && objs.length != imagePaths.length) {
       Toast("error", "missing metadata of some Files");
       return;
     } else if (!isWebform && metadataObjects.length != imagePaths.length) {
@@ -251,6 +246,7 @@ const ListCollectionStep2 = () => {
           element[Object.keys(element)[index]];
       }
       obj["ipfs"] = imagePaths[index].path;
+      obj["image"] = `ipfs://${imagePaths[index].path}`;
       obj["mediaType"] = imagePaths[index].file_mimeType;
       // ipfs: uploaded_image.path
       metadataArr.push(obj);
@@ -417,7 +413,7 @@ const ListCollectionStep2 = () => {
           assetObj = {},
           metadataX = {};
 
-        console.log(metadataObjects, "metadasd");
+        // console.log(metadataObjects, "metadasd");
 
         let arr = [];
         let prices = [];
@@ -456,6 +452,7 @@ const ListCollectionStep2 = () => {
 
             arr.push(element);
           }
+          debugger
           const data = {
             metadata: arr,
             prices,
@@ -486,6 +483,7 @@ const ListCollectionStep2 = () => {
       }
     } catch (e) {
       console.log("error", e);
+      set
       Toast("error", "Error Occured while Minting");
       // console.log(e)
     }
@@ -568,7 +566,7 @@ const ListCollectionStep2 = () => {
                         className="upload-file-label"
                         ref={selectedFilesLabelRef}
                       >
-                        No file choosen
+                        {selectedFiles.length > 0 ? `${selectedFiles.length} files choosen` : "No file chosen"}
                       </label>
                     </div>
                     <input
@@ -859,6 +857,7 @@ const Step1Styled = styled.section`
     background: white;
     border-radius: 10px;
     height: 100%;
+    margin-right: 10px;
   }
   .file-input-button {
     display: flex;
@@ -998,7 +997,6 @@ const Step1Styled = styled.section`
     }
     .upload-file-label {
       color: white;
-      margin-left: 10px;
     }
     .meta-button-group {
       display: flex;

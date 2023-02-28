@@ -322,8 +322,8 @@ const SingleMintStep3 = () => {
               defaultValue="female"
               name="radio-buttons-group"
             >
-              {payData.map((data) => (
-                <>
+              {payData.map((data, index) => (
+                <div key={index}>
                   <Box className="check_panel">
                     <FormControlLabel
                       value={data.value}
@@ -341,14 +341,16 @@ const SingleMintStep3 = () => {
                       {data.value === "c" && (
                         <>
                           <Grid container spacing={3} sx={{ py: 2 }}>
-                            <Grid item lg={5}>
+                            {/* <Grid item lg={5}>
                               <QRCode value={currentAddr} />
-                            </Grid>
-                            <Grid item lg={7}>
-                              <Typography variant="h6">Make Payment</Typography>
+                            </Grid> */}
+                            <Grid item xs={12}>
+                              <Typography sx={{
+                                mb: 1
+                              }} variant="h6">Make Payment</Typography>
                               <TextField
                                 placeholder="e.g addr1qykn8nchkf5ckg0clq6pa580a50t3zdc06prgwcaj605wpd2g0z6sy0pturmfuru097z3yxknjpnm7fymm96n2vyfxaq0gk62p"
-                                fullWidth
+                                fullWidth={true}
                                 onChange={(e) => setCurrentAddr(e.target.value)}
                                 defaultValue={currentAddr}
                                 sx={{
@@ -369,7 +371,7 @@ const SingleMintStep3 = () => {
                       )}
                     </Box>
                   </Box>
-                </>
+                </div>
               ))}
             </RadioGroup>
           </FormControl>

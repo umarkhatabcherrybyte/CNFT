@@ -123,7 +123,7 @@ const AuctionModal = ({ open, setOpen, setIsSuccessModal, detail, listId }) => {
             placeholder="00.00 ADA"
             sx={style}
             name="price"
-            fullWidth
+            fullWidth={true}
             value={formik?.values.price}
             onChange={formik?.handleChange}
             error={formik?.touched.price && Boolean(formik?.errors.price)}

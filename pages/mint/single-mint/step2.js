@@ -91,7 +91,7 @@ const SingleMintStep2 = () => {
                 placeholder="Name your item"
                 name="name"
                 onChange={(e) => onInputChange(e)}
-                fullWidth
+                fullWidth={true}
                 sx={{
                   fieldset: {
                     border: "none",
@@ -115,7 +115,7 @@ const SingleMintStep2 = () => {
                 placeholder="Description(optional)"
                 name="description"
                 onChange={(e) => onInputChange(e)}
-                fullWidth
+                fullWidth={true}
                 sx={{
                   fieldset: {
                     border: "none",
@@ -141,7 +141,7 @@ const SingleMintStep2 = () => {
                 name="creator"
                 placeholder="Creator(optional)"
                 onChange={(e) => onInputChange(e)}
-                fullWidth
+                fullWidth={true}
                 sx={{
                   fieldset: {
                     border: "none",
@@ -165,7 +165,7 @@ const SingleMintStep2 = () => {
                 name="link"
                 placeholder="Web link(optional)"
                 onChange={(e) => onInputChange(e)}
-                fullWidth
+                fullWidth={true}
                 sx={{
                   fieldset: {
                     border: "none",

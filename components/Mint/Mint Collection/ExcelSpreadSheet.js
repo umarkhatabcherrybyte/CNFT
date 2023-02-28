@@ -237,6 +237,18 @@ const ExcelSpreadSheet = ({
                                 }}
                                 autoComplete="current-password"
                               />
+                              <HighlightOff
+                                sx={{
+                                  mt: "7px",
+                                  ml: "3px",
+                                  "&:hover": {
+                                    cursor: "pointer",
+                                  },
+                                }}
+                                onClick={() => {
+                                  deleteTableCol(index);
+                                }}
+                              />
                             </Box>
                           </TableCell>
                         )
