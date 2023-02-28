@@ -29,7 +29,6 @@ import { costLovelace, bankWalletAddress } from "../../../config/utils";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { INSTANCE } from "/config/axiosInstance"
 
-
 const payData = [
   {
     title: "Mint for free and list with us ",
@@ -134,6 +133,7 @@ const SingleMintStep3 = () => {
                 };
                 const res = await INSTANCE.post("/collection/create", data);
                 if (res) {
+                  Toast("success", "Minted Successfully")
                   window.localStorage.setItem('policy', mintingPolicy.script)
                   window.localStorage.setItem('policy-id', policyId)
                   window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
@@ -207,6 +207,7 @@ const SingleMintStep3 = () => {
                 };
                 const res = await INSTANCE.post("/collection/create", data);
                 if (res) {
+                  Toast("success", "Minted Successfully")
                   window.localStorage.setItem('policy', mintingPolicy.script)
                   window.localStorage.setItem('policy-id', policyId)
                   window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))

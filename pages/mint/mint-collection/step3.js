@@ -237,6 +237,7 @@ const CollectionStep3 = () => {
 						};
 						const res = await INSTANCE.post("/collection/create", data);
 						if (res) {
+							Toast("success", "Minted Successfully")
 							window.localStorage.setItem('policy', mintingPolicy.script)
 							window.localStorage.setItem('policy-id', policyId)
 							window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
@@ -327,6 +328,7 @@ const CollectionStep3 = () => {
 							};
 							const res = await INSTANCE.post("/collection/create", data);
 							if (res) {
+								Toast("success", "Minted Successfully")
 								window.localStorage.setItem('policy', mintingPolicy.script)
 								window.localStorage.setItem('policy-id', policyId)
 								window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
