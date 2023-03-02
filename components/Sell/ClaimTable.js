@@ -10,21 +10,16 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-// import Paper from "@mui/material/Paper";
 import Layout from "../Mint/Layout";
 import Heading from "../shared/headings/Heading";
-
 import { useWallet, useLovelace } from "@meshsdk/react";
 import { INSTANCE } from "../../config/axiosInstance";
 import styled from "styled-components";
 import { getKeyData } from "../../helper/localStorage";
 import FullScreenLoader from "../shared/FullScreenLoader";
 import { Toast } from "../shared/Toast";
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
 
-const SellTable = ({ activeBids }) => {
+const ClaimTable = () => {
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +40,7 @@ const SellTable = ({ activeBids }) => {
       getData();
     }
   }, [connected]);
-  const onAcceptBid = async (id) => {
+  const onClaim = async (id) => {
     setIsLoading(true);
     try {
       const res = await INSTANCE.post("/bid/accept", {
@@ -59,7 +54,7 @@ const SellTable = ({ activeBids }) => {
     }
   };
   return (
-    <SellTableStyled>
+    <>
       {isLoading && <FullScreenLoader />}
       {connected ? (
         <TableContainer sx={{ py: 4 }}>
@@ -122,11 +117,8 @@ const SellTable = ({ activeBids }) => {
                       {row?.from}
                     </TableCell> */}
                     <TableCell align="center">
-                      <Button
-                        className="btn2"
-                        onClick={() => onAcceptBid(row._id)}
-                      >
-                        Accept
+                      <Button className="btn2" onClick={() => onClaim(row._id)}>
+                        Claim
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -141,10 +133,8 @@ const SellTable = ({ activeBids }) => {
           </Box>
         </Layout>
       )}
-    </SellTableStyled>
+    </>
   );
 };
 
-export default SellTable;
-
-const SellTableStyled = styled.section``;
+export default ClaimTable;

@@ -4,9 +4,9 @@ import { useWallet, useLovelace } from "@meshsdk/react";
 import CaptionHeading from "/components/shared/headings/CaptionHeading";
 import { Toast } from "../shared/Toast";
 import UserService from "../../services/user.service";
-
+import { useDispatch } from "react-redux";
 import { Box, Select, MenuItem, Button, Typography } from "@mui/material";
-
+import { setUser } from "../../redux/user/userActions";
 const wallets = [
   {
     img: "/images/wallet/nami_small.png",
@@ -41,6 +41,7 @@ const wallets = [
 ];
 
 const WalletDropdown = () => {
+  const dispatch = useDispatch();
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
 
@@ -50,6 +51,12 @@ const WalletDropdown = () => {
   useEffect(() => {
     disconnect();
   }, []);
+  useEffect(() => {
+    if (!connected) {
+      localStorage.removeItem("user_id");
+      disconnect(setUser(""));
+    }
+  }, [connected]);
 
   useEffect(() => {
     signIn();
@@ -76,6 +83,7 @@ const WalletDropdown = () => {
         if (res.data) {
           console.log(res.data);
           window.localStorage.setItem("user_id", res.data.data._id);
+          dispatch(setUser(res.data.data._id));
         }
       }
     } catch (error) {

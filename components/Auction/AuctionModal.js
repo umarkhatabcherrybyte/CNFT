@@ -8,6 +8,8 @@ import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { INSTANCE } from "/config/axiosInstance";
 import { getKeyData } from "../../helper/localStorage";
 import { Toast } from "../shared/Toast";
+import { useWallet, useLovelace } from "@meshsdk/react";
+
 const style = {
   fieldset: {
     border: "none",
@@ -19,15 +21,20 @@ const style = {
     mb: 2,
   },
 };
-const AuctionModal = ({ open, setOpen, setIsSuccessModal, detail, listId }) => {
+const AuctionModal = ({
+  open,
+  setOpen,
+  setIsSuccessModal,
+  detail,
+  listId,
+  auctionIndex,
+}) => {
   const [fee, setFee] = useState("0");
   const [total, setTotal] = useState("");
   const [inputVal, setInputVal] = useState("");
-  const onPLaceBid = () => {
-    console.log("wokring");
-    // setIsSuccessModal(true);
-    // setOpen(false);
-  };
+  const { wallet, connected, name, connecting, connect, disconnect, error } =
+    useWallet();
+
   const formik = useFormik({
     initialValues: {
       price: "",
@@ -35,57 +42,76 @@ const AuctionModal = ({ open, setOpen, setIsSuccessModal, detail, listId }) => {
     validationSchema: placeYourBidSchema,
     onSubmit: async (values) => {
       console.log(values);
-      try {
-        const response = await INSTANCE.post("/list/validate/bid", {
-          price: values.price,
-          list_id: listId,
-          unit: detail?.list?.collection_id.policy_id + fromText(detail?.list?.collection_id.assets[item]?.asset_name),
-        });
-        if (response.status) {
-          const transferLucid = await Lucid.new(
-            new Blockfrost(
-              "https://cardano-preprod.blockfrost.io/api/v0",
-              "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
-            ),
-            "Preprod"
-          );
-          transferLucid.selectWalletFromSeed(
-            "cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise"
-          );
-          const lucidBrowser = await Lucid.new(
-            new Blockfrost(
-              "https://cardano-preprod.blockfrost.io/api/v0",
-              "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
-            ),
-            "Preprod"
-          );
-          // .payToAddress(address, { lovelace: BigInt(user_value) })
-          const tx = await lucidBrowser
-            .newTx()
-            .payToAddress(await transferLucid.wallet.address(), {
-              [unit]: 1n,
-            })
-            .validTo(Date.now() + 100000)
-            .complete();
-          const signedTx = await tx.sign().complete();
-          const txHash = await signedTx.submit();
-          if (txHash) {
-            const res = await INSTANCE.post("/list/add/bid", {
-              user_id: getKeyData("user_id"),
-              list_id: listId,
-              price: values.price
-            });
-            if (res) {
-              Toast("success", "Bid Added Successfully")
-            }
-            else {
-              Toast("error", "Could Not Add Bid")
+      if (connected) {
+        try {
+          const connectedWallet = getKeyData("connectedWallet");
+          const unit =
+            detail?.list?.collection_id.policy_id +
+            fromText(
+              detail?.list?.collection_id.assets[auctionIndex]?.asset_name
+            );
+          const response = await INSTANCE.post("/bid/validate", {
+            price: values.price,
+            list_id: listId,
+            unit: unit,
+          });
+          if (response.status) {
+            const transferLucid = await Lucid.new(
+              new Blockfrost(
+                "https://cardano-preprod.blockfrost.io/api/v0",
+                "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+              ),
+              "Preprod"
+            );
+            transferLucid.selectWalletFromSeed(
+              "cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise"
+            );
+            const lucidBrowser = await Lucid.new(
+              new Blockfrost(
+                "https://cardano-preprod.blockfrost.io/api/v0",
+                "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+              ),
+              "Preprod"
+            );
+            const api = await window.cardano[String(connectedWallet)].enable();
+            const price_value = Number(1000000 * values.price);
+            lucidBrowser.selectWallet(api);
+            const tx = await lucidBrowser
+              .newTx()
+              .payToAddress(await transferLucid.wallet.address(), {
+                lovelace: BigInt(price_value),
+              })
+              .validTo(Date.now() + 100000)
+              .complete();
+            const signedTx = await tx.sign().complete();
+            const txHash = await signedTx.submit();
+            if (txHash) {
+              // bidder_id  current user
+              // lister_id user who list this auction
+              // list_id  _id that's on the top of the page
+              // asset_index  index that's on the top of the page
+              const res = await INSTANCE.post("/bid/create", {
+                bidder_id: getKeyData("user_id"),
+                lister_id: detail.list.user_id._id,
+                list_id: listId,
+                list_id: listId,
+                asset_index: auctionIndex,
+                price: Number(1000000 * values.price),
+                unit: unit,
+              });
+              if (res) {
+                Toast("success", "Bid Added Successfully");
+              } else {
+                Toast("error", "Could Not Add Bid");
+              }
             }
           }
+        } catch (e) {
+          Toast("error", "Could Not Add Bid");
+          console.log(e);
         }
-      } catch (e) {
-        Toast("error", "Could Not Add Bid")
-        console.log(e);
+      } else {
+        Toast("error", "Please connect your wallet");
       }
     },
   });
@@ -168,7 +194,7 @@ const AuctionModal = ({ open, setOpen, setIsSuccessModal, detail, listId }) => {
             }}
             className=" br_50"
             disabled={formik.isSubmitting}
-          // onClick={onPLaceBid}
+            // onClick={onPLaceBid}
           >
             Place Your Bid
           </Button>

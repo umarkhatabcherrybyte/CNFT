@@ -22,16 +22,19 @@ import {
   auctionDetailRoute,
 } from "../Routes/constants";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
 const MyListCard = () => {
   const router = useRouter();
+  const { user_id } = useSelector((store) => store.user);
+  console.log(user_id, "userid");
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
   const [listing, setListing] = useState([]);
   // console.log(listing);
   useEffect(() => {
+    // const user_id = getKeyData("user_id");
     const getData = async () => {
       try {
-        const user_id = getKeyData("user_id");
         const response = await INSTANCE.post("/list/find/all", {
           user_id,
         });
@@ -41,10 +44,11 @@ const MyListCard = () => {
         console.log(e);
       }
     };
-    if (connected) {
+
+    if (connected && user_id) {
       getData();
     }
-  }, [connected]);
+  }, [connected, user_id]);
 
   const navigationHandler = (type, id, model) => {
     console.log(type);
@@ -93,10 +97,11 @@ const MyListCard = () => {
                       <CardMedia
                         component="img"
                         height="290"
-                        image={`${card.mint_type === "collection"
+                        image={`${
+                          card.mint_type === "collection"
                             ? card.feature_image
                             : `https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`
-                          }`}
+                        }`}
                         alt="green iguana"
                       />
                       {/* <Box

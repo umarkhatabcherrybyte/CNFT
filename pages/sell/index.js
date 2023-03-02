@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import ContainerLayout from "../../components/shared/ContainerLayout";
 import BreadCrumHeader from "../../components/shared/BreadCrumHeader";
@@ -14,35 +14,55 @@ import Ballon from "../../components/Design/Ballon";
 import Strips from "../../components/Design/Strips";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
+import { useWallet } from "@meshsdk/react";
+import { getKeyData } from "../../helper/localStorage";
+import { INSTANCE } from "/config/axiosInstance";
+import ClaimTable from "../../components/Sell/ClaimTable";
+// import NoBid from ""
 const Sell = () => {
   const router = useRouter();
-  const { step } = useSelector((store) => store.listing);
-  console.log("step", step);
+  const { listing, user } = useSelector((store) => store);
+  console.log(user, "user");
+  const { connected } = useWallet();
   const { type } = router.query;
   const [tabValue, setTabValue] = useState("list");
-  const [listTabValue, setListTabValue] = useState("add");
+  const [activeBids, setActiveBids] = useState([]);
+  const [claim, setClaim] = useState([]);
+  useEffect(() => {
+    const getActiveBid = async () => {
+      try {
+        const response = await INSTANCE.post("/bid/lister", {
+          lister_id: user.user_id,
+        });
+        setActiveBids([...response?.data?.data]);
+      } catch (e) {
+        setActiveBids([]);
+        console.log(e);
+      }
+    };
+    const getClaim = async () => {
+      try {
+        const response = await INSTANCE.post("/bid/lister", {
+          lister_id: user.user_id,
+        });
+        setClaim([...response?.data?.data]);
+      } catch (e) {
+        setClaim([]);
+        console.log(e);
+      }
+    };
 
-  const onListTabChange = (event, newValue) => {
-    setListTabValue(newValue);
-  };
-
+    if (connected && user.user_id) {
+      getActiveBid();
+      getClaim();
+    }
+  }, [connected, user.user_id]);
   const onTabChange = (event, newValue) => {
     setTabValue(newValue);
     if (newValue === "design") {
       navigate("/design");
     }
   };
-
-  const validationSchema = yup.object({
-    platform_url: yup
-      .string()
-      .matches(
-        /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/,
-        "Enter correct url!"
-      )
-      .required("Please enter website"),
-    platform_name: yup.string("").required("Game Name is required"),
-  });
 
   return (
     <SellStyled>
@@ -94,6 +114,11 @@ const Sell = () => {
                 value="active"
                 className="tab_btn initialcase poppin"
               />
+              {/* <Tab
+                label="Claim "
+                value="claim"
+                className="tab_btn initialcase poppin"
+              /> */}
               <img
                 src="/images/heart.png"
                 className="w_100"
@@ -104,8 +129,8 @@ const Sell = () => {
             <TabPanel value="list" sx={{ p: 0, py: 2 }}>
               {type === "add-listing" ? (
                 <>
-                  {step === "step1" && <MylistTabs />}
-                  {step === "step2" && <SellMethod />}
+                  {listing.step === "step1" && <MylistTabs />}
+                  {listing.step === "step2" && <SellMethod />}
                 </>
               ) : (
                 <MyListCard />
@@ -121,13 +146,21 @@ const Sell = () => {
                 }}
               >
                 {/* <Nobid /> */}
-                <SellTable />
+                <SellTable activeBids={activeBids} />
               </Box>
             </TabPanel>
-            <TabPanel value="wallet" sx={{ p: 0 }}>
-              <MyListCard />
+            <TabPanel value="claim" sx={{ p: 0 }}>
+              <Box
+                sx={{
+                  py: 5,
+                  "& svg": {
+                    width: "100%",
+                  },
+                }}
+              >
+                <ClaimTable claim={claim} />
+              </Box>
             </TabPanel>
-            <TabPanel value="design" sx={{ p: 0 }}></TabPanel>
           </TabContext>
         </Box>
       </ContainerLayout>
