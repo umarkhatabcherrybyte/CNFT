@@ -126,10 +126,14 @@ const BuyDetail = () => {
           try {
             const res = await INSTANCE.post("/list/approve", {
               list_id: id,
+              index: item,
               recipient_address: user_address,
             });
+            if (res) {
+              Toast("success", "NFT Transfered to Your Wallet")
+            }
           } catch (e) {
-            Toast("error", "Try again lator.");
+            Toast("error", "Try again later.");
           }
           // window.localStorage.setItem('policy', mintingPolicy.script)
           // window.localStorage.setItem('policy-id', policyId)
@@ -339,9 +343,8 @@ const BuyDetail = () => {
                               sx={{ pb: 1.5, px: 2 }}
                               variant="caption"
                             >
-                              {detail.asset_details?.fingerprint.slice(0, 35) +
-                                "...."}
-                              {/* sssssssssssssssssssssssssssssssssss */}
+                              {detail?.asset_details.fingerprint ? detail?.asset_details?.fingerprint.slice(0, 35) +
+                                "...." : "......"}
                             </Typography>
                           </Box>
                         </Grid>

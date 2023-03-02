@@ -452,7 +452,7 @@ const ListCollectionStep2 = () => {
 
             arr.push(element);
           }
-          debugger
+          // debugger
           const data = {
             metadata: arr,
             prices,
@@ -479,7 +479,7 @@ const ListCollectionStep2 = () => {
           }
         }
       } else {
-        Toast("error", "You are not Not Connected");
+        Toast("error", "You are Not Connected");
       }
     } catch (e) {
       console.log("error", e);

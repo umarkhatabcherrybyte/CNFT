@@ -296,7 +296,7 @@ const SingleMintStep3 = () => {
             }
           }
         } else {
-          Toast("error", "You are not Not Connected");
+          Toast("error", "You are Not Connected");
         }
 
       }

@@ -341,7 +341,7 @@ const CollectionStep3 = () => {
 					}
 				}
 			} else {
-				Toast("error", "You are not Not Connected");
+				Toast("error", "You are Not Connected");
 			}
 		} catch (error) {
 			console.log('error', error)
