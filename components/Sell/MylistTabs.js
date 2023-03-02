@@ -348,59 +348,6 @@ const MylistTabs = () => {
                   />
                   <LightText heading="with policy ID we can verify your token" />
                 </Box> */}
-<<<<<<< Updated upstream
-                {
-                  lists && lists.length > 0 ?
-                    <Box sx={{ py: 1 }}>
-                      <Typography className="text_white bold" variant="caption">
-                        Collection
-                      </Typography>
-                      <LightText heading="if this is a part of collection select the collection." />
-                      {/* <Select
-                        // value={selectedValue}
-                        value={formik.values.collection_name}
-                        displayEmpty
-                        // onChange={onMenuChange}
-                        onChange={formik.handleChange("collection_name")}
-                        sx={{
-                          background: "var(--box-color)",
-                          color: "#fff",
-                          borderRadius: "15px",
-                          fieldset: {
-                            border: "none",
-                          },
-                          svg: {
-                            color: "#fff",
-                          },
-                        }}
-                        renderValue={(selected) => {
-                          // console.log(selected);
-                          if (selected === "") {
-                            return <p>Select</p>;
-                          }
-                          return selected;
-                        }}
-                        placeholder="Age"
-                        inputProps={{ "aria-label": "Without label" }}
-                      >
-                        <MenuItem disabled value="">
-                          <em>Select</em>
-                        </MenuItem>
-                        {lists.map((list) => (
-                          <MenuItem key={list._id} value={list}>
-                            {list.name}
-                          </MenuItem>
-                        ))}
-                      </Select> */}
-                      <FormHelperText sx={{ color: "#d32f2f" }}>
-                        {formik.touched.collection_name &&
-                          formik.errors.collection_name}
-                      </FormHelperText>
-                    </Box> :
-                    <></>
-                }
-
-=======
                 {/* <Box sx={{ py: 1 }}>
                   <Typography className="text_white bold" variant="caption">
                     Collection
@@ -448,13 +395,12 @@ const MylistTabs = () => {
                       formik.errors.collection_name}
                   </FormHelperText>
                 </Box> */}
->>>>>>> Stashed changes
                 <Box sx={{ py: 2 }}>
                   <Button
                     className="btn2"
                     sx={{ width: "150px" }}
                     type="submit"
-                    // onClick={() => setListingSteps("step2")}
+                  // onClick={() => setListingSteps("step2")}
                   >
                     Next
                   </Button>
