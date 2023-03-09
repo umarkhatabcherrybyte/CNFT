@@ -24,19 +24,15 @@ const SingleMint = () => {
   const onSelectFile = ({ currentTarget: input }) => {
     if (input.files && input.files[0]) {
       const files = input.files[0];
-      const _url = URL.createObjectURL(files);
       setMintFile(files);
       const name = files?.name.toLowerCase();
       if (name.match(/\.(jpg|jpeg|png|gif)$/)) {
         setMintFileFormat("image");
-      }
-
-      // else if (name.match(/\.(mp3)$/)) {
-      //   setMintFileFormat("audio");
-      // } else if (name.match(/\.(mp4)$/)) {
-      //   setMintFileFormat("video");
-      // }
-      else {
+      } else if (name.match(/\.(mp3)$/)) {
+        setMintFileFormat("audio");
+      } else if (name.match(/\.(mp4)$/)) {
+        setMintFileFormat("video");
+      } else {
         setMintFileFormat("invalid");
       }
     }

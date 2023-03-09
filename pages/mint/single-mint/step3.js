@@ -327,66 +327,66 @@ const SingleMintStep3 = () => {
               name="radio-buttons-group"
             >
               {payData.map((data, index) => (
-                <div key={index}>
-                  <Box className="check_panel">
-                    <FormControlLabel
-                      value={data.value}
-                      control={<Radio />}
-                      label={data.title}
-                      onChange={(e) => setSelectedValue(e.target.value)}
-                      sx={{
-                        "& .Mui-checked": {
-                          color: "var(--secondary-color)",
-                        },
-                      }}
-                    />
-                    <Box>
-                      <Typography sx={{ pl: 4 }}>{data.description}</Typography>
-                      {data.value === "c" && (
-                        <>
-                          <Grid container spacing={3} sx={{ py: 2 }}>
-                            {/* <Grid item lg={5}>
+                <Box className="check_panel" key={index}>
+                  <FormControlLabel
+                    value={data.value}
+                    control={<Radio />}
+                    label={data.title}
+                    onChange={(e) => setSelectedValue(e.target.value)}
+                    sx={{
+                      "& .Mui-checked": {
+                        color: "var(--secondary-color)",
+                      },
+                    }}
+                  />
+                  <Box>
+                    <Typography sx={{ pl: 4 }}>{data.description}</Typography>
+                    {data.value === "c" && (
+                      <>
+                        <Grid container spacing={3} sx={{ py: 2 }}>
+                          {/* <Grid item lg={5}>
                               <QRCode value={currentAddr} />
                             </Grid> */}
-                            <Grid item xs={12}>
-                              <Typography
-                                sx={{
-                                  mb: 1,
-                                }}
-                                variant="h6"
-                              >
-                                Make Payment
-                              </Typography>
-                              <TextField
-                                placeholder="e.g addr1qykn8nchkf5ckg0clq6pa580a50t3zdc06prgwcaj605wpd2g0z6sy0pturmfuru097z3yxknjpnm7fymm96n2vyfxaq0gk62p"
-                                fullWidth={true}
-                                onChange={(e) => setCurrentAddr(e.target.value)}
-                                defaultValue={currentAddr}
-                                sx={{
-                                  background: "transparent",
-                                  input: {
-                                    padding: "9px 10px",
-                                    borderRadius: "10px",
-                                    border: "1px solid #fff",
-                                  },
-                                  fieldset: {
-                                    border: "none",
-                                  },
-                                }}
-                              />
-                            </Grid>
+                          <Grid item xs={12}>
+                            <Typography
+                              sx={{
+                                mb: 1,
+                              }}
+                              variant="h6"
+                            >
+                              Make Payment
+                            </Typography>
+                            <TextField
+                              placeholder="e.g addr1qykn8nchkf5ckg0clq6pa580a50t3zdc06prgwcaj605wpd2g0z6sy0pturmfuru097z3yxknjpnm7fymm96n2vyfxaq0gk62p"
+                              fullWidth={true}
+                              onChange={(e) => setCurrentAddr(e.target.value)}
+                              defaultValue={currentAddr}
+                              sx={{
+                                background: "transparent",
+                                input: {
+                                  padding: "9px 10px",
+                                  borderRadius: "10px",
+                                  border: "1px solid #fff",
+                                },
+                                fieldset: {
+                                  border: "none",
+                                },
+                              }}
+                            />
                           </Grid>
-                        </>
-                      )}
-                    </Box>
+                        </Grid>
+                      </>
+                    )}
                   </Box>
-                </div>
+                </Box>
               ))}
             </RadioGroup>
           </FormControl>
-          <Button className="btn2" sx={{ my: 3 }} onClick={(e) => onMint(e)}>
-            Pay and Mint
-          </Button>
+          <Box>
+            <Button className="btn2" sx={{ my: 3 }} onClick={(e) => onMint(e)}>
+              Pay and Mint
+            </Button>
+          </Box>
         </Layout>
       </Container>
     </SingleMintStep3Styled>

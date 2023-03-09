@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import CaptionHeading from "/components/shared/headings/CaptionHeading";
-import { Toast } from "../shared/Toast";
 import UserService from "../../services/user.service";
 import { useDispatch } from "react-redux";
 import { Box, Select, MenuItem, Button, Typography } from "@mui/material";
+import { Toast } from "../shared/Toast";
 import { setUser } from "../../redux/user/userActions";
 const wallets = [
   {
@@ -92,15 +92,19 @@ const WalletDropdown = () => {
   };
 
   const handleWalletClick = async (event, walletV) => {
-    if (walletV.value === walletName) {
-      setWalletName("default");
-      disconnect();
+    if (walletV.value && window?.cardano[walletV?.value] != undefined) {
+      if (walletV.value === walletName) {
+        setWalletName("default");
+        disconnect();
+      } else {
+        connect(walletV.value);
+        window.localStorage.setItem(
+          "connectedWallet",
+          String(walletV.value).toLowerCase()
+        );
+      }
     } else {
-      connect(walletV.value);
-      window.localStorage.setItem(
-        "connectedWallet",
-        String(walletV.value).toLowerCase()
-      );
+      Toast("error", "Please install your wallet");
     }
   };
 

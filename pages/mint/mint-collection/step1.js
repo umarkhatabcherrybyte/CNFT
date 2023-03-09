@@ -61,15 +61,19 @@ const CollectionStep1 = () => {
     setSeletedFiles(files);
   };
   const onSelectedFiles = (e) => {
-    if (e.target.files) {
-      var temp = selectedFiles ? [...selectedFiles] : [];
-      for (let i = 0; i < e.target.files.length; i++) {
-        const files = e.target.files[i];
-        temp.push(files);
+    if (e.target.files && e.target.files[0]) {
+      const name = e.target.files[0]?.name.toLowerCase();
+      if (name.match(/\.(jpg|jpeg|png|gif|mp3|mp4)$/)) {
+        var temp = selectedFiles ? [...selectedFiles] : [];
+        for (let i = 0; i < e.target.files.length; i++) {
+          const files = e.target.files[i];
+          temp.push(files);
+        }
+        setSeletedFiles(temp);
+        selectedFilesLabelRef.current.innerHTML = `${temp.length} files choosen`;
+      } else {
+        Toast("error", "Please upload correct file format.");
       }
-      console.log(e.target.files.length, temp.length, 'length')
-      setSeletedFiles(temp);
-      selectedFilesLabelRef.current.innerHTML = `${temp.length} files choosen`;
     } else {
       selectedFilesLabelRef.current.innerHTML = `No file choosen`;
     }
@@ -92,7 +96,7 @@ const CollectionStep1 = () => {
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => { })
+      UploadService.uploadMeta(file, path, (event) => {})
         .then((response) => {
           if (response.data.data.length > 0) {
             setMetadataObjects(response.data.data || []);
@@ -184,39 +188,47 @@ const CollectionStep1 = () => {
 
   function onNextStep() {
     let objs = convertMetadataObjects();
-    console.log(
-      objs, 'onjs'
-    );
+    console.log(objs, "onjs");
     // debugger
     if (imagePaths.length == 0) {
-      console.log(objs.length != imagePaths.length, objs.length, imagePaths.length)
-      Toast("error", 'please upload NFT files first');
-      return
-    }
-    else if (!validateCollectionData(objs)) {
+      console.log(
+        objs.length != imagePaths.length,
+        objs.length,
+        imagePaths.length
+      );
+      Toast("error", "please upload NFT files first");
+      return;
+    } else if (!validateCollectionData(objs)) {
       console.log("here");
       return;
-    }
-    else if (isWebform && (objs.length != imagePaths.length)) {
-      Toast("error", 'missing metadata of some Files');
-      return
-    }
-    else if (!isWebform && (metadataObjects.length != imagePaths.length)) {
-      Toast("error", 'missing metadata of some Files');
-      return
-    }
-    else if (!isWebform &&
+    } else if (isWebform && objs.length != imagePaths.length) {
+      Toast("error", "missing metadata of some Files");
+      return;
+    } else if (!isWebform && metadataObjects.length != imagePaths.length) {
+      Toast("error", "missing metadata of some Files");
+      return;
+    } else if (
+      !isWebform &&
       metadataObjects.length == imagePaths.length &&
-      metadataFileUploaded) {
-      window.localStorage.setItem("metadataObjects", JSON.stringify(metadataObjects));
+      metadataFileUploaded
+    ) {
+      window.localStorage.setItem(
+        "metadataObjects",
+        JSON.stringify(metadataObjects)
+      );
       window.localStorage.setItem("images", JSON.stringify(imagePaths));
-      window.localStorage.setItem("metadataObjectsProperties", JSON.stringify(metadataObjectProperties));
+      window.localStorage.setItem(
+        "metadataObjectsProperties",
+        JSON.stringify(metadataObjectProperties)
+      );
       router.push(mintCollectionStep2);
-    }
-    else if (isWebform) {
+    } else if (isWebform) {
       window.localStorage.setItem("images", JSON.stringify(imagePaths));
       window.localStorage.setItem("metadataObjects", JSON.stringify(objs));
-      window.localStorage.setItem("metadataObjectsProperties", JSON.stringify(metadataObjectProperties));
+      window.localStorage.setItem(
+        "metadataObjectsProperties",
+        JSON.stringify(metadataObjectProperties)
+      );
       router.push(mintCollectionStep2);
     }
   }
@@ -252,8 +264,9 @@ const CollectionStep1 = () => {
       }
       obj["ipfs"] = imagePaths[index].path;
       obj["image"] = `ipfs://${imagePaths[index].path}`;
-      obj["mediaType"] = imagePaths[index].file_mimeType
-      metadataArr.push(obj)
+      obj["mediaType"] = imagePaths[index].file_mimeType;
+      // obj["mediaType"] = "image/jpeg"
+      metadataArr.push(obj);
     }
     console.log(metadataArr, "arr");
     return metadataArr;
@@ -299,7 +312,7 @@ const CollectionStep1 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => { })
+    UploadService.downloadMetafile(path, (event) => {})
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
@@ -338,10 +351,7 @@ const CollectionStep1 = () => {
       });
       console.log(isDuplicate, "dup");
       if (isDuplicate) {
-        Toast(
-          "error",
-          "You have duplicate names in the webform!"
-        );
+        Toast("error", "You have duplicate names in the webform!");
         // console.log(isDup)
         return false;
       } else {
@@ -392,9 +402,7 @@ const CollectionStep1 = () => {
                         onFileInputButton();
                       }}
                     >
-                      <label style={{ fontSize: "14px" }}>
-                        Choose File
-                      </label>
+                      <label style={{ fontSize: "14px" }}>Choose File</label>
                       <Box sx={{ padding: "10px" }}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -449,14 +457,16 @@ const CollectionStep1 = () => {
                         className="upload-file-label"
                         ref={selectedFilesLabelRef}
                       >
-                        {selectedFiles.length > 0 ? `${selectedFiles.length} files choosen` : "No file chosen"}
+                        {selectedFiles.length > 0
+                          ? `${selectedFiles.length} files choosen`
+                          : "No file chosen"}
                       </label>
                     </div>
                     <input
                       type="file"
                       accept="image/*"
                       ref={hiddenFileInputRef}
-                      multiple
+                      // multiple
                       onChange={(e) => onSelectedFiles(e)}
                     />
                   </Box>
@@ -601,9 +611,7 @@ const CollectionStep1 = () => {
                     className="file-select-button"
                     onClick={() => onMetaFileInputButton()}
                   >
-                    <label style={{ fontSize: "14px" }}>
-                      Choose File
-                    </label>
+                    <label style={{ fontSize: "14px" }}>Choose File</label>
                     <div style={{ padding: "10px" }}>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -654,9 +662,7 @@ const CollectionStep1 = () => {
                     </div>
                   </div>
                   <div>
-                    <label ref={metaFileLabelRef}>
-                      No file choosen
-                    </label>
+                    <label ref={metaFileLabelRef}>No file choosen</label>
                   </div>
                   <input
                     type="file"

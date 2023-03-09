@@ -426,9 +426,11 @@ const CollectionStep3 = () => {
               ))}
             </RadioGroup>
           </FormControl>
-          <Button className="btn2" sx={{ my: 3 }} onClick={(e) => onMint(e)}>
-            Pay and Mint
-          </Button>
+          <Box>
+            <Button className="btn2" sx={{ my: 3 }} onClick={(e) => onMint(e)}>
+              Pay and Mint
+            </Button>
+          </Box>
         </Layout>
       </Container>
     </SingleMintStep3Styled>
