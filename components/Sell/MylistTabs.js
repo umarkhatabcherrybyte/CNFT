@@ -313,7 +313,6 @@ const MylistTabs = () => {
               <Grid xs={12} item>
                 <Divider sx={{ borderColor: "#fff", opacity: "0.6" }} />
               </Grid>
-
               <Grid item xs={12} md={6}>
                 <Box sx={{ ...inputFileStyle }}>
                   <Typography

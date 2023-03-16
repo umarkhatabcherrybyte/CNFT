@@ -85,7 +85,7 @@ const Footer = () => {
                 </Typography>
                 <ul>
                   <li>
-                    <Link to="">Help and Support</Link>
+                    <Link href="/help-support">Help and Support</Link>
                   </li>
                   <li>
                     <Link href={termConditionRoute}>Terms and Condition</Link>
