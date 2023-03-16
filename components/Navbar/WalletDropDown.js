@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { Box, Select, MenuItem, Button, Typography } from "@mui/material";
 import { Toast } from "../shared/Toast";
 import { setUser } from "../../redux/user/userActions";
+import { formatAmount } from "/helper/formatAmount";
 const wallets = [
   {
     img: "/images/wallet/nami_small.png",
@@ -104,10 +105,7 @@ const WalletDropdown = () => {
         disconnect();
       } else {
         connect(walletV.value);
-        window.localStorage.setItem(
-          "connectedWallet",
-          String(walletV.value).toLowerCase()
-        );
+        window.localStorage.setItem("connectedWallet", walletV.extension);
       }
     } else {
       Toast("error", "Please install your wallet");
@@ -218,7 +216,7 @@ const WalletDropdown = () => {
               <CaptionHeading
                 heading={
                   connected && name === wallet.value
-                    ? parseInt(lovelace) / 1000000 + " ADA"
+                    ? formatAmount(parseInt(lovelace) / 1000000) + " ADA"
                     : wallet.label
                 }
               />
@@ -250,7 +248,7 @@ const WalletDropdown = () => {
         ) : (
           <>
             {walletName != "default" && lovelace ? (
-              parseInt(lovelace) / 1000000 + " ADA"
+              formatAmount(parseInt(lovelace) / 1000000) + " ADA"
             ) : (
               <p className="font_12">Connect Here</p>
             )}

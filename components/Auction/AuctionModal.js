@@ -100,6 +100,7 @@ const AuctionModal = ({
                 unit: unit,
               });
               if (res) {
+                setOpen(false);
                 Toast("success", "Bid Added Successfully");
               } else {
                 Toast("error", "Could Not Add Bid");

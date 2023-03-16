@@ -93,12 +93,12 @@ const Footer = () => {
                   <li>
                     <Link href="/auction">Auctions</Link>
                   </li>
-                  <li>
+                  {/* <li>
                     <Link to="">Royalty System</Link>
                   </li>
                   <li>
                     <Link to="">How to use Smart Contracts</Link>
-                  </li>
+                  </li> */}
                 </ul>
               </Box>
             </Grid>
