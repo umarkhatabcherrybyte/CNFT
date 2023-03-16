@@ -78,7 +78,7 @@ const AuctionCard = ({ data, index }) => {
             component="div"
             className="uppercase poppin "
           >
-            {asset_detail?.asset_name}
+            {data.mint_type === "collection" ? data?.name  :asset_detail?.asset_name }
           </Typography>
           {/* <Typography
             gutterBottom

@@ -88,6 +88,7 @@ const SellTable = ({ activeBids }) => {
                   background: "#3b3b3b4d",
                 }}
               >
+                <TableCell>Name</TableCell>
                 <TableCell>Price</TableCell>
                 <TableCell align="center">USD Price</TableCell>
                 <TableCell align="center">Expiration Date</TableCell>
@@ -98,39 +99,38 @@ const SellTable = ({ activeBids }) => {
             <TableBody>
               {activeBids.length > 0 &&
                 activeBids.map((row) => (
-                  <TableRow
-                    key={row.name}
-                    sx={{
-                      "&:last-child td, &:last-child th": {
-                        border: 0,
-                        // borderRadius: "15px 15px 0  0",
-                      },
-                      background: "#3b3b3b4d",
-                    }}
-                  >
-                    <TableCell component="th" scope="row">
-                      {row?.price}
-                    </TableCell>
-                    <TableCell align="center">{row?.usd}</TableCell>
-                    <TableCell align="center">
-                      In {row?.list_id?.sell_type_id?.end_time} days
-                    </TableCell>
-                    {/* <TableCell
-                      align="center"
-                      sx={{ color: "var(--secondary-color) !important" }}
+                  row.list_id.collection_id.assets.map((item) => (
+                    <TableRow
+                      key={item.asset_name}
+                      sx={{
+                        "&:last-child td, &:last-child th": {
+                          border: 0,
+                          // borderRadius: "15px 15px 0  0",
+                        },
+                        background: "#3b3b3b4d",
+                      }}
                     >
-                      {row?.from}
-                    </TableCell> */}
-                    <TableCell align="center">
-                      <Button
-                        className="btn2"
-                        onClick={() => onAcceptBid(row._id)}
-                      >
-                        Accept
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      <TableCell component="th" scope="row">
+                        {item?.asset_name}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {item?.price}
+                      </TableCell>
+                      <TableCell align="center">{row?.usd}</TableCell>
+                      <TableCell align="center">
+                        In {row?.list_id?.sell_type_id?.end_time} days
+                      </TableCell>
+                      <TableCell align="center">
+                        <Button
+                          className="btn2"
+                          onClick={() => onAcceptBid(row._id)}
+                        >
+                          Accept
+                        </Button>
+                      </TableCell>
+                    </TableRow>))
+                )
+                )}
             </TableBody>
           </Table>
         </TableContainer>
