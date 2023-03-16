@@ -39,42 +39,42 @@ const AddImage = ({ heading, desc, width, formik, name }) => {
           justifyContent: "center",
         }}
       >
-        {formik.values[name] ? (
-          <img
-            className="br_15"
-            src={URL.createObjectURL(formik.values[name])}
-            alt="no image"
-            style={{
-              width: "98%",
-              height: "90%",
-            }}
-          />
-        ) : (
-          <Button
-            variant="contained"
-            component="label"
-            sx={{
-              width: "100%",
-              height: "100%",
-              background: "#FFFFFF33 ",
+        <Button
+          variant="contained"
+          component="label"
+          sx={{
+            width: "100%",
+            height: "100%",
+            background: "#FFFFFF33 ",
 
-              "&:hover": {
-                background: "#FFFFFF33",
-              },
-            }}
-          >
-            <Image sx={{ color: "#fff", width: "4em", height: "4em" }} />
-            <input
-              hidden
-              accept="image/*"
-              type="file"
-              name={name}
-              onChange={(e) => {
-                formik.setFieldValue(name, e.currentTarget.files[0]);
+            "&:hover": {
+              background: "#FFFFFF33",
+            },
+          }}
+        >
+          {formik.values[name] ? (
+            <img
+              className="br_15"
+              src={URL.createObjectURL(formik.values[name])}
+              alt="no image"
+              style={{
+                width: "98%",
+                height: "90%",
               }}
             />
-          </Button>
-        )}
+          ) : (
+            <Image sx={{ color: "#fff", width: "4em", height: "4em" }} />
+          )}
+          <input
+            hidden
+            accept="image/*"
+            type="file"
+            name={name}
+            onChange={(e) => {
+              formik.setFieldValue(name, e.currentTarget.files[0]);
+            }}
+          />
+        </Button>
       </Box>
       <FormHelperText sx={{ color: "#d32f2f" }}>
         {formik.touched[name] && formik.errors[name]}
@@ -85,7 +85,7 @@ const AddImage = ({ heading, desc, width, formik, name }) => {
 const ListCollection = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  useEffect(() => { }, []);
+  useEffect(() => {}, []);
   const data = useSelector((state) => state.listing.data);
   // console.log(data);
   const formik = useFormik({
