@@ -85,13 +85,13 @@ const Footer = () => {
                 </Typography>
                 <ul>
                   <li>
-                    <Link to="">Help and Support</Link>
+                    <Link href="/help-support">Help and Support</Link>
                   </li>
                   <li>
                     <Link href={termConditionRoute}>Terms and Condition</Link>
                   </li>
                   <li>
-                    <Link to="">Auctions</Link>
+                    <Link href="/auction">Auctions</Link>
                   </li>
                   <li>
                     <Link to="">Royalty System</Link>
@@ -113,16 +113,16 @@ const Footer = () => {
                 </Typography>
                 <ul>
                   <li>
-                    <Link to="">Buy</Link>
+                    <Link href="/buy">Buy</Link>
                   </li>
                   <li>
-                    <Link to="">Sell</Link>
+                    <Link href="/sell">Sell</Link>
                   </li>
                   <li>
-                    <Link to="">Auction</Link>
+                    <Link href="/auction">Auction</Link>
                   </li>
                   <li>
-                    <Link to="">Mint</Link>
+                    <Link href="/mint">Mint</Link>
                   </li>
                 </ul>
               </Box>
@@ -134,7 +134,7 @@ const Footer = () => {
             className="text_center text_white proxima "
             sx={{ py: 4, borderTop: "1px solid #fff" }}
           >
-            2022 copyright CNFTGENIE, LLC, all rights reserved.
+            2023 copyright CNFTGENIE, LLC, all rights reserved.
           </Box>
         </Box>
       </Box>

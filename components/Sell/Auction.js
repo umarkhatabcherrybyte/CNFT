@@ -178,6 +178,7 @@ const Auction = ({ setIsForm, setTotalAmount }) => {
                 name="days"
                 value={formik?.values.days}
                 onChange={formik?.handleChange}
+                inputProps={{ maxLength: 2 }}
                 // error={formik?.touched.days && Boolean(formik?.errors.days)}
                 // helperText={formik?.touched.days && formik?.errors.days}
                 InputLabelProps={{
@@ -226,6 +227,7 @@ const Auction = ({ setIsForm, setTotalAmount }) => {
                     color: "#fff",
                   },
                 }}
+                inputProps={{ maxLength: 2 }}
                 sx={{
                   width: "18px",
                   fieldset: {
@@ -267,6 +269,7 @@ const Auction = ({ setIsForm, setTotalAmount }) => {
                     color: "#fff",
                   },
                 }}
+                inputProps={{ maxLength: 2 }}
                 sx={{
                   width: "18px",
                   fieldset: {

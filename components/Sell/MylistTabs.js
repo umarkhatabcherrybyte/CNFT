@@ -58,12 +58,12 @@ const MylistTabs = () => {
         let address = await wallet?.getUsedAddresses();
         setRecipientAddress(address[0]);
         let res = await INSTANCE.post("list/user/collection", {
-          user_id
+          user_id,
         });
 
         if (res) {
-          console.log(res.data)
-          setLists(res.data.data)
+          console.log(res.data);
+          setLists(res.data.data);
         }
       }
     }
@@ -89,7 +89,7 @@ const MylistTabs = () => {
     validationSchema: addSingleListingSchema,
     onSubmit: async (values) => {
       try {
-        console.log(values, 'values')
+        console.log(values, "values");
         if (connected) {
           setIsLoading(true);
           let connectedWallet = window.localStorage.getItem("connectedWallet");
@@ -313,14 +313,13 @@ const MylistTabs = () => {
               <Grid xs={12} item>
                 <Divider sx={{ borderColor: "#fff", opacity: "0.6" }} />
               </Grid>
-
               <Grid item xs={12} md={6}>
                 <Box sx={{ ...inputFileStyle }}>
                   <Typography
                     variant="h6"
                     className="bold text_white montserrat"
                   >
-                    PNG, GIF, WEBP, MP4, Max 100mb.
+                    PNG, GIF, MP4, Max 100mb.
                   </Typography>
                 </Box>
                 <Box sx={{ py: 1 }}>
@@ -400,7 +399,7 @@ const MylistTabs = () => {
                     className="btn2"
                     sx={{ width: "150px" }}
                     type="submit"
-                  // onClick={() => setListingSteps("step2")}
+                    // onClick={() => setListingSteps("step2")}
                   >
                     Next
                   </Button>
@@ -412,6 +411,9 @@ const MylistTabs = () => {
                   component="label"
                   sx={{
                     // height: "67%",
+
+                    label: {},
+                    padding: "0",
                     my: 2,
                     background: "#FFFFFF33 ",
                     border: "3px dashed #fff",

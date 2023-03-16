@@ -33,7 +33,7 @@ const OptionMenu = ({ placeholder, setFilter, name, data, filter }) => {
           onChange={onMenuChange}
           sx={{
             "& .MuiOutlinedInput-input": {
-              padding: "10px 0",
+              padding: "10px 12px",
             },
             fieldset: {
               border: "1px solid #fff !important",
