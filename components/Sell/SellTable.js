@@ -98,7 +98,7 @@ const SellTable = ({ activeBids }) => {
             </TableHead>
             <TableBody>
               {activeBids.length > 0 &&
-                activeBids.map((row) => (
+                activeBids.map((row) =>
                   row.list_id.collection_id.assets.map((item) => (
                     <TableRow
                       key={item.asset_name}
@@ -118,7 +118,8 @@ const SellTable = ({ activeBids }) => {
                       </TableCell>
                       <TableCell align="center">{row?.usd}</TableCell>
                       <TableCell align="center">
-                        In {row?.list_id?.sell_type_id?.end_time} days
+                        In {row?.days_remaining} days {row?.hours_remaining}{" "}
+                        hours {row?.minutes_remaining} minutes
                       </TableCell>
                       <TableCell align="center">
                         <Button
@@ -128,8 +129,8 @@ const SellTable = ({ activeBids }) => {
                           Accept
                         </Button>
                       </TableCell>
-                    </TableRow>))
-                )
+                    </TableRow>
+                  ))
                 )}
             </TableBody>
           </Table>

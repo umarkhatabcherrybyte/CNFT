@@ -14,7 +14,7 @@ const Index = () => {
       <ContainerLayout>
         <Box sx={{ pt: 3 }}>
           <Heading
-            heading="CNFT GENIE, LLC TERMS AND CONDITIONS
+            heading="CNFT GENIE, HELP AND SUPPORT
 "
           />
         </Box>

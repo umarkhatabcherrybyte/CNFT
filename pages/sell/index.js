@@ -34,8 +34,36 @@ const Sell = () => {
         const response = await INSTANCE.post("/bid/lister", {
           lister_id: user.user_id,
         });
+        const data = response?.data?.data;
+        const currentDate = new Date();
+        const temp = data.map((obj) => {
+          const targetDate = new Date(obj?.list_id?.sell_type_id?.end_time);
+          const differenceInMilliseconds =
+            targetDate.getTime() - currentDate.getTime();
+          // Check if the target date is in the past
+          if (differenceInMilliseconds > 0) {
+            // Convert milliseconds to days, hours, and minutes
+            const days = Math.floor(
+              differenceInMilliseconds / (1000 * 60 * 60 * 24)
+            );
+            const hours = Math.floor(
+              (differenceInMilliseconds % (1000 * 60 * 60 * 24)) /
+                (1000 * 60 * 60)
+            );
+            const minutes = Math.floor(
+              (differenceInMilliseconds % (1000 * 60 * 60)) / (1000 * 60)
+            );
 
-        setActiveBids([...response?.data?.data]);
+            return {
+              ...obj,
+              days_remaining: days,
+              hours_remaining: hours,
+              minutes_remaining: minutes,
+            };
+          }
+        });
+
+        setActiveBids([...temp]);
       } catch (e) {
         setActiveBids([]);
         console.log(e);
