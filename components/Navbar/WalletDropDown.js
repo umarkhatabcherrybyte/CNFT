@@ -12,31 +12,37 @@ const wallets = [
     img: "/images/wallet/nami_small.png",
     value: "Nami",
     label: "Nami",
+    extension: "nami",
   },
   {
     img: "/images/wallet/eternl_small.png",
     value: "eternl",
     label: "Eternl",
+    extension: "eternl",
   },
   {
     img: "/images/wallet/flint_small.png",
     value: "Flint Wallet",
     label: "Flint",
+    extension: "flint",
   },
   {
     img: "/images/wallet/nufi_small.png",
     value: "NuFi",
     label: "Nufi",
+    extension: "nufi",
   },
   {
     img: "/images/wallet/gerowallet_small.png",
     value: "GeroWallet",
     label: "Gero",
+    extension: "gerowallet",
   },
   {
     img: "/images/wallet/typhoncip30_small.png",
     value: "Typhon Wallet",
     label: "Typhon",
+    extension: "typhoncip30",
   },
 ];
 
@@ -92,7 +98,7 @@ const WalletDropdown = () => {
   };
 
   const handleWalletClick = async (event, walletV) => {
-    if (walletV.value && window?.cardano[walletV?.value] != undefined) {
+    if (walletV.extension && window?.cardano[walletV?.extension] != undefined) {
       if (walletV.value === walletName) {
         setWalletName("default");
         disconnect();
@@ -246,7 +252,7 @@ const WalletDropdown = () => {
             {walletName != "default" && lovelace ? (
               parseInt(lovelace) / 1000000 + " ADA"
             ) : (
-              <p className="font_12">Connect Wallet</p>
+              <p className="font_12">Connect Here</p>
             )}
           </>
         )}

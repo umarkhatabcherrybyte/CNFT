@@ -29,8 +29,17 @@ const Auction = () => {
           mint_type: tabValue,
           ...filter,
         });
-        // console.log("filter");
-        setAuction([...res?.data?.data]);
+        const temp = [];
+
+        const array = res.data.data;
+        const currentDate = new Date();
+        for (let i = 0; i < array.length; i++) {
+          const end_time = new Date(array[i].sell_type_id.end_time);
+          if (end_time.getTime() > currentDate.getTime()) {
+            temp.push(array[i]);
+          }
+        }
+        setAuction([...temp]);
         setIsLoading(false);
       } catch (e) {
         setIsLoading(false);

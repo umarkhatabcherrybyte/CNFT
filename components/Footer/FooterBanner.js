@@ -35,14 +35,17 @@ const FooterBanner = () => {
                   </Typography>
                   <Box sx={{ py: 2 }}>
                     <Button
-                      onClick={() => router("/buy")}
+                      onClick={() => router.push("/buy")}
                       // onClick={() => window.open("/#", "_self")}
                       className="btn2"
                       sx={{ mr: 2, my: 1, whiteSpace: "nowrap" }}
                     >
                       Browse
                     </Button>
-                    <Button onClick={() => router("/mint")} className="btn">
+                    <Button
+                      onClick={() => router.push("/mint")}
+                      className="btn"
+                    >
                       Create
                     </Button>
                   </Box>

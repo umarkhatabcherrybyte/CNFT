@@ -34,6 +34,7 @@ const Sell = () => {
         const response = await INSTANCE.post("/bid/lister", {
           lister_id: user.user_id,
         });
+
         setActiveBids([...response?.data?.data]);
       } catch (e) {
         setActiveBids([]);
