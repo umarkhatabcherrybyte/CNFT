@@ -28,23 +28,7 @@ const SellTable = ({ activeBids }) => {
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
   const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const user_id = getKeyData("user_id");
-        const response = await INSTANCE.post("/list/find/all", {
-          user_id,
-        });
-        // setListing(response?.data?.data);
-      } catch (e) {
-        // setListing([]);
-        console.log(e);
-      }
-    };
-    if (connected) {
-      getData();
-    }
-  }, [connected]);
+
   const onAcceptBid = async (id) => {
     setIsLoading(true);
     try {
@@ -114,7 +98,7 @@ const SellTable = ({ activeBids }) => {
                         {item?.asset_name}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {item?.price}
+                        {row.list_id.mint_type == 'single' ? Number(row.price) : item.price  }
                       </TableCell>
                       <TableCell align="center">{row?.usd}</TableCell>
                       <TableCell align="center">

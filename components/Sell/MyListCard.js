@@ -38,7 +38,7 @@ const MyListCard = () => {
         const response = await INSTANCE.post("/list/find/all", {
           user_id,
         });
-        setListing(response?.data?.data);
+        setListing(response?.data?.new_data);
       } catch (e) {
         setListing([]);
         console.log(e);
@@ -97,11 +97,7 @@ const MyListCard = () => {
                       <CardMedia
                         component="img"
                         height="290"
-                        image={`${
-                          card.mint_type === "collection"
-                            ? card.feature_image
-                            : `https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`
-                        }`}
+                        image={card?.image}
                         alt="green iguana"
                       />
                       {/* <Box
@@ -136,34 +132,38 @@ const MyListCard = () => {
                         className="bold"
                         sx={{ textTransform: "uppercase" }}
                       >
-                        {card?.collection_id?.assets[0]?.asset_name}
+                        {card?.name}
                       </Typography>
-                      <Box className="space_between">
-                        {/* <CaptionHeading heading="julian_jokey" /> */}
-                        <Typography
-                          gutterBottom
-                          variant="body"
-                          component="div"
-                          sx={{ color: "var(--secondary-color)" }}
-                          className="bold flex"
-                        >
-                          {card?.sell_type_id?.price}
-                          <Typography
-                            variant="caption"
-                            component="div"
-                            sx={{
-                              color: "var(--secondary-color)",
-                              fontSize: "10px",
-                              pl: 1,
-                            }}
-                            className="bold"
-                          >
-                            ADA
-                          </Typography>
-                        </Typography>
-                      </Box>
+                      {
+                        card?.price > 0 ?
+                          <Box className="space_between">
+                            {/* <CaptionHeading heading="julian_jokey" /> */}
+                            <Typography
+                              gutterBottom
+                              variant="body"
+                              component="div"
+                              sx={{ color: "var(--secondary-color)" }}
+                              className="bold flex"
+                            >
+                              {card?.price}
+                              <Typography
+                                variant="caption"
+                                component="div"
+                                sx={{
+                                  color: "var(--secondary-color)",
+                                  fontSize: "10px",
+                                  pl: 1,
+                                }}
+                                className="bold"
+                              >
+                                ADA
+                              </Typography>
+                            </Typography>
+                          </Box> :
+                          <></>
+                      }
                     </CardContent>
-                    {card?.sell_model != "FixedPrice" && (
+                    {/* {card?.sell_model != "FixedPrice" && (
                       <CardContent
                         sx={{ background: "#12274D", py: "1 !important" }}
                       >
@@ -175,7 +175,7 @@ const MyListCard = () => {
                           ></Box>
                         </Box>
                       </CardContent>
-                    )}
+                    )} */}
                   </Card>
                 </Grid>
               ))}

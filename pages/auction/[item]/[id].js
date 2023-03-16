@@ -33,7 +33,7 @@ const AuctionDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
-  console.log(detail);
+  console.log(detail,'sdada dasdas');
   useEffect(() => {
     const getData = async () => {
       setIsLoading(true);

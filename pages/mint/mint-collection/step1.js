@@ -187,10 +187,13 @@ const CollectionStep1 = () => {
   }
 
   function onNextStep() {
-    let objs = convertMetadataObjects();
-    console.log(objs, "onjs");
     // debugger
-    if (imagePaths.length == 0) {
+    
+    if(!metadataFileUploaded){
+      Toast("error", "please upload NFT files first2");
+      return;
+    }
+    else if (imagePaths.length == 0) {
       console.log(
         objs.length != imagePaths.length,
         objs.length,
@@ -198,7 +201,10 @@ const CollectionStep1 = () => {
       );
       Toast("error", "please upload NFT files first");
       return;
-    } else if (!validateCollectionData(objs)) {
+    } 
+    let objs = convertMetadataObjects();
+    console.log(objs, "onjs");
+    if (!validateCollectionData(objs)) {
       console.log("here");
       return;
     } else if (isWebform && objs.length != imagePaths.length) {

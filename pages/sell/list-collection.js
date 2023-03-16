@@ -185,12 +185,21 @@ const ListCollectionStep2 = () => {
   }
 
   async function onNextStep() {
+    if(!metadataFileUploaded){
+      Toast("error", "please upload NFT files first2");
+      return;
+    }
+    else if (imagePaths.length == 0) {
+      console.log(
+        objs.length != imagePaths.length,
+        objs.length,
+        imagePaths.length
+      );
+      Toast("error", "please upload NFT files first");
+      return;
+    } 
     let objs = convertMetadataObjects();
-    console.log(
-      objs, 'onjs'
-    );
-    // debugger
-    // validateCollectionData(objs)
+    console.log(objs, "onjs");
     if (imagePaths.length == 0) {
       Toast("error", "please upload NFT files first");
       return;
