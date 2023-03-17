@@ -9,6 +9,7 @@ import { INSTANCE } from "/config/axiosInstance";
 import { getKeyData } from "../../helper/localStorage";
 import { Toast } from "../shared/Toast";
 import { useWallet, useLovelace } from "@meshsdk/react";
+import { LoadingButton } from "@mui/lab";
 
 const style = {
   fieldset: {
@@ -34,14 +35,16 @@ const AuctionModal = ({
   const [inputVal, setInputVal] = useState("");
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
-
   const formik = useFormik({
     initialValues: {
       price: "",
     },
     validationSchema: placeYourBidSchema,
-    onSubmit: async (values) => {
-      console.log(values);
+    onSubmit: async (values, { setSubmitting }) => {
+      if (Number(detail?.highest_bid) > values.price) {
+        Toast("error", "Your values must be greater than highest bid values");
+        return;
+      }
       if (connected) {
         try {
           const connectedWallet = getKeyData("connectedWallet");
@@ -73,8 +76,9 @@ const AuctionModal = ({
               ),
               "Preprod"
             );
+            console.log(values.price, "dasd");
             const api = await window.cardano[String(connectedWallet)].enable();
-            const price_value = Number(1000000 * values.price);
+            const price_value = Number(values.price * 1000000);
             lucidBrowser.selectWallet(api);
             const tx = await lucidBrowser
               .newTx()
@@ -96,12 +100,13 @@ const AuctionModal = ({
                 list_id: listId,
                 list_id: listId,
                 asset_index: auctionIndex,
-                price: Number(1000000 * values.price),
+                price: Number(values.price),
                 unit: unit,
               });
               if (res) {
                 setOpen(false);
                 Toast("success", "Bid Added Successfully");
+                window.location.reload();
               } else {
                 Toast("error", "Could Not Add Bid");
               }
@@ -116,6 +121,7 @@ const AuctionModal = ({
       }
     },
   });
+  console.log(formik.isSubmitting);
 
   if (!open) {
     return null;
@@ -166,7 +172,7 @@ const AuctionModal = ({
               You must bid at least
             </Typography>
             <Typography variant="caption" component="div" className="bold ">
-              1500.95 ADA
+              {detail?.highest_bid} ADA
             </Typography>
           </Box>
           <Box className="space_between" sx={{ py: 1 }}>
@@ -182,7 +188,11 @@ const AuctionModal = ({
               Total bid amount:
             </Typography>
             <Typography variant="caption" component="div" className="bold ">
-              15.01 ADA
+              {isNaN(parseFloat(formik.values.price))
+                ? 0
+                : parseFloat(formik.values.price) +
+                  parseFloat((formik.values.price * 0.025).toFixed(3))}
+              ADA
             </Typography>
           </Box>
           <Button
@@ -195,10 +205,21 @@ const AuctionModal = ({
             }}
             className=" br_50"
             disabled={formik.isSubmitting}
-            // onClick={onPLaceBid}
           >
             Place Your Bid
           </Button>
+          {/* <LoadingButton
+            type="submit"
+            fullWidth
+            startIcon={<CalendarTodayOutlined />}
+            loading={formik.isSubmitting}
+            // variant="outlined"
+            disabled={formik.isSubmitting}
+            className="btn2"
+            sx={{ width: "100%" }}
+          >
+            {!formik.isSubmitting ? "Place Your Bid" : "Submitting"}
+          </LoadingButton> */}
         </form>
       </CustomModal>
     </>

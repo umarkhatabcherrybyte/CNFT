@@ -69,7 +69,7 @@ const ListCollectionStep2 = () => {
         const files = e.target.files[i];
         temp.push(files);
       }
-      console.log(e.target.files.length, temp.length, 'length')
+      console.log(e.target.files.length, temp.length, "length");
       setSeletedFiles(temp);
       selectedFilesLabelRef.current.innerHTML = `${temp.length} files choosen`;
     } else {
@@ -94,7 +94,7 @@ const ListCollectionStep2 = () => {
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => { })
+      UploadService.uploadMeta(file, path, (event) => {})
         .then((response) => {
           if (response.data.data.length > 0) {
             setMetadataObjects(response.data.data || []);
@@ -185,11 +185,10 @@ const ListCollectionStep2 = () => {
   }
 
   async function onNextStep() {
-    if(!metadataFileUploaded){
+    if (!metadataFileUploaded) {
       Toast("error", "please upload NFT files first2");
       return;
-    }
-    else if (imagePaths.length == 0) {
+    } else if (imagePaths.length == 0) {
       console.log(
         objs.length != imagePaths.length,
         objs.length,
@@ -197,18 +196,16 @@ const ListCollectionStep2 = () => {
       );
       Toast("error", "please upload NFT files first");
       return;
-    } 
+    }
     let objs = convertMetadataObjects();
     console.log(objs, "onjs");
     if (imagePaths.length == 0) {
       Toast("error", "please upload NFT files first");
       return;
-    }
-    else if (!validateCollectionData(objs)) {
+    } else if (!validateCollectionData(objs)) {
       console.log("here");
       return;
-    }
-    else if (isWebform && objs.length != imagePaths.length) {
+    } else if (isWebform && objs.length != imagePaths.length) {
       Toast("error", "missing metadata of some Files");
       return;
     } else if (!isWebform && metadataObjects.length != imagePaths.length) {
@@ -304,7 +301,7 @@ const ListCollectionStep2 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => { })
+    UploadService.downloadMetafile(path, (event) => {})
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
@@ -356,10 +353,7 @@ const ListCollectionStep2 = () => {
       });
       console.log(isDuplicate, "dup");
       if (isDuplicate) {
-        Toast(
-          "error",
-          "You have duplicate names in the webform!"
-        );
+        Toast("error", "You have duplicate names in the webform!");
         // console.log(isDup)
         return false;
       } else {
@@ -433,7 +427,7 @@ const ListCollectionStep2 = () => {
           // console.log(metadataX, 'dsadasd')
           assetObj[String(policyId + fromText(element.name))] = 1n;
           obj = { [policyId]: metadataX };
-          prices.push(element.price);
+          prices.push(element.price * 10000000);
           delete element["price"];
           // element["unit"] = String(policyId + fromText(element.name))
           // arr.push(element)
@@ -492,7 +486,7 @@ const ListCollectionStep2 = () => {
       }
     } catch (e) {
       console.log("error", e);
-      set
+      set;
       Toast("error", "Error Occured while Minting");
       // console.log(e)
     }
@@ -575,7 +569,9 @@ const ListCollectionStep2 = () => {
                         className="upload-file-label"
                         ref={selectedFilesLabelRef}
                       >
-                        {selectedFiles.length > 0 ? `${selectedFiles.length} files choosen` : "No file chosen"}
+                        {selectedFiles.length > 0
+                          ? `${selectedFiles.length} files choosen`
+                          : "No file chosen"}
                       </label>
                     </div>
                     <input

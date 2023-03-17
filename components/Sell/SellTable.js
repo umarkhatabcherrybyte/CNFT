@@ -33,8 +33,11 @@ const SellTable = ({ activeBids }) => {
       const res = await INSTANCE.post("/bid/accept", {
         bid_id: id,
       });
-      setIsLoading(false);
-      Toast("success", "Your bid has been accepted.");
+      if (res) {
+        setIsLoading(false);
+        window.location.reload();
+        Toast("success", "Your bid has been accepted.");
+      }
     } catch (e) {
       setIsLoading(false);
       console.log(e);
@@ -72,7 +75,7 @@ const SellTable = ({ activeBids }) => {
               >
                 <TableCell>Name</TableCell>
                 <TableCell>Price</TableCell>
-                <TableCell align="center">USD Price</TableCell>
+                <TableCell align="center">USD Price (est)</TableCell>
                 <TableCell align="center">Expiration Date</TableCell>
                 {/* <TableCell align="center">From</TableCell> */}
                 <TableCell align="center"></TableCell>
@@ -81,51 +84,48 @@ const SellTable = ({ activeBids }) => {
             <TableBody>
               {activeBids.length > 0 &&
                 activeBids.map((row) =>
-                  row.list_id.collection_id.assets.map((item) => (
-                    <TableRow
-                      key={item.asset_name}
-                      sx={{
-                        "&:last-child td, &:last-child th": {
-                          border: 0,
-                          // borderRadius: "15px 15px 0  0",
-                        },
-                        background: "#3b3b3b4d",
-                      }}
-                    >
-                      <TableCell component="th" scope="row">
-                        {item?.asset_name}
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        {row.list_id.mint_type == "single"
-                          ? Number(row.price)
-                          : item.price}
-                      </TableCell>
-                      <TableCell align="center">
-                        {adaInfo?.current_price} <br />
-                        {row?.price} <br />
-                        {item?.price} <br />
-                        {adaInfo?.current_price &&
-                          parseFloat(
-                            adaInfo?.current_price * row.list_id.mint_type ==
-                              "single"
-                              ? Number(row.price)
-                              : item.price
-                          ).toFixed(2)}
-                      </TableCell>
-                      <TableCell align="center">
-                        In {row?.days_remaining} days {row?.hours_remaining}{" "}
-                        hours {row?.minutes_remaining} minutes
-                      </TableCell>
-                      <TableCell align="center">
-                        <Button
-                          className="btn2"
-                          onClick={() => onAcceptBid(row._id)}
+                  row?.list_id?.collection_id?.assets.map((item, index) => {
+                    if (index == row.asset_index) {
+                      return (
+                        <TableRow
+                          key={item.asset_name}
+                          sx={{
+                            "&:last-child td, &:last-child th": {
+                              border: 0,
+                              // borderRadius: "15px 15px 0  0",
+                            },
+                            background: "#3b3b3b4d",
+                          }}
                         >
-                          Accept
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                          <TableCell component="th" scope="row">
+                            {item?.asset_name}
+                          </TableCell>
+                          <TableCell component="th" scope="row">
+                            {Number(row.price)}
+                          </TableCell>
+                          <TableCell align="center">
+                            {!adaInfo
+                              ? "..."
+                              : parseFloat(
+                                  adaInfo?.current_price * row.price
+                                ).toFixed(2)}
+                          </TableCell>
+                          <TableCell align="center">
+                            In {row?.days_remaining} days {row?.hours_remaining}{" "}
+                            hours {row?.minutes_remaining} minutes
+                          </TableCell>
+                          <TableCell align="center">
+                            <Button
+                              className="btn2"
+                              onClick={() => onAcceptBid(row._id)}
+                            >
+                              Accept
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    }
+                  })
                 )}
             </TableBody>
           </Table>

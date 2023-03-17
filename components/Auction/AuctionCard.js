@@ -15,7 +15,6 @@ const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
 const AuctionCard = ({ data, index }) => {
   const router = useRouter();
   const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
-
   const [date, setDate] = useState("");
 
   const asset_detail = data?.collection_id?.assets[0];
@@ -28,6 +27,7 @@ const AuctionCard = ({ data, index }) => {
       : `${auctionDetailRoute}/0`;
     router.push(`${route}/${data._id}`);
   };
+
   return (
     <AuctionCardStyled>
       <Card
@@ -111,10 +111,15 @@ const AuctionCard = ({ data, index }) => {
               component="div"
               className="bold gray poppin"
             >
-              $
-              {parseFloat(
+              ${" "}
+              {!adaInfo
+                ? "..."
+                : parseFloat(
+                    adaInfo?.current_price * data?.sell_type_id?.price
+                  ).toFixed(2)}
+              {/* {parseFloat(
                 adaInfo?.current_price * data?.sell_type_id?.price
-              ).toFixed(2)}
+              ).toFixed(2)} */}
             </Typography>
           </Box>
         </CardContent>

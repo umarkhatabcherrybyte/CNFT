@@ -121,10 +121,12 @@ const AuctionDetail = () => {
                           Curent Bid in USD :{" "}
                           <span>
                             {" "}
-                            {parseFloat(
-                              adaInfo?.current_price *
-                                detail.list?.sell_type_id?.price
-                            ).toFixed(2)}{" "}
+                            {!adaInfo
+                              ? "..."
+                              : parseFloat(
+                                  adaInfo?.current_price *
+                                    detail.list?.sell_type_id?.price
+                                ).toFixed(2)}
                             USD
                           </span>
                         </Typography>
@@ -196,6 +198,7 @@ const AuctionDetail = () => {
         listId={id}
         detail={detail}
         open={open}
+        highest_bid={2}
         setOpen={setOpen}
         setIsSuccessModal={setIsSuccessModal}
       />

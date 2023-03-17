@@ -259,10 +259,12 @@ const BuyDetail = () => {
                           >
                             <Typography className="bold montserrat">
                               Price:{" "}
-                              {parseFloat(
-                                adaInfo?.current_price *
-                                  detail.list?.sell_type_id?.price
-                              ).toFixed(2)}
+                              {!adaInfo
+                                ? "..."
+                                : parseFloat(
+                                    adaInfo?.current_price *
+                                      detail.list?.sell_type_id?.price
+                                  ).toFixed(2)}
                               USD
                             </Typography>
                           </Box>

@@ -56,6 +56,7 @@ const SingleMint = () => {
           },
         });
         const uploaded_image = await client.add(mintFile);
+        console.log(uploaded_image);
         if (uploaded_image) {
           Toast("success", "Uploaded Successfully");
           setIsUploading(false);

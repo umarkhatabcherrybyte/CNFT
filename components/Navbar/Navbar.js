@@ -143,7 +143,7 @@ const Navbar = () => {
             <Box className="flex_item">
               {!isMatch && (
                 <>
-                  <SearchBar />
+                  {/* <SearchBar /> */}
                   <Tabs
                     value={value}
                     onChange={(e, value) => {
@@ -251,7 +251,7 @@ const Navbar = () => {
               <Divider sx={{ borderColor: "#fff" }} />
               <Grid container spacing={1} alignItems="center" sx={{ py: 2 }}>
                 <Grid item xs={6}>
-                  <SearchBar />
+                  {/* <SearchBar /> */}
                 </Grid>
                 <Grid
                   item

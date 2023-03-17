@@ -17,7 +17,10 @@ const MainHeaderr = () => {
   const theme = useTheme();
   const isMatch = useMediaQuery(theme.breakpoints.down("lg"));
   const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
-
+  // console.log(router.isReady);
+  // if (!router.isReady) {
+  //   // return;
+  // }
   return (
     <>
       <MainHeaderStyled>
