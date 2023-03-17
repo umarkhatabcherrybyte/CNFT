@@ -4,6 +4,6 @@ export const formatAmount = (amount) => {
   } else if (amount >= 1000000) {
     return (amount / 1000000).toFixed(1) + "m";
   } else {
-    return amount.toString();
+    return amount.toFixed(2);
   }
 };

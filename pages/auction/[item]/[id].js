@@ -15,6 +15,7 @@ import SuccessModal from "../../../components/Auction/SuccessModal";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import { useRouter } from "next/router";
 import GetAdaPriceService from "/services/get-ada-price.service";
+import useFetchData from "../../../hooks/adaInfo";
 import { INSTANCE } from "/config/axiosInstance";
 import dynamic from "next/dynamic";
 import FullScreenLoader from "../../../components/shared/FullScreenLoader";
@@ -29,11 +30,12 @@ const AuctionDetail = () => {
   const [open, setOpen] = useState(false);
   const [isSuccessModal, setIsSuccessModal] = useState(false);
   const [detail, setDetail] = useState({});
-  const [adaInfo, setAdaInfo] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
+
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
-  console.log(detail,'sdada dasdas');
+  console.log(detail, "sdada dasdas");
   useEffect(() => {
     const getData = async () => {
       setIsLoading(true);
@@ -51,21 +53,7 @@ const AuctionDetail = () => {
       getData();
     }
   }, [id]);
-  useEffect(() => {
-    GetAdaPriceService.getPrice()
-      .then((response) => {
-        setAdaInfo(response.data[0]);
-      })
-      .catch(() => {});
-    const interval = setInterval(() => {
-      GetAdaPriceService.getPrice()
-        .then((response) => {
-          setAdaInfo(response.data[0]);
-        })
-        .catch(() => {});
-    }, 30000);
-    return () => clearInterval(interval);
-  }, []);
+
   return (
     <AuctionDetailStyled>
       <ContainerLayout>

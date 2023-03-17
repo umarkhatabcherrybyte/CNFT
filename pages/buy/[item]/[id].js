@@ -27,7 +27,7 @@ import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { Toast } from "/components/shared/Toast";
 import { getKeyData } from "/helper/localStorage";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
-
+import useFetchData from "../../../hooks/adaInfo";
 // import { BigInt } from "lucid-cardano/types/src/core/wasm_modules/cardano_multiplatform_lib_web/cardano_multiplatform_lib";
 const List = [{}, {}, {}, {}];
 
@@ -49,10 +49,11 @@ const tabData = [
 const BuyDetail = () => {
   const router = useRouter();
   const { id, item } = router.query;
+  const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
   const [open, setOpen] = useState(false);
   const [tabValue, setTabValue] = useState("ada");
   const [detail, setDetail] = useState({});
-  const [adaInfo, setAdaInfo] = useState({});
+
   const [isLoading, setIsLoading] = useState(true);
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
@@ -73,21 +74,6 @@ const BuyDetail = () => {
       getData();
     }
   }, [id]);
-  useEffect(() => {
-    GetAdaPriceService.getPrice()
-      .then((response) => {
-        setAdaInfo(response.data[0]);
-      })
-      .catch(() => { });
-    const interval = setInterval(() => {
-      GetAdaPriceService.getPrice()
-        .then((response) => {
-          setAdaInfo(response.data[0]);
-        })
-        .catch(() => { });
-    }, 30000);
-    return () => clearInterval(interval);
-  }, []);
 
   const onBuy = async (e) => {
     if (connected) {
@@ -130,7 +116,7 @@ const BuyDetail = () => {
               recipient_address: user_address,
             });
             if (res) {
-              Toast("success", "NFT Transfered to Your Wallet")
+              Toast("success", "NFT Transfered to Your Wallet");
             }
           } catch (e) {
             Toast("error", "Try again later.");
@@ -261,7 +247,7 @@ const BuyDetail = () => {
                               {detail.list?.mint_type === "single"
                                 ? detail.list?.sell_type_id?.price
                                 : detail.list?.collection_id?.assets[item]
-                                  ?.price}
+                                    ?.price}
                               ADA
                             </Typography>
                           </Box>
@@ -275,7 +261,7 @@ const BuyDetail = () => {
                               Price:{" "}
                               {parseFloat(
                                 adaInfo?.current_price *
-                                detail.list?.sell_type_id?.price
+                                  detail.list?.sell_type_id?.price
                               ).toFixed(2)}
                               USD
                             </Typography>
@@ -343,8 +329,12 @@ const BuyDetail = () => {
                               sx={{ pb: 1.5, px: 2 }}
                               variant="caption"
                             >
-                              {detail?.asset_details.fingerprint ? detail?.asset_details?.fingerprint.slice(0, 35) +
-                                "...." : "......"}
+                              {detail?.asset_details.fingerprint
+                                ? detail?.asset_details?.fingerprint.slice(
+                                    0,
+                                    35
+                                  ) + "...."
+                                : "......"}
                             </Typography>
                           </Box>
                         </Grid>

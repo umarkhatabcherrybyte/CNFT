@@ -20,15 +20,13 @@ import styled from "styled-components";
 import { getKeyData } from "../../helper/localStorage";
 import FullScreenLoader from "../shared/FullScreenLoader";
 import { Toast } from "../shared/Toast";
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
+import GetAdaPriceService from "/services/get-ada-price.service";
+import useFetchData from "/hooks/adaInfo";
 const SellTable = ({ activeBids }) => {
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
   const [isLoading, setIsLoading] = useState(false);
-
+  const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
   const onAcceptBid = async (id) => {
     setIsLoading(true);
     try {
@@ -98,9 +96,22 @@ const SellTable = ({ activeBids }) => {
                         {item?.asset_name}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {row.list_id.mint_type == 'single' ? Number(row.price) : item.price  }
+                        {row.list_id.mint_type == "single"
+                          ? Number(row.price)
+                          : item.price}
                       </TableCell>
-                      <TableCell align="center">{row?.usd}</TableCell>
+                      <TableCell align="center">
+                        {adaInfo?.current_price} <br />
+                        {row?.price} <br />
+                        {item?.price} <br />
+                        {adaInfo?.current_price &&
+                          parseFloat(
+                            adaInfo?.current_price * row.list_id.mint_type ==
+                              "single"
+                              ? Number(row.price)
+                              : item.price
+                          ).toFixed(2)}
+                      </TableCell>
                       <TableCell align="center">
                         In {row?.days_remaining} days {row?.hours_remaining}{" "}
                         hours {row?.minutes_remaining} minutes

@@ -5,7 +5,7 @@ import { Box, Card, CardMedia, Typography, CardContent } from "@mui/material";
 import { auctionDetailRoute, MycollectionRoute } from "../Routes/constants";
 import { useRouter } from "next/router";
 import GetAdaPriceService from "/services/get-ada-price.service";
-
+import useFetchData from "../../hooks/adaInfo";
 // import DateCountdown from "react-date-countdown-timer";
 // import Countdown from "react-countdown";
 import dynamic from "next/dynamic";
@@ -14,23 +14,10 @@ const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
 });
 const AuctionCard = ({ data, index }) => {
   const router = useRouter();
-  const [adaInfo, setAdaInfo] = React.useState({});
+  const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
+
   const [date, setDate] = useState("");
-  useEffect(() => {
-    GetAdaPriceService.getPrice()
-      .then((response) => {
-        setAdaInfo(response.data[0]);
-      })
-      .catch(() => {});
-    const interval = setInterval(() => {
-      GetAdaPriceService.getPrice()
-        .then((response) => {
-          setAdaInfo(response.data[0]);
-        })
-        .catch(() => {});
-    }, 30000);
-    return () => clearInterval(interval);
-  }, []);
+
   const asset_detail = data?.collection_id?.assets[0];
   const type = data.mint_type === "collection";
   const sell_model = data?.sell_model;
@@ -78,7 +65,9 @@ const AuctionCard = ({ data, index }) => {
             component="div"
             className="uppercase poppin "
           >
-            {data.mint_type === "collection" ? data?.name  :asset_detail?.asset_name }
+            {data.mint_type === "collection"
+              ? data?.name
+              : asset_detail?.asset_name}
           </Typography>
           {/* <Typography
             gutterBottom
