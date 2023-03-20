@@ -20,7 +20,7 @@ import CaptionHeading from "/components/shared/headings/CaptionHeading";
 import LightText from "/components/shared/headings/LightText";
 import Heading from "/components/shared/headings/Heading";
 import { List } from "@mui/icons-material";
-import { mintCollectionStep2, mintRoute } from "/components/Routes/constants";
+import { mintCollectionStep2, mintRoute, mintCollectionStep3 } from "/components/Routes/constants";
 import { useRouter } from "next/router";
 import { create } from "ipfs-http-client";
 
@@ -165,7 +165,7 @@ const CollectionStep1 = () => {
   function onNextStep() {
     // debugger
     if (!isWebform && metadataObjectsFromFile.length > 0) {
-      router.push(mintCollectionStep2);
+      router.push(mintCollectionStep3);
       return
     }
     else if (!metadataFileUploaded) {

@@ -37,6 +37,7 @@ const ListCollectionStep2 = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [metadataObjects, setMetadataObjects] = useState([]);
+  const [metadataObjectsFromFile, setMetadataObjectsFromFile] = useState([]);
   const [metadataObjectProperties, setMetadataObjectProperties] = useState([]);
   let _progressInfos = [];
 
@@ -97,7 +98,7 @@ const ListCollectionStep2 = () => {
       UploadService.uploadMeta(file, path, (event) => {})
         .then((response) => {
           if (response.data.data.length > 0) {
-            setMetadataObjects(response.data.data || []);
+            setMetadataObjectsFromFile(response.data.data || []);
             window.localStorage.setItem(
               "metadataObjects",
               JSON.stringify(response.data.data)
@@ -146,6 +147,7 @@ const ListCollectionStep2 = () => {
         }
         setImagePaths(arr);
         // console.log()
+        setMetadataFileUploaded(true)
         Toast("success", "Files Uploaded Successfully");
       } catch (error) {
         console.log(error, "err");
@@ -185,8 +187,12 @@ const ListCollectionStep2 = () => {
   }
 
   async function onNextStep() {
-    if (!metadataFileUploaded) {
-      Toast("error", "please upload NFT files first2");
+    if (!isWebform && metadataObjectsFromFile.length > 0) {
+      mintCollection(metadataObjectsFromFile)
+      return
+    }
+    else if (!metadataFileUploaded) {
+      Toast("error", "please upload NFT files first1");
       return;
     } else if (imagePaths.length == 0) {
       console.log(
@@ -194,13 +200,13 @@ const ListCollectionStep2 = () => {
         objs.length,
         imagePaths.length
       );
-      Toast("error", "please upload NFT files first");
+      Toast("error", "please upload NFT files first2");
       return;
     }
     let objs = convertMetadataObjects();
     console.log(objs, "onjs");
     if (imagePaths.length == 0) {
-      Toast("error", "please upload NFT files first");
+      Toast("error", "please upload NFT files first3");
       return;
     } else if (!validateCollectionData(objs)) {
       console.log("here");
@@ -486,7 +492,6 @@ const ListCollectionStep2 = () => {
       }
     } catch (e) {
       console.log("error", e);
-      set;
       Toast("error", "Error Occured while Minting");
       // console.log(e)
     }
