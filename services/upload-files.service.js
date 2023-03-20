@@ -25,7 +25,7 @@ class UploadFilesService {
   uploadMeta(file, path, onUploadProgress) {
     let formData = new FormData();
     formData.append("file", file);
-    return http.post("api/collection/file", formData, {
+    return http.post("/collection/file", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         path: path,

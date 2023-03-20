@@ -39,6 +39,7 @@ const CollectionStep1 = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const [metadataObjects, setMetadataObjects] = useState([]);
+  const [metadataObjectsFromFile, setMetadataObjectsFromFile] = useState([]);
   const [metadataObjectProperties, setMetadataObjectProperties] = useState([]);
   let _progressInfos = [];
 
@@ -96,10 +97,11 @@ const CollectionStep1 = () => {
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => {})
+      UploadService.uploadMeta(file, path, (event) => { })
         .then((response) => {
           if (response.data.data.length > 0) {
-            setMetadataObjects(response.data.data || []);
+            console.log(response.data.data, 'dara')
+            setMetadataObjectsFromFile(response.data.data || []);
             window.localStorage.setItem(
               "metadataObjects",
               JSON.stringify(response.data.data)
@@ -147,7 +149,7 @@ const CollectionStep1 = () => {
           }
         }
         setImagePaths(arr);
-        // console.log()
+        setMetadataFileUploaded(true)
         Toast("success", "Files Uploaded Successfully");
       } catch (error) {
         console.log(error, "err");
@@ -160,37 +162,14 @@ const CollectionStep1 = () => {
     }
   };
 
-  function upload(path, idx, file) {
-    _progressInfos = [..._progressInfos];
-    UploadService.upload(file, path, (event) => {
-      _progressInfos[idx].percentage = Math.round(
-        (100 * event.loaded) / event.total
-      );
-      setProgressInfos(_progressInfos);
-    })
-      .then((response) => {
-        setMetaData([]);
-        t();
-      })
-      .catch(() => {
-        _progressInfos[idx].percentage = 0;
-        setProgressInfos(_progressInfos);
-      });
-
-    function t() {
-      UploadService.getFiles(connectedWallet + "_" + walletAddress).then(
-        (files) => {
-          setFileInfos(files.data);
-        }
-      );
-    }
-  }
-
   function onNextStep() {
     // debugger
-    
-    if(!metadataFileUploaded){
-      Toast("error", "please upload NFT files first2");
+    if (!isWebform && metadataObjectsFromFile.length > 0) {
+      router.push(mintCollectionStep2);
+      return
+    }
+    else if (!metadataFileUploaded) {
+      Toast("error", "please upload NFT files first");
       return;
     }
     else if (imagePaths.length == 0) {
@@ -201,7 +180,7 @@ const CollectionStep1 = () => {
       );
       Toast("error", "please upload NFT files first");
       return;
-    } 
+    }
     let objs = convertMetadataObjects();
     console.log(objs, "onjs");
     if (!validateCollectionData(objs)) {
@@ -213,7 +192,9 @@ const CollectionStep1 = () => {
     } else if (!isWebform && metadataObjects.length != imagePaths.length) {
       Toast("error", "missing metadata of some Files");
       return;
-    } else if (
+    }
+
+    else if (
       !isWebform &&
       metadataObjects.length == imagePaths.length &&
       metadataFileUploaded
@@ -318,7 +299,7 @@ const CollectionStep1 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => {})
+    UploadService.downloadMetafile(path, (event) => { })
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
@@ -684,7 +665,7 @@ const CollectionStep1 = () => {
                   // disabled={!metaFile}
                   onClick={() => uploadMeta()}
                 >
-                  Upload
+                  Upload Files
                 </Button>
               </Grid>
               {/* <Grid item md={2} xs={12}>

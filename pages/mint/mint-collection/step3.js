@@ -98,7 +98,7 @@ const CollectionStep3 = () => {
           for (let index = 0; index < metadata_objs.length; index++) {
             const element = metadata_objs[index];
             prices.push(element.price);
-            console.log(element, "elem");
+            // console.log(element, "elem");
             let metadata = element;
             metadataX[metadata.name] = metadata;
             console.log(metadataX, "dsadasd");
@@ -192,7 +192,7 @@ const CollectionStep3 = () => {
           for (let index = 0; index < metadata_objs.length; index++) {
             const element = metadata_objs[index];
             prices.push(element.price);
-            console.log(element, "elem");
+            // console.log(element, "elem");
             let metadata = element;
             metadataX[metadata.name] = metadata;
             console.log(metadataX, "dsadasd");

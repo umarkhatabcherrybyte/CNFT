@@ -15,7 +15,6 @@ import TextField from '@mui/material/TextField';
 import { Toast } from "../../shared/Toast";
 import MintService from '../../../services/mint.service'
 import { List } from "@mui/icons-material";
-import { C } from "lucid-cardano";
 
 const ExcelSpreadSheet = ({
   metadataObjects,

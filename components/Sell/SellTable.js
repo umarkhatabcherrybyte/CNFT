@@ -110,6 +110,7 @@ const SellTable = ({ activeBids }) => {
                                   adaInfo?.current_price * row.price
                                 ).toFixed(2)}
                           </TableCell>
+
                           <TableCell align="center">
                             In {row?.days_remaining} days {row?.hours_remaining}{" "}
                             hours {row?.minutes_remaining} minutes
@@ -124,6 +125,7 @@ const SellTable = ({ activeBids }) => {
                           </TableCell>
                         </TableRow>
                       );
+
                     }
                   })
                 )}
