@@ -68,7 +68,7 @@ const AuctionDetail = () => {
                 <Grid xs={12} md={6} item>
                   <Box>
                     <img
-                      src={`https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[item]?.ipfs}`}
+                      src={!isVideoOrIsAudio(detail?.list?.collection_id?.assets[item]) ?  `https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[item]?.ipfs}` : detail?.list?.collection_id?.assets[item]?.featured_image}
                       alt=""
                       className="w_100 br_15 detail_img"
                     />
