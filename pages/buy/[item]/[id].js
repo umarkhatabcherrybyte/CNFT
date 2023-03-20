@@ -28,6 +28,7 @@ import { Toast } from "/components/shared/Toast";
 import { getKeyData } from "/helper/localStorage";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
 import useFetchData from "../../../hooks/adaInfo";
+import { isVideoOrIsAudio } from "../../../utils/utils";
 // import { BigInt } from "lucid-cardano/types/src/core/wasm_modules/cardano_multiplatform_lib_web/cardano_multiplatform_lib";
 const List = [{}, {}, {}, {}];
 
@@ -167,7 +168,7 @@ const BuyDetail = () => {
                   <Grid container spacing={3}>
                     <Grid xs={12} md={6} item>
                       <img
-                        src={`https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[item]?.ipfs}`}
+                        src={!isVideoOrIsAudio(detail?.list?.collection_id?.assets[item]) ?  `https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[item]?.ipfs}` : detail?.list?.collection_id?.assets[item]?.featured_image}
                         alt=""
                         className="w_100 br_15 item_img"
                       />

@@ -79,7 +79,8 @@ const FeatureTokenSlider = ({ nfts }) => {
                   <CardMedia
                     component="img"
                     // height="205"
-                    image={`https://ipfs.io/ipfs/${nft?.collection_id?.assets[0]?.ipfs}`}
+
+                    image={!isVideoOrIsAudio(nft?.collection_id?.assets[0]) ? `https://ipfs.io/ipfs/${nft?.collection_id?.assets[0]?.ipfs}` : nft?.collection_id?.assets[0]?.featured_image}
                     alt="green iguana"
                     sx={{
                       borderRadius: "15px",

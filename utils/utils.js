@@ -55,3 +55,9 @@ export const shuffleArray = (array) => {
 
   return shuffeled;
 };
+
+export const isVideoOrIsAudio = (file) => {
+  return 	file.media_type == 'image/png' ||
+  file.media_type == 'image/jpeg' ||
+  file.media_type == 'image/jpg' ||  file.media_type == 'video/mp4' 
+}

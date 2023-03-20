@@ -376,9 +376,7 @@ const ListCollectionStep2 = () => {
     const listing_previous = getObjData("listing");
     try {
       let connectedWallet = window.localStorage.getItem("connectedWallet");
-
-      let img = window.localStorage.getItem("img");
-      if (img && connected) {
+      if (connected) {
         const transferLucid = await Lucid.new(
           new Blockfrost(
             "https://cardano-preprod.blockfrost.io/api/v0",
