@@ -29,6 +29,7 @@ const AuctionModal = ({
   detail,
   listId,
   auctionIndex,
+  getData,
 }) => {
   const [fee, setFee] = useState("0");
   const [total, setTotal] = useState("");
@@ -106,7 +107,7 @@ const AuctionModal = ({
               if (res) {
                 setOpen(false);
                 Toast("success", "Bid Added Successfully");
-                window.location.reload();
+                getData();
               } else {
                 Toast("error", "Could Not Add Bid");
               }

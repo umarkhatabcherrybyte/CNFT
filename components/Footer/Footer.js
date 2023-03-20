@@ -1,9 +1,11 @@
 import React from "react";
 import styled from "styled-components";
-import { Box, Grid, Typography, Link } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
+import Link from "next/link";
 import { termConditionRoute } from "../Routes/constants";
-
+import { useRouter } from "next/router";
 const Footer = () => {
+  const router = useRouter();
   return (
     <FooterStyled>
       <Box>
@@ -46,7 +48,7 @@ const Footer = () => {
                 </ul>
               </Box>
             </Grid> */}
-            <Grid item md={2.5} sm={6} xs={12}>
+            {/* <Grid item md={2.5} sm={6} xs={12}>
               <Box className="widget">
                 <Typography
                   className="text_white title proxima"
@@ -73,7 +75,7 @@ const Footer = () => {
                   </li>
                 </ul>
               </Box>
-            </Grid>
+            </Grid> */}
             <Grid item md={2.5} sm={6} xs={12}>
               <Box className="widget">
                 <Typography

@@ -36,19 +36,20 @@ const AuctionDetail = () => {
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
   console.log(detail, "sdada dasdas");
+  const getData = async () => {
+    console.log("Sdsdadasdasdsad");
+    setIsLoading(true);
+    try {
+      const res = await INSTANCE.get(`/list/get/${item}/${id}`);
+      setDetail(res?.data?.data);
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
+      setDetail([]);
+      console.log(e);
+    }
+  };
   useEffect(() => {
-    const getData = async () => {
-      setIsLoading(true);
-      try {
-        const res = await INSTANCE.get(`/list/get/${item}/${id}`);
-        setDetail(res?.data?.data);
-        setIsLoading(false);
-      } catch (e) {
-        setIsLoading(false);
-        setDetail([]);
-        console.log(e);
-      }
-    };
     if (id) {
       getData();
     }
@@ -201,6 +202,7 @@ const AuctionDetail = () => {
         highest_bid={2}
         setOpen={setOpen}
         setIsSuccessModal={setIsSuccessModal}
+        getData={getData}
       />
       <SuccessModal open={isSuccessModal} setOpen={setIsSuccessModal} />
     </AuctionDetailStyled>

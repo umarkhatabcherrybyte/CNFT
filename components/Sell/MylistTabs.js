@@ -75,6 +75,8 @@ const MylistTabs = () => {
   const router = useRouter();
   const [tabValue, setTabValue] = useState("add");
   const [isLoading, setIsLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState(null);
+
   const onTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -82,6 +84,7 @@ const MylistTabs = () => {
     initialValues: {
       type: "single",
       file: null,
+      imageFile: null,
       name: "",
       description: "",
       collection_name: "",
@@ -197,6 +200,7 @@ const MylistTabs = () => {
                     policy_id: policyId,
                     type: "single",
                     minting_policy: JSON.stringify(mintingPolicy),
+                    image_file: values.imageFile,
                     // asset_hex_name: unit,
                   };
                   const res = await INSTANCE.post("/collection/create", data);
@@ -236,8 +240,25 @@ const MylistTabs = () => {
       }
     },
   });
-  console.log(formik.values.file);
-
+  console.log(formik.values);
+  const onMintFileChange = (e) => {
+    if (e.currentTarget.files[0]) {
+      formik.setFieldValue("file", e.currentTarget.files[0]);
+      // if (
+      //   (e.currentTarget.files[0].type === "image/png" ||
+      //     e.currentTarget.files[0].type === "image/jpeg" ||
+      //     e.currentTarget.files[0].type === "image/jpg") &&
+      //   (!formik.values.imageFile ||
+      //     (formik.values.imageFile &&
+      //       (formik.values.imageFile.type === "image/png" ||
+      //         formik.values.imageFile.type === "image/jpeg" ||
+      //         formik.values.imageFile.type === "image/jpg")))
+      // ) {
+      //   return;
+      // }
+      // formik.setFieldValue("imageFile", null);
+    }
+  };
   return (
     <>
       {isLoading && <FullScreenLoader />}
@@ -447,12 +468,15 @@ const MylistTabs = () => {
                     </Box>
                   ) : (
                     <Box
+                      className="flex"
                       sx={{
                         overflow: "hidden",
                         width: "100%",
+                        height: "100%",
                         img: {
                           width: "100%",
                           borderRadius: "10px",
+                          objectFit: "cover",
                         },
                       }}
                     >
@@ -488,11 +512,7 @@ const MylistTabs = () => {
                     // accept="image/*"
                     type="file"
                     name="file"
-                    onChange={(e) => {
-                      if (e.currentTarget.files[0]) {
-                        formik.setFieldValue("file", e.currentTarget.files[0]);
-                      }
-                    }}
+                    onChange={(e) => onMintFileChange(e)}
                   />
                 </Button>
                 {formik.touched.file && formik.errors.file && (
@@ -500,6 +520,90 @@ const MylistTabs = () => {
                     {formik.errors.file}
                   </FormHelperText>
                 )}
+                {/* feature image for audio and video  */}
+                {formik.values.file &&
+                  (formik.values.file.type === "audio/mpeg" ||
+                    formik.values.file.type === "video/mp4") && (
+                    <Box>
+                      <Button
+                        variant="contained"
+                        component="label"
+                        sx={{
+                          height: "100%",
+                          // height: "22rem",
+                          label: {},
+                          padding: "0",
+                          my: 2,
+                          background: "#FFFFFF33 ",
+                          border: "3px dashed #fff",
+                          borderRadius: "15px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+
+                          "&:hover": {
+                            backgroundColor: "inherit !important",
+                          },
+                          img: {
+                            width: "100%",
+                            borderRadius: "15px",
+                            height: "22rem",
+                            objectFit: "cover",
+                          },
+                        }}
+                      >
+                        {!formik.values.imageFile || formik.errors.imageFile ? (
+                          <>
+                            <Box
+                              className="flex_align"
+                              sx={{ flexDirection: "column" }}
+                            >
+                              <Image
+                                sx={{
+                                  color: "#fff",
+                                  width: "10em",
+                                  height: "10em",
+                                }}
+                              />
+                              <Typography
+                                variant="caption"
+                                className="text_white montserrat"
+                                sx={{ opacity: "0.7" }}
+                                component="div"
+                              >
+                                Upload feature image to preview your brand new
+                                NFT
+                              </Typography>
+                            </Box>
+                          </>
+                        ) : (
+                          <img
+                            src={URL.createObjectURL(formik.values.imageFile)}
+                          />
+                        )}
+
+                        <input
+                          hidden
+                          accept="image/*"
+                          type="file"
+                          name="imageFile"
+                          onChange={(e) => {
+                            if (e.currentTarget.files[0]) {
+                              formik.setFieldValue(
+                                "imageFile",
+                                e.currentTarget.files[0]
+                              );
+                            }
+                          }}
+                        />
+                      </Button>
+                      {formik.touched.imageFile && formik.errors.imageFile && (
+                        <FormHelperText sx={{ color: "#d32f2f" }}>
+                          {formik.errors.imageFile}
+                        </FormHelperText>
+                      )}
+                    </Box>
+                  )}
               </Grid>
             </Grid>
           </form>

@@ -1,12 +1,12 @@
 import * as yup from "yup";
 const supportedFormats = [
-  // "video/mp4",
+  "video/mp4",
   "image/png",
   "image/jpeg",
   "image/jpg",
-  // "audio/mp3",
-  // "audio/mpeg",
-  // "audio/mp4",
+  "audio/mp3",
+  "audio/mpeg",
+  "audio/mp4",
 ];
 export const addSingleListingSchema = yup.object({
   name: yup.string().required("Please enter Name"),
@@ -23,6 +23,23 @@ export const addSingleListingSchema = yup.object({
       return supportedFormats.includes(value.type);
     })
     .required("File is required"),
+  imageFile: yup
+    .mixed()
+    .nullable()
+    .when("file", {
+      is: (value) =>
+        value && (value.type === "audio/mpeg" || value.type === "video/mp4"),
+      then: yup
+        .mixed()
+        .test("fileFormat", "Invalid file format", (value) => {
+          if (!value) {
+            return true; // allow null values
+          }
+          const supportedFormats = ["image/png", "image/jpeg", "image/jpg"];
+          return supportedFormats.includes(value.type);
+        })
+        .required("Image file is required"),
+    }),
 });
 export const addCollectioneListingSchema = yup.object({
   name: yup.string().required("Please enter Name"),
