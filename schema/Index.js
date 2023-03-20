@@ -1,20 +1,28 @@
 import * as yup from "yup";
-
+const supportedFormats = [
+  // "video/mp4",
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  // "audio/mp3",
+  // "audio/mpeg",
+  // "audio/mp4",
+];
 export const addSingleListingSchema = yup.object({
   name: yup.string().required("Please enter Name"),
   description: yup.string(),
   collection_name: yup.string(),
-  file: yup.mixed().nullable().required("File is required"),
-  // .test(
-  //   "fileSize",
-  //   "File Size is too large",
-  //   (value) => value && value.size <= FILE_SIZE
-  // )
-  // .test(
-  //   "fileFormat",
-  //   "Unsupported Format",
-  //   (value) => value && SUPPORTED_FORMATS.includes(value.type)
-  // ),
+  file: yup
+    .mixed()
+    .nullable()
+    .test("fileFormat", "Invalid file format", (value) => {
+      if (!value) {
+        return true; // allow null values
+      }
+
+      return supportedFormats.includes(value.type);
+    })
+    .required("File is required"),
 });
 export const addCollectioneListingSchema = yup.object({
   name: yup.string().required("Please enter Name"),

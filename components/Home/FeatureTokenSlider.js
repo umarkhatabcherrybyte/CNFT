@@ -15,6 +15,7 @@ import { carouselNew } from "../setting/Slider";
 import { ArrowForwardIos } from "@mui/icons-material";
 import { collectionDetailRoute } from "/components/Routes/constants";
 import { useRouter } from "next/router";
+import Heading from "../shared/headings/Heading";
 export function SliderArrow(props) {
   const { className, style, onClick, arrow } = props;
 
@@ -43,15 +44,15 @@ export function SliderArrow(props) {
     </SliderArrowStyled>
   );
 }
-const FeatureTokenSlider = () => {
+const FeatureTokenSlider = ({ nfts }) => {
   const router = useRouter();
-  const nftsState = useSelector(selectors.nftBreakdownState);
-  const nfts = nftsState.data ? nftsState.data : [];
+  // const nftsState = useSelector(selectors.nftBreakdownState);
+  // const nfts = nftsState.data ? nftsState.data : [];
   return (
     <FeatureTokenStyled>
       <Box sx={{ py: 4 }}>
         <Slider {...carouselNew}>
-          {nfts.length > 0 &&
+          {nfts && nfts.length > 0 ? (
             nfts.map((nft, index) => (
               <Box sx={{ px: 1 }} key={index}>
                 <Card
@@ -63,24 +64,29 @@ const FeatureTokenSlider = () => {
                     borderRadius: "20px",
                     border: "solid 1px #ddd",
                     color: "#fff",
-                    height: {
-                      xs: "17rem",
-                      md: "21rem",
-                    },
+                    // height: {
+                    //   xs: "17rem",
+                    //   md: "21rem",
+                    // },
                     "& .flex": {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
                     },
                   }}
-                  onClick={() => router.push(`${collectionDetailRoute}/34`)}
+                  onClick={() => router.push(`buy/0/${nft._id}`)}
                 >
                   <CardMedia
                     component="img"
                     // height="205"
-                    image="/images/carousel/crs-1.jpg"
+                    image={`https://ipfs.io/ipfs/${nft?.collection_id?.assets[0]?.ipfs}`}
                     alt="green iguana"
-                    sx={{ borderRadius: "15px", maxHeight: "205px" }}
+                    sx={{
+                      borderRadius: "15px",
+                      maxHeight: "205px",
+                      height: "15rem",
+                      objectFit: "cover",
+                    }}
                   />
                   <CardContent sx={{ padding: "10px !important" }}>
                     <Grid
@@ -95,7 +101,7 @@ const FeatureTokenSlider = () => {
                           component="div"
                           className="bold poppin"
                         >
-                          {nft?.title}
+                          {nft?.collection_id?.assets[0]?.asset_name}
                         </Typography>
                       </Grid>
                       <Grid item xs={12} lg={6} justifyContent="end">
@@ -110,7 +116,7 @@ const FeatureTokenSlider = () => {
                           }}
                           className="bold poppin"
                         >
-                          {nft?.price}{" "}
+                          {nft?.sell_type_id?.price}
                           <Typography
                             // className="font_12"
                             sx={{
@@ -122,7 +128,7 @@ const FeatureTokenSlider = () => {
                         </Typography>
                       </Grid>
                     </Grid>
-                    <Grid
+                    {/* <Grid
                       container
                       spacing={1}
                       alignItems="center"
@@ -157,7 +163,10 @@ const FeatureTokenSlider = () => {
                           <Typography
                             variant="caption"
                             component="div"
-                            sx={{ ml: 2, fontSize: { xs: "8px", md: "auto" } }}
+                            sx={{
+                              ml: 2,
+                              fontSize: { xs: "8px", md: "auto" },
+                            }}
                           >
                             People Placed Bid
                           </Typography>
@@ -177,11 +186,16 @@ const FeatureTokenSlider = () => {
                           </Box>
                         </Box>
                       </Grid>
-                    </Grid>
+                    </Grid> */}
                   </CardContent>
                 </Card>
               </Box>
-            ))}
+            ))
+          ) : (
+            <Box className="flex">
+              <Heading heading="No Tokens" />
+            </Box>
+          )}
         </Slider>
       </Box>
     </FeatureTokenStyled>

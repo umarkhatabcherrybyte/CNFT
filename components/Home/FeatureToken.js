@@ -1,22 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Box, Typography, Tab } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import * as selectors from "/redux/selectors/Selector";
 import { fetchNftsBreakdown } from "/redux/actions/thunks/nfts";
-import { useSelector, useDispatch } from "react-redux";
-import { useRouter } from "next/router";
+import { useDispatch } from "react-redux";
 import FeatureTokenSlider from "./FeatureTokenSlider";
+import { INSTANCE } from "/config/axiosInstance";
 const FeatureToken = () => {
   const dispatch = useDispatch();
-  const router = useRouter();
-  const nftsState = useSelector(selectors.nftBreakdownState);
-  const nfts = nftsState.data ? nftsState.data : [];
-  React.useEffect(() => {
-    dispatch(fetchNftsBreakdown());
+  const [featureTokens, setFeatureTokens] = useState([]);
+  useEffect(() => {
+    // dispatch(fetchNftsBreakdown());
+    getFeaturedToken();
   }, [dispatch]);
-  const [value, setValue] = React.useState("1");
 
+  const getFeaturedToken = async () => {
+    try {
+      const res = await INSTANCE.get("/list/featured/tokens");
+      if (res) {
+        setFeatureTokens(res.data.data);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const [value, setValue] = React.useState("1");
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -69,16 +77,16 @@ const FeatureToken = () => {
                 </TabList>
               </Box>
               <TabPanel value="1" sx={{ p: 0 }}>
-                <FeatureTokenSlider />
+                <FeatureTokenSlider nfts={featureTokens.all} />
               </TabPanel>
               <TabPanel value="2" sx={{ p: 0 }}>
-                <FeatureTokenSlider />
+                <FeatureTokenSlider nfts={featureTokens.images} />
               </TabPanel>
               <TabPanel value="3" sx={{ p: 0 }}>
-                <FeatureTokenSlider />
+                <FeatureTokenSlider nfts={featureTokens.audios} />
               </TabPanel>
               <TabPanel value="4" sx={{ p: 0 }}>
-                <FeatureTokenSlider />
+                <FeatureTokenSlider nfts={featureTokens.videos} />
               </TabPanel>
             </TabContext>
           </Box>

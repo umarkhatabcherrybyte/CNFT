@@ -236,6 +236,7 @@ const MylistTabs = () => {
       }
     },
   });
+  console.log(formik.values.file);
 
   return (
     <>
@@ -411,7 +412,7 @@ const MylistTabs = () => {
                   component="label"
                   sx={{
                     // height: "67%",
-
+                    height: "22rem",
                     label: {},
                     padding: "0",
                     my: 2,
@@ -427,7 +428,24 @@ const MylistTabs = () => {
                     },
                   }}
                 >
-                  {formik.values.file ? (
+                  {!formik.values.file || formik.errors.file ? (
+                    <Box
+                      className="flex_align"
+                      sx={{ flexDirection: "column" }}
+                    >
+                      <Image
+                        sx={{ color: "#fff", width: "10em", height: "10em" }}
+                      />
+                      <Typography
+                        variant="caption"
+                        className="text_white montserrat"
+                        sx={{ opacity: "0.7" }}
+                        component="div"
+                      >
+                        Upload file to preview your brand new NFT
+                      </Typography>
+                    </Box>
+                  ) : (
                     <Box
                       sx={{
                         overflow: "hidden",
@@ -438,47 +456,50 @@ const MylistTabs = () => {
                         },
                       }}
                     >
-                      <img
-                        src={URL.createObjectURL(formik.values.file)}
-                        alt=""
-                        className="thumbnail_overlay"
-                        name="file"
-                      />
+                      {formik.values.file.type.startsWith("video/") && (
+                        <>
+                          <video
+                            controls
+                            style={{ width: "100%", height: "19rem" }}
+                          >
+                            <source
+                              src={URL.createObjectURL(formik.values.file)}
+                            ></source>
+                          </video>
+                        </>
+                      )}
+                      {formik.values.file.type.startsWith("audio/") && (
+                        <>
+                          <audio controls>
+                            <source
+                              src={URL.createObjectURL(formik.values.file)}
+                            />
+                          </audio>
+                        </>
+                      )}
+                      {formik.values.file.type.startsWith("image/") && (
+                        <img src={URL.createObjectURL(formik.values.file)} />
+                      )}
                     </Box>
-                  ) : (
-                    <>
-                      <Box
-                        className="flex_align"
-                        sx={{ flexDirection: "column" }}
-                      >
-                        <Image
-                          sx={{ color: "#fff", width: "10em", height: "10em" }}
-                        />
-                        <Typography
-                          variant="caption"
-                          className="text_white montserrat"
-                          sx={{ opacity: "0.7" }}
-                          component="div"
-                        >
-                          Upload file to preview your brand new NFT
-                        </Typography>
-                      </Box>
-                    </>
                   )}
 
                   <input
                     hidden
-                    accept="image/*"
+                    // accept="image/*"
                     type="file"
                     name="file"
                     onChange={(e) => {
-                      formik.setFieldValue("file", e.currentTarget.files[0]);
+                      if (e.currentTarget.files[0]) {
+                        formik.setFieldValue("file", e.currentTarget.files[0]);
+                      }
                     }}
                   />
                 </Button>
-                <FormHelperText sx={{ color: "#d32f2f" }}>
-                  {formik.touched.file && formik.errors.file}
-                </FormHelperText>
+                {formik.touched.file && formik.errors.file && (
+                  <FormHelperText sx={{ color: "#d32f2f" }}>
+                    {formik.errors.file}
+                  </FormHelperText>
+                )}
               </Grid>
             </Grid>
           </form>
