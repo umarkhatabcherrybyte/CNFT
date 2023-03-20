@@ -10,7 +10,7 @@ import { getKeyData } from "../../helper/localStorage";
 import { Toast } from "../shared/Toast";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import { LoadingButton } from "@mui/lab";
-
+import { useRouter } from "next/router";
 const style = {
   fieldset: {
     border: "none",
@@ -32,6 +32,7 @@ const AuctionModal = ({
   getData,
 }) => {
   const [fee, setFee] = useState("0");
+  const router = useRouter();
   const [total, setTotal] = useState("");
   const [inputVal, setInputVal] = useState("");
   const { wallet, connected, name, connecting, connect, disconnect, error } =
@@ -107,6 +108,7 @@ const AuctionModal = ({
               if (res) {
                 setOpen(false);
                 Toast("success", "Bid Added Successfully");
+                router.push("/");
                 getData();
               } else {
                 Toast("error", "Could Not Add Bid");

@@ -191,12 +191,45 @@ const MylistTabs = () => {
               // console.log(txHash, "hasg");
               if (txHash) {
                 //  api call
-                // Create a new FileReader object
-                var reader = new FileReader();
-                // Read file3 as data URL
-                reader.readAsDataURL(values.imageFile);
-                reader.onload = async () => {
-                  const file3DataURL = reader.result;
+
+                if (values.imageFile) {
+                  var reader = new FileReader();
+                  reader.readAsDataURL(values.imageFile);
+                  reader.onload = async () => {
+                    const file3DataURL = reader.result;
+                    try {
+                      const user_id = window.localStorage.getItem("user_id");
+                      metadata["unit"] = unit;
+                      metadata["ipfs"] = uploaded_image.path;
+                      const data = {
+                        metadata: [metadata],
+                        user_id: user_id,
+                        recipient_address: recipientAddress,
+                        policy_id: policyId,
+                        type: "single",
+                        minting_policy: JSON.stringify(mintingPolicy),
+                        image_file: file3DataURL,
+                      };
+                      const res = await INSTANCE.post(
+                        "/collection/create",
+                        data
+                      );
+                      if (res) {
+                        setIsLoading(false);
+                        dispatch(setStep("step2"));
+                        // dispatch(setListing())
+                        window.localStorage.setItem(
+                          "listing",
+                          JSON.stringify(res?.data.data)
+                        );
+                      }
+                    } catch (e) {
+                      setIsLoading(false);
+
+                      console.log(e);
+                    }
+                  };
+                } else {
                   try {
                     const user_id = window.localStorage.getItem("user_id");
                     metadata["unit"] = unit;
@@ -208,8 +241,7 @@ const MylistTabs = () => {
                       policy_id: policyId,
                       type: "single",
                       minting_policy: JSON.stringify(mintingPolicy),
-                      image_file: file3DataURL,
-                      // asset_hex_name: unit,
+                      image_file: "",
                     };
                     const res = await INSTANCE.post("/collection/create", data);
                     if (res) {
@@ -226,7 +258,7 @@ const MylistTabs = () => {
 
                     console.log(e);
                   }
-                };
+                }
 
                 //
                 // window.localStorage.setItem("policy-id", policyId);

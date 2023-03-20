@@ -19,9 +19,11 @@ import useFetchData from "../../../hooks/adaInfo";
 import { INSTANCE } from "/config/axiosInstance";
 import dynamic from "next/dynamic";
 import FullScreenLoader from "../../../components/shared/FullScreenLoader";
+import { isVideoOrIsAudio } from "../../../utils/utils";
 const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
   ssr: false,
 });
+
 const cardData = [{}, {}, {}, {}];
 
 const AuctionDetail = () => {
@@ -68,7 +70,14 @@ const AuctionDetail = () => {
                 <Grid xs={12} md={6} item>
                   <Box>
                     <img
-                      src={!isVideoOrIsAudio(detail?.list?.collection_id?.assets[item]) ?  `https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[item]?.ipfs}` : detail?.list?.collection_id?.assets[item]?.featured_image}
+                      src={
+                        !isVideoOrIsAudio(
+                          detail?.list?.collection_id?.assets[item]
+                        )
+                          ? `https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[item]?.ipfs}`
+                          : detail?.list?.collection_id?.assets[item]
+                              ?.feature_image
+                      }
                       alt=""
                       className="w_100 br_15 detail_img"
                     />
@@ -125,8 +134,7 @@ const AuctionDetail = () => {
                             {!adaInfo
                               ? "..."
                               : parseFloat(
-                                  adaInfo?.current_price *
-                                    detail.list?.sell_type_id?.price
+                                  adaInfo?.current_price * detail.highest_bid
                                 ).toFixed(2)}
                             USD
                           </span>
@@ -137,7 +145,7 @@ const AuctionDetail = () => {
                       <Box className="light_white_bg text_white br_15 montserrat">
                         <Typography sx={{ py: 1.5, px: 1 }}>
                           Curent Bid in ADA :{" "}
-                          <span>{detail.list?.sell_type_id?.price} ADA</span>
+                          <span>{detail?.highest_bid} ADA</span>
                         </Typography>
                       </Box>
                     </Grid>

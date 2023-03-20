@@ -9,6 +9,7 @@ import useFetchData from "../../hooks/adaInfo";
 // import DateCountdown from "react-date-countdown-timer";
 // import Countdown from "react-countdown";
 import dynamic from "next/dynamic";
+import { isVideoOrIsAudio } from "../../utils/utils";
 const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
   ssr: false,
 });
@@ -53,7 +54,11 @@ const AuctionCard = ({ data, index }) => {
           <CardMedia
             component="img"
             height="290"
-            image={`https://ipfs.io/ipfs/${asset_detail?.ipfs}`}
+            image={
+              isVideoOrIsAudio(asset_detail)
+                ? asset_detail?.feature_image
+                : `https://ipfs.io/ipfs/${asset_detail?.ipfs}`
+            }
             alt="green iguana"
           />
           <Box sx={{ position: "absolute", bottom: "10px" }}></Box>

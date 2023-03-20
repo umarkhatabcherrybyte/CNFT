@@ -57,7 +57,18 @@ export const shuffleArray = (array) => {
 };
 
 export const isVideoOrIsAudio = (file) => {
-  return 	file.media_type == 'image/png' ||
-  file.media_type == 'image/jpeg' ||
-  file.media_type == 'image/jpg' ||  file.media_type == 'video/mp4' 
-}
+  console.log(
+    file,
+    file.media_type == "image/png" ||
+      file.media_type == "image/jpeg" ||
+      file.media_type == "image/jpg" ||
+      file.media_type == "video/mp4",
+    "dasda"
+  );
+  return (
+    file.media_type == "audio/mpeg" ||
+    file.media_type == " audio/mp4" ||
+    file.media_type == " audio/mp3" ||
+    file.media_type == "video/mp4"
+  );
+};

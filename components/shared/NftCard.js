@@ -8,6 +8,7 @@ import {
   MycollectionRoute,
   auctionDetailRoute,
 } from "../Routes/constants";
+import { isVideoOrIsAudio } from "../../utils/utils";
 const NftCard = ({ card }) => {
   const asset_detail = card?.collection_id?.assets[0];
   const type = card.mint_type === "collection";
@@ -46,6 +47,8 @@ const NftCard = ({ card }) => {
             image={`${
               type
                 ? card.feature_image
+                : isVideoOrIsAudio(asset_detail)
+                ? asset_detail?.feature_image
                 : `https://ipfs.io/ipfs/${asset_detail?.ipfs}`
             }`}
             alt="green iguana"

@@ -118,6 +118,7 @@ const BuyDetail = () => {
             });
             if (res) {
               Toast("success", "NFT Transfered to Your Wallet");
+              router.push("/buy");
             }
           } catch (e) {
             Toast("error", "Try again later.");
@@ -168,7 +169,14 @@ const BuyDetail = () => {
                   <Grid container spacing={3}>
                     <Grid xs={12} md={6} item>
                       <img
-                        src={!isVideoOrIsAudio(detail?.list?.collection_id?.assets[item]) ?  `https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[item]?.ipfs}` : detail?.list?.collection_id?.assets[item]?.featured_image}
+                        src={
+                          !isVideoOrIsAudio(
+                            detail?.list?.collection_id?.assets[item]
+                          )
+                            ? `https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[item]?.ipfs}`
+                            : detail?.list?.collection_id?.assets[item]
+                                ?.feature_image
+                        }
                         alt=""
                         className="w_100 br_15 item_img"
                       />

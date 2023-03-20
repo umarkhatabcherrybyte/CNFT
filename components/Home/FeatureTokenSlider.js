@@ -16,6 +16,8 @@ import { ArrowForwardIos } from "@mui/icons-material";
 import { collectionDetailRoute } from "/components/Routes/constants";
 import { useRouter } from "next/router";
 import Heading from "../shared/headings/Heading";
+import { isVideoOrIsAudio } from "../../utils/utils";
+
 export function SliderArrow(props) {
   const { className, style, onClick, arrow } = props;
 
@@ -80,7 +82,11 @@ const FeatureTokenSlider = ({ nfts }) => {
                     component="img"
                     // height="205"
 
-                    image={!isVideoOrIsAudio(nft?.collection_id?.assets[0]) ? `https://ipfs.io/ipfs/${nft?.collection_id?.assets[0]?.ipfs}` : nft?.collection_id?.assets[0]?.featured_image}
+                    image={
+                      !isVideoOrIsAudio(nft?.collection_id?.assets[0])
+                        ? `https://ipfs.io/ipfs/${nft?.collection_id?.assets[0]?.ipfs}`
+                        : nft?.collection_id?.assets[0]?.featured_image
+                    }
                     alt="green iguana"
                     sx={{
                       borderRadius: "15px",
