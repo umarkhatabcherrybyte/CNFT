@@ -10,51 +10,41 @@ import {
   Box,
   Typography,
 } from "@mui/material";
+// import Paper from "@mui/material/Paper";
 import Layout from "../Mint/Layout";
 import Heading from "../shared/headings/Heading";
+
 import { useWallet, useLovelace } from "@meshsdk/react";
 import { INSTANCE } from "../../config/axiosInstance";
 import styled from "styled-components";
 import { getKeyData } from "../../helper/localStorage";
 import FullScreenLoader from "../shared/FullScreenLoader";
 import { Toast } from "../shared/Toast";
-
-const ClaimTable = () => {
+import GetAdaPriceService from "/services/get-ada-price.service";
+import useFetchData from "/hooks/adaInfo";
+const ClaimTable = ({ claim }) => {
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
   const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const user_id = getKeyData("user_id");
-        const response = await INSTANCE.post("/list/find/all", {
-          user_id,
-        });
-        // setListing(response?.data?.data);
-      } catch (e) {
-        // setListing([]);
-        console.log(e);
-      }
-    };
-    if (connected) {
-      getData();
-    }
-  }, [connected]);
-  const onClaim = async (id) => {
+  const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
+  const onClaimBid = async (id) => {
     setIsLoading(true);
     try {
-      const res = await INSTANCE.post("/bid/accept", {
+      const res = await INSTANCE.post("/bid/claim", {
         bid_id: id,
       });
-      setIsLoading(false);
-      Toast("success", "Your bid has been accepted.");
+      if (res) {
+        setIsLoading(false);
+        Toast("success", "You have claim your bid.");
+        window.location.reload();
+      }
     } catch (e) {
       setIsLoading(false);
       console.log(e);
     }
   };
   return (
-    <>
+    <ClaimTableStyled>
       {isLoading && <FullScreenLoader />}
       {connected ? (
         <TableContainer sx={{ py: 4 }}>
@@ -83,18 +73,16 @@ const ClaimTable = () => {
                   background: "#3b3b3b4d",
                 }}
               >
+                <TableCell>Name</TableCell>
                 <TableCell>Price</TableCell>
-                <TableCell align="center">USD Price</TableCell>
-                <TableCell align="center">Expiration Date</TableCell>
-                {/* <TableCell align="center">From</TableCell> */}
+                <TableCell align="center">USD Price (est)</TableCell>
                 <TableCell align="center"></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {activeBids.length > 0 &&
-                activeBids.map((row) => (
+              {claim.length > 0 &&
+                claim.map((row) => (
                   <TableRow
-                    key={row.name}
                     sx={{
                       "&:last-child td, &:last-child th": {
                         border: 0,
@@ -104,20 +92,26 @@ const ClaimTable = () => {
                     }}
                   >
                     <TableCell component="th" scope="row">
-                      {row?.price}
+                      {
+                        row?.list_id?.collection_id?.assets[row.asset_index]
+                          .asset_name
+                      }
                     </TableCell>
-                    <TableCell align="center">{row?.usd}</TableCell>
-                    <TableCell align="center">
-                      In {row?.list_id?.sell_type_id?.end_time} days
+                    <TableCell component="th" scope="row">
+                      {Number(row.price)}
                     </TableCell>
-                    {/* <TableCell
-                      align="center"
-                      sx={{ color: "var(--secondary-color) !important" }}
-                    >
-                      {row?.from}
-                    </TableCell> */}
                     <TableCell align="center">
-                      <Button className="btn2" onClick={() => onClaim(row._id)}>
+                      {!adaInfo
+                        ? "..."
+                        : parseFloat(
+                            adaInfo?.current_price * row.price
+                          ).toFixed(2)}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Button
+                        className="btn2"
+                        onClick={() => onClaimBid(row._id)}
+                      >
                         Claim
                       </Button>
                     </TableCell>
@@ -133,8 +127,10 @@ const ClaimTable = () => {
           </Box>
         </Layout>
       )}
-    </>
+    </ClaimTableStyled>
   );
 };
 
 export default ClaimTable;
+
+const ClaimTableStyled = styled.section``;

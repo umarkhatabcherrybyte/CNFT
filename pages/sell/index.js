@@ -71,10 +71,10 @@ const Sell = () => {
     };
     const getClaim = async () => {
       try {
-        const response = await INSTANCE.post("/bid/lister", {
-          lister_id: user.user_id,
+        const response = await INSTANCE.post("/bid/all", {
+          user_id: user.user_id,
         });
-        setClaim([...response?.data?.data]);
+        setClaim(response?.data?.data);
       } catch (e) {
         setClaim([]);
         console.log(e);
@@ -143,11 +143,11 @@ const Sell = () => {
                 value="active"
                 className="tab_btn initialcase poppin"
               />
-              {/* <Tab
+              <Tab
                 label="Claim "
                 value="claim"
                 className="tab_btn initialcase poppin"
-              /> */}
+              />
               <img
                 src="/images/heart.png"
                 className="w_100"
