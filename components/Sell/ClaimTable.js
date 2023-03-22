@@ -40,6 +40,11 @@ const ClaimTable = ({ claim }) => {
       }
     } catch (e) {
       setIsLoading(false);
+      Toast(
+        "error",
+        "Our servers are currently processing a high volume of requests. Please try again in a few minutes."
+      );
+
       console.log(e);
     }
   };

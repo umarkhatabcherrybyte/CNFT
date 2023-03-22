@@ -48,6 +48,7 @@ export function SliderArrow(props) {
 }
 const FeatureTokenSlider = ({ nfts }) => {
   const router = useRouter();
+
   // const nftsState = useSelector(selectors.nftBreakdownState);
   // const nfts = nftsState.data ? nftsState.data : [];
   return (
@@ -85,8 +86,13 @@ const FeatureTokenSlider = ({ nfts }) => {
                     image={
                       !isVideoOrIsAudio(nft?.collection_id?.assets[0])
                         ? `https://ipfs.io/ipfs/${nft?.collection_id?.assets[0]?.ipfs}`
-                        : nft?.collection_id?.assets[0]?.featured_image
+                        : nft?.collection_id?.assets[0]?.feature_image
                     }
+                    // image={
+                    //   !isVideoOrIsAudio(nft?.collection_id?.assets[0])
+                    //     ? `https://ipfs.io/ipfs/${nft?.collection_id?.assets[0]?.ipfs}`
+                    //     : nft?.collection_id?.assets[0]?.featured_image
+                    // }
                     alt="green iguana"
                     sx={{
                       borderRadius: "15px",

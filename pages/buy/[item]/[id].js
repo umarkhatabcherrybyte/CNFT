@@ -177,6 +177,14 @@ const BuyDetail = () => {
                             : detail?.list?.collection_id?.assets[item]
                                 ?.feature_image
                         }
+                        // src={
+                        //   !isVideoOrIsAudio(
+                        //     detail?.list?.collection_id?.assets[item]
+                        //   )
+                        //     ? `https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[item]?.ipfs}`
+                        //     : detail?.list?.collection_id?.assets[item]
+                        //         ?.feature_image
+                        // }
                         alt=""
                         className="w_100 br_15 item_img"
                       />

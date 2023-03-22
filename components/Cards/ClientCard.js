@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Card, CardMedia, Typography, CardContent } from "@mui/material";
 import { ArrowForwardIos } from "@mui/icons-material";
-
+import { isVideoOrIsAudio } from "../../utils/utils";
 import styled from "styled-components";
 import { MycollectionRoute, buyDetailRoute } from "../Routes/constants";
 import { useRouter } from "next/router";
@@ -31,7 +31,13 @@ const ClientCard = ({ card }) => {
           <CardMedia
             component="img"
             height="290"
-            image={`https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`}
+            image={`/images/download.jpg`}
+            // src={
+            //   !isVideoOrIsAudio(card?.collection_id?.assets[0])
+            //     ? `https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`
+            //     : card?.collection_id?.assets[0]?.feature_image
+            // }
+
             alt="green iguana"
           />
           {/* <Box

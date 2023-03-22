@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Layout from "../../../components/Mint/Layout";
-import { CardanoWallet, useWallet } from "@meshsdk/react";
+import { CardanoWallet, useLovelace, useWallet } from "@meshsdk/react";
 import { Toast } from "../../../components/shared/Toast";
 import { createTransaction, signTransaction } from "../../../backend";
 import {
@@ -57,7 +57,7 @@ const payData = [
 
 const SingleMintStep3 = () => {
   let router = useRouter();
-
+  const lovelace = useLovelace();
   const { wallet, connected } = useWallet();
   const [currentAddr, setCurrentAddr] = useState("");
   const [selectedValue, setSelectedValue] = React.useState();
@@ -66,6 +66,11 @@ const SingleMintStep3 = () => {
     try {
       if (!connected) {
         Toast("error", "Please Connect Your Wallet First");
+      } else if (lovelace < 1000000) {
+        Toast(
+          "error",
+          "You do not have enough Ada to complete this transaction"
+        );
       } else {
         let img = window.localStorage.getItem("img");
         let connectedWallet = window.localStorage.getItem("connectedWallet");

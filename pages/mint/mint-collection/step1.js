@@ -20,7 +20,11 @@ import CaptionHeading from "/components/shared/headings/CaptionHeading";
 import LightText from "/components/shared/headings/LightText";
 import Heading from "/components/shared/headings/Heading";
 import { List } from "@mui/icons-material";
-import { mintCollectionStep2, mintRoute, mintCollectionStep3 } from "/components/Routes/constants";
+import {
+  mintCollectionStep2,
+  mintRoute,
+  mintCollectionStep3,
+} from "/components/Routes/constants";
 import { useRouter } from "next/router";
 import { create } from "ipfs-http-client";
 
@@ -97,10 +101,10 @@ const CollectionStep1 = () => {
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => { })
+      UploadService.uploadMeta(file, path, (event) => {})
         .then((response) => {
           if (response.data.data.length > 0) {
-            console.log(response.data.data, 'dara')
+            console.log(response.data.data, "dara");
             setMetadataObjectsFromFile(response.data.data || []);
             window.localStorage.setItem(
               "metadataObjects",
@@ -149,7 +153,7 @@ const CollectionStep1 = () => {
           }
         }
         setImagePaths(arr);
-        setMetadataFileUploaded(true)
+        setMetadataFileUploaded(true);
         Toast("success", "Files Uploaded Successfully");
       } catch (error) {
         console.log(error, "err");
@@ -166,13 +170,11 @@ const CollectionStep1 = () => {
     // debugger
     if (!isWebform && metadataObjectsFromFile.length > 0) {
       router.push(mintCollectionStep3);
-      return
-    }
-    else if (!metadataFileUploaded) {
+      return;
+    } else if (!metadataFileUploaded) {
       Toast("error", "please upload NFT files first");
       return;
-    }
-    else if (imagePaths.length == 0) {
+    } else if (imagePaths.length == 0) {
       console.log(
         objs.length != imagePaths.length,
         objs.length,
@@ -192,9 +194,7 @@ const CollectionStep1 = () => {
     } else if (!isWebform && metadataObjects.length != imagePaths.length) {
       Toast("error", "missing metadata of some Files");
       return;
-    }
-
-    else if (
+    } else if (
       !isWebform &&
       metadataObjects.length == imagePaths.length &&
       metadataFileUploaded
@@ -208,7 +208,7 @@ const CollectionStep1 = () => {
         "metadataObjectsProperties",
         JSON.stringify(metadataObjectProperties)
       );
-      router.push(mintCollectionStep2);
+      router.push(mintCollectionStep3);
     } else if (isWebform) {
       window.localStorage.setItem("images", JSON.stringify(imagePaths));
       window.localStorage.setItem("metadataObjects", JSON.stringify(objs));
@@ -216,7 +216,7 @@ const CollectionStep1 = () => {
         "metadataObjectsProperties",
         JSON.stringify(metadataObjectProperties)
       );
-      router.push(mintCollectionStep2);
+      router.push(mintCollectionStep3);
     }
   }
 
@@ -299,7 +299,7 @@ const CollectionStep1 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => { })
+    UploadService.downloadMetafile(path, (event) => {})
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");

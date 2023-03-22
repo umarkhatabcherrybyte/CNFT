@@ -4,6 +4,7 @@ import { Box, Card, CardMedia, Typography, CardContent } from "@mui/material";
 import { auctionDetailRoute } from "../Routes/constants";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
+import { isVideoOrIsAudio } from "../../utils/utils";
 const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
   ssr: false,
 });
@@ -36,7 +37,12 @@ const DetailCard = ({ card }) => {
             <CardMedia
               component="img"
               height="290"
-              image={`https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`}
+              src={
+                !isVideoOrIsAudio(card.collection_id?.assets[0])
+                  ? `https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`
+                  : card?.collection_id?.assets[0]?.feature_image
+              }
+              // image={`https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`}
               alt="green iguana"
             />
             <Box sx={{ position: "absolute", bottom: "10px" }}></Box>
