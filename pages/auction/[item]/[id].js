@@ -28,6 +28,7 @@ const cardData = [{}, {}, {}, {}];
 
 const AuctionDetail = () => {
   const router = useRouter();
+
   const { id, item } = router.query;
   const [open, setOpen] = useState(false);
   const [isSuccessModal, setIsSuccessModal] = useState(false);

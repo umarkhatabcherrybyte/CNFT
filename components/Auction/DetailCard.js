@@ -37,11 +37,12 @@ const DetailCard = ({ card }) => {
             <CardMedia
               component="img"
               height="290"
-              src={
-                !isVideoOrIsAudio(card.collection_id?.assets[0])
-                  ? `https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`
-                  : card?.collection_id?.assets[0]?.feature_image
-              }
+              // src={
+              //   !isVideoOrIsAudio(card.collection_id?.assets[0])
+              //     ? `https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`
+              //     : card?.collection_id?.assets[0]?.feature_image
+              // }
+              src="/images/download.jpg"
               // image={`https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`}
               alt="green iguana"
             />

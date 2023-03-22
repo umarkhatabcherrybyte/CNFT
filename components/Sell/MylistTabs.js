@@ -23,7 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { create } from "ipfs-http-client";
 import { setListing } from "../../redux/listing/ListingActions";
 import { setStep } from "../../redux/listing/ListingActions";
-import { CardanoWallet, useWallet } from "@meshsdk/react";
+import { CardanoWallet, useLovelace, useWallet } from "@meshsdk/react";
 import { Toast } from "../shared/Toast";
 import { INSTANCE } from "../../config/axiosInstance";
 import FullScreenLoader from "../shared/FullScreenLoader";
@@ -73,6 +73,7 @@ const MylistTabs = () => {
   // console.log(listing);
   const dispatch = useDispatch();
   const router = useRouter();
+  const lovelace = useLovelace();
   const [tabValue, setTabValue] = useState("add");
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
@@ -96,107 +97,148 @@ const MylistTabs = () => {
       try {
         console.log(values, "values");
         if (connected) {
-          setIsLoading(true);
-          let connectedWallet = window.localStorage.getItem("connectedWallet");
-          if (values.file != null || values.file != undefined) {
-            const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
-            const projectSecret = "136393a5b7f4e47a9e153a88eb636003";
-            const auth = `Basic ${Buffer.from(
-              `${projectId}:${projectSecret}`
-            ).toString("base64")}`;
-            const client = create({
-              host: "ipfs.infura.io",
-              port: 5001,
-              protocol: "https",
-              headers: {
-                authorization: auth,
-              },
-            });
-            const uploaded_image = await client.add(values.file);
-            if (uploaded_image) {
-              // console.log(uploaded_image, "img");
-
-              const transferLucid = await Lucid.new(
-                new Blockfrost(
-                  "https://cardano-preprod.blockfrost.io/api/v0",
-                  "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
-                ),
-                "Preprod"
-              );
-
-              transferLucid.selectWalletFromSeed(
-                "cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise"
-              );
-
-              const lucidBrowser = await Lucid.new(
-                new Blockfrost(
-                  "https://cardano-preprod.blockfrost.io/api/v0",
-                  "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
-                ),
-                "Preprod"
-              );
-
-              const api = await window.cardano[
-                String(connectedWallet)
-              ].enable();
-              lucidBrowser.selectWallet(api);
-
-              const { paymentCredential } =
-                lucidBrowser.utils.getAddressDetails(
-                  await lucidBrowser.wallet.address()
-                );
-              const mintingPolicy = lucidBrowser.utils.nativeScriptFromJson({
-                type: "all",
-                scripts: [
-                  { type: "sig", keyHash: paymentCredential?.hash },
-                  {
-                    type: "before",
-                    slot: lucidBrowser.utils.unixTimeToSlot(
-                      Date.now() + 518400000
-                    ),
-                  },
-                ],
+          if (lovelace < 1000000) {
+            Toast(
+              "error",
+              "You do not have enough Ada to complete this transaction"
+            );
+            return;
+          } else {
+            setIsLoading(true);
+            let connectedWallet =
+              window.localStorage.getItem("connectedWallet");
+            if (values.file != null || values.file != undefined) {
+              const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
+              const projectSecret = "136393a5b7f4e47a9e153a88eb636003";
+              const auth = `Basic ${Buffer.from(
+                `${projectId}:${projectSecret}`
+              ).toString("base64")}`;
+              const client = create({
+                host: "ipfs.infura.io",
+                port: 5001,
+                protocol: "https",
+                headers: {
+                  authorization: auth,
+                },
               });
+              const uploaded_image = await client.add(values.file);
+              if (uploaded_image) {
+                // console.log(uploaded_image, "img");
 
-              const policyId =
-                lucidBrowser.utils.mintingPolicyToId(mintingPolicy);
-              // console.log(mintingPolicy, policyId, "pm");
-              let metadataX = {};
-              let metadata = {
-                name: values.name,
-                image: `ipfs://${uploaded_image.path}`,
-                mediaType: values.file.type,
-              };
-              if (values.description.length > 0) {
-                metadata["description"] = values.description;
-              }
-              metadataX[metadata.name] = metadata;
-              // console.log(metadataX, "dsadasd");
-              const unit = policyId + fromText(metadata.name);
+                const transferLucid = await Lucid.new(
+                  new Blockfrost(
+                    "https://cardano-preprod.blockfrost.io/api/v0",
+                    "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+                  ),
+                  "Preprod"
+                );
 
-              let obj = { [policyId]: metadataX };
-              // console.log(obj, "obj");
-              const tx = await lucidBrowser
-                .newTx()
-                .attachMetadata("721", obj)
-                .mintAssets({ [unit]: 1n })
-                .payToAddress(await transferLucid.wallet.address(), {
-                  [unit]: 1n,
-                })
-                .validTo(Date.now() + 100000)
-                .attachMintingPolicy(mintingPolicy)
-                .complete();
-              const signedTx = await tx.sign().complete();
-              const txHash = await signedTx.submit();
-              // console.log(txHash, "hasg");
-              if (txHash) {
-                //  api call
+                transferLucid.selectWalletFromSeed(
+                  "cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise"
+                );
 
-                if (values.imageFile) {
-                  var reader = new FileReader();
-                  reader.readAsDataURL(values.imageFile);
-                  reader.onload = async () => {
-                    const file3DataURL = reader.result;
+                const lucidBrowser = await Lucid.new(
+                  new Blockfrost(
+                    "https://cardano-preprod.blockfrost.io/api/v0",
+                    "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+                  ),
+                  "Preprod"
+                );
+
+                const api = await window.cardano[
+                  String(connectedWallet)
+                ].enable();
+                lucidBrowser.selectWallet(api);
+
+                const { paymentCredential } =
+                  lucidBrowser.utils.getAddressDetails(
+                    await lucidBrowser.wallet.address()
+                  );
+                const mintingPolicy = lucidBrowser.utils.nativeScriptFromJson({
+                  type: "all",
+                  scripts: [
+                    { type: "sig", keyHash: paymentCredential?.hash },
+                    {
+                      type: "before",
+                      slot: lucidBrowser.utils.unixTimeToSlot(
+                        Date.now() + 518400000
+                      ),
+                    },
+                  ],
+                });
+
+                const policyId =
+                  lucidBrowser.utils.mintingPolicyToId(mintingPolicy);
+                // console.log(mintingPolicy, policyId, "pm");
+                let metadataX = {};
+                let metadata = {
+                  name: values.name,
+                  image: `ipfs://${uploaded_image.path}`,
+                  mediaType: values.file.type,
+                };
+                if (values.description.length > 0) {
+                  metadata["description"] = values.description;
+                }
+                metadataX[metadata.name] = metadata;
+                // console.log(metadataX, "dsadasd");
+                const unit = policyId + fromText(metadata.name);
+
+                let obj = { [policyId]: metadataX };
+                // console.log(obj, "obj");
+                const tx = await lucidBrowser
+                  .newTx()
+                  .attachMetadata("721", obj)
+                  .mintAssets({ [unit]: 1n })
+                  .payToAddress(await transferLucid.wallet.address(), {
+                    [unit]: 1n,
+                  })
+                  .validTo(Date.now() + 100000)
+                  .attachMintingPolicy(mintingPolicy)
+                  .complete();
+                const signedTx = await tx.sign().complete();
+                const txHash = await signedTx.submit();
+                // console.log(txHash, "hasg");
+                if (txHash) {
+                  //  api call
+
+                  if (values.imageFile) {
+                    var reader = new FileReader();
+                    reader.readAsDataURL(values.imageFile);
+                    reader.onload = async () => {
+                      const file3DataURL = reader.result;
+                      try {
+                        const user_id = window.localStorage.getItem("user_id");
+                        metadata["unit"] = unit;
+                        metadata["ipfs"] = uploaded_image.path;
+                        const data = {
+                          metadata: [metadata],
+                          user_id: user_id,
+                          recipient_address: recipientAddress,
+                          policy_id: policyId,
+                          type: "single",
+                          minting_policy: JSON.stringify(mintingPolicy),
+                          image_file: file3DataURL,
+                        };
+                        const res = await INSTANCE.post(
+                          "/collection/create",
+                          data
+                        );
+                        if (res) {
+                          setIsLoading(false);
+                          dispatch(setStep("step2"));
+                          // dispatch(setListing())
+                          window.localStorage.setItem(
+                            "listing",
+                            JSON.stringify(res?.data.data)
+                          );
+                        }
+                      } catch (e) {
+                        setIsLoading(false);
+
+                        console.log(e);
+                      }
+                    };
+                  } else {
                     try {
                       const user_id = window.localStorage.getItem("user_id");
                       metadata["unit"] = unit;
@@ -208,7 +250,7 @@ const MylistTabs = () => {
                         policy_id: policyId,
                         type: "single",
                         minting_policy: JSON.stringify(mintingPolicy),
-                        image_file: file3DataURL,
+                        image_file: "",
                       };
                       const res = await INSTANCE.post(
                         "/collection/create",
@@ -228,48 +270,19 @@ const MylistTabs = () => {
 
                       console.log(e);
                     }
-                  };
-                } else {
-                  try {
-                    const user_id = window.localStorage.getItem("user_id");
-                    metadata["unit"] = unit;
-                    metadata["ipfs"] = uploaded_image.path;
-                    const data = {
-                      metadata: [metadata],
-                      user_id: user_id,
-                      recipient_address: recipientAddress,
-                      policy_id: policyId,
-                      type: "single",
-                      minting_policy: JSON.stringify(mintingPolicy),
-                      image_file: "",
-                    };
-                    const res = await INSTANCE.post("/collection/create", data);
-                    if (res) {
-                      setIsLoading(false);
-                      dispatch(setStep("step2"));
-                      // dispatch(setListing())
-                      window.localStorage.setItem(
-                        "listing",
-                        JSON.stringify(res?.data.data)
-                      );
-                    }
-                  } catch (e) {
-                    setIsLoading(false);
-
-                    console.log(e);
                   }
-                }
 
-                //
-                // window.localStorage.setItem("policy-id", policyId);
-                // window.localStorage.setItem(
-                //   "minting-script",
-                //   JSON.stringify(mintingPolicy)
-                // );
+                  //
+                  // window.localStorage.setItem("policy-id", policyId);
+                  // window.localStorage.setItem(
+                  //   "minting-script",
+                  //   JSON.stringify(mintingPolicy)
+                  // );
+                }
               }
+            } else {
+              Toast("error", "Please connect your wallet first");
             }
-          } else {
-            Toast("error", "Please connect your wallet first");
           }
         } else {
           Toast("error", "Connect Your Wallet First");

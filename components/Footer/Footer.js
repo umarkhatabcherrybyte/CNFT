@@ -48,7 +48,7 @@ const Footer = () => {
                 </ul>
               </Box>
             </Grid> */}
-            {/* <Grid item md={2.5} sm={6} xs={12}>
+            <Grid item md={2.5} sm={6} xs={12}>
               <Box className="widget">
                 <Typography
                   className="text_white title proxima"
@@ -59,23 +59,23 @@ const Footer = () => {
                 </Typography>
                 <ul>
                   <li>
-                    <Link to="">All NFTs</Link>
+                    <Link href="/">All NFTs</Link>
                   </li>
                   <li>
-                    <Link to="">Art</Link>
+                    <Link href="/">Art</Link>
                   </li>
                   <li>
-                    <Link to="">Photo</Link>
+                    <Link href="/">Photo</Link>
                   </li>
                   <li>
-                    <Link to="">Music</Link>
+                    <Link href="/">Music</Link>
                   </li>
                   <li>
-                    <Link to="">Video</Link>
+                    <Link href="/">Video</Link>
                   </li>
                 </ul>
               </Box>
-            </Grid> */}
+            </Grid>
             <Grid item md={2.5} sm={6} xs={12}>
               <Box className="widget">
                 <Typography
@@ -92,9 +92,9 @@ const Footer = () => {
                   <li>
                     <Link href={termConditionRoute}>Terms and Condition</Link>
                   </li>
-                  <li>
+                  {/* <li>
                     <Link href="/auction">Auctions</Link>
-                  </li>
+                  </li> */}
                   {/* <li>
                     <Link to="">Royalty System</Link>
                   </li>

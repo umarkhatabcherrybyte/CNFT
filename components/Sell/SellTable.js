@@ -47,43 +47,43 @@ const SellTable = ({ activeBids }) => {
     <SellTableStyled>
       {isLoading && <FullScreenLoader />}
       {connected ? (
-        <TableContainer sx={{ py: 4 }}>
-          <Box
-            sx={{
-              background: "var(--secondary-color)",
-              borderRadius: "15px 15px 0 0",
-            }}
-          >
-            <Typography variant="h6" className="bold" sx={{ py: 2, px: 2 }}>
-              Bids Placed On Your NFT
-            </Typography>
-          </Box>
-          <Table
-            aria-label="simple table"
-            sx={{
-              minWidth: 650,
-              "& .MuiTableCell-root": {
-                color: "#fff",
-              },
-            }}
-          >
-            <TableHead>
-              <TableRow
-                sx={{
-                  background: "#3b3b3b4d",
-                }}
-              >
-                <TableCell>Name</TableCell>
-                <TableCell>Price</TableCell>
-                <TableCell align="center">USD Price (est)</TableCell>
-                <TableCell align="center">Expiration Date</TableCell>
-                {/* <TableCell align="center">From</TableCell> */}
-                <TableCell align="center"></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {activeBids.length > 0 &&
-                activeBids.map((row) =>
+        activeBids.length > 0 ? (
+          <TableContainer sx={{ py: 4 }}>
+            <Box
+              sx={{
+                background: "var(--secondary-color)",
+                borderRadius: "15px 15px 0 0",
+              }}
+            >
+              <Typography variant="h6" className="bold" sx={{ py: 2, px: 2 }}>
+                Bids Placed On Your NFT
+              </Typography>
+            </Box>
+            <Table
+              aria-label="simple table"
+              sx={{
+                minWidth: 650,
+                "& .MuiTableCell-root": {
+                  color: "#fff",
+                },
+              }}
+            >
+              <TableHead>
+                <TableRow
+                  sx={{
+                    background: "#3b3b3b4d",
+                  }}
+                >
+                  <TableCell>Name</TableCell>
+                  <TableCell>Price</TableCell>
+                  <TableCell align="center">USD Price (est)</TableCell>
+                  <TableCell align="center">Expiration Date</TableCell>
+                  {/* <TableCell align="center">From</TableCell> */}
+                  <TableCell align="center"></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {activeBids.map((row) =>
                   row?.list_id?.collection_id?.assets.map((item, index) => {
                     if (index == row.asset_index) {
                       return (
@@ -125,13 +125,23 @@ const SellTable = ({ activeBids }) => {
                           </TableCell>
                         </TableRow>
                       );
-
                     }
                   })
                 )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ) : (
+          <Box
+            sx={{
+              img: {
+                width: "100%",
+              },
+            }}
+          >
+            <img src="/images/no_bid.png" />
+          </Box>
+        )
       ) : (
         <Layout>
           <Box className="flex_align_center">

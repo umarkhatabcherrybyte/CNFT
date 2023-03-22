@@ -6,6 +6,7 @@ import {
   Typography,
   CardMedia,
   CardContent,
+  Button,
 } from "@mui/material";
 import { Settings } from "@mui/icons-material";
 import styled from "styled-components";
@@ -134,34 +135,34 @@ const MyListCard = () => {
                       >
                         {card?.name}
                       </Typography>
-                      {
-                        card?.price > 0 ?
-                          <Box className="space_between">
-                            {/* <CaptionHeading heading="julian_jokey" /> */}
+                      {card?.price > 0 ? (
+                        <Box className="space_between">
+                          {/* <CaptionHeading heading="julian_jokey" /> */}
+                          <Typography
+                            gutterBottom
+                            variant="body"
+                            component="div"
+                            sx={{ color: "var(--secondary-color)" }}
+                            className="bold flex"
+                          >
+                            {card?.price}
                             <Typography
-                              gutterBottom
-                              variant="body"
+                              variant="caption"
                               component="div"
-                              sx={{ color: "var(--secondary-color)" }}
-                              className="bold flex"
+                              sx={{
+                                color: "var(--secondary-color)",
+                                fontSize: "10px",
+                                pl: 1,
+                              }}
+                              className="bold"
                             >
-                              {card?.price}
-                              <Typography
-                                variant="caption"
-                                component="div"
-                                sx={{
-                                  color: "var(--secondary-color)",
-                                  fontSize: "10px",
-                                  pl: 1,
-                                }}
-                                className="bold"
-                              >
-                                ADA
-                              </Typography>
+                              ADA
                             </Typography>
-                          </Box> :
-                          <></>
-                      }
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <></>
+                      )}
                     </CardContent>
                     {/* {card?.sell_model != "FixedPrice" && (
                       <CardContent
@@ -188,11 +189,27 @@ const MyListCard = () => {
             </Layout>
           )
         ) : (
-          <Layout>
-            <Box className="flex_align_center">
-              <Heading heading="Please connect your wallet first." />
-            </Box>
-          </Layout>
+          <Box
+            className="flex_align_center"
+            sx={{
+              position: "relative",
+              img: {
+                width: "100%",
+              },
+            }}
+          >
+            <img
+              src="/images/no_list.png"
+              onClick={(e) => {
+                router.push({
+                  pathname: "/sell",
+                  query: {
+                    type: "add-listing",
+                  },
+                });
+              }}
+            />
+          </Box>
         )}
       </Box>
     </MyListCardStyled>

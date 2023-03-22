@@ -33,6 +33,7 @@ import {
 import { costLovelace, bankWalletAddress } from "../../../config/utils";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { INSTANCE } from "/config/axiosInstance";
+import FullScreenLoader from "/components/shared/FullScreenLoader";
 
 const payData = [
   // {
@@ -61,6 +62,7 @@ const SingleMintStep3 = () => {
   const { wallet, connected } = useWallet();
   const [currentAddr, setCurrentAddr] = useState("");
   const [selectedValue, setSelectedValue] = React.useState();
+  const [isLoading, setIsLoading] = useState(false);
 
   const onMint = async () => {
     try {
@@ -78,6 +80,8 @@ const SingleMintStep3 = () => {
           Toast("error", "Please Select an Option for Minting");
         } else if (img && connected) {
           if (selectedValue == "a") {
+            setIsLoading(true);
+
             const lucid = await Lucid.new(
               new Blockfrost(
                 "https://cardano-preprod.blockfrost.io/api/v0",
@@ -147,12 +151,16 @@ const SingleMintStep3 = () => {
                     JSON.stringify(mintingPolicy)
                   );
                   router.push("/mint");
+                  setIsLoading(false);
                 }
               } catch (e) {
+                setIsLoading(false);
+
                 console.log(e);
               }
             }
           } else if (selectedValue == "b") {
+            setIsLoading(true);
             const lucid = await Lucid.new(
               new Blockfrost(
                 "https://cardano-preprod.blockfrost.io/api/v0",
@@ -222,12 +230,18 @@ const SingleMintStep3 = () => {
                     JSON.stringify(mintingPolicy)
                   );
                   router.push("/mint");
+                  setIsLoading(false);
                 }
               } catch (e) {
+                setIsLoading(false);
+
                 console.log(e);
               }
             }
+            setIsLoading(false);
           } else if (selectedValue == "c") {
+            setIsLoading(true);
+
             const lucid = await Lucid.new(
               new Blockfrost(
                 "https://cardano-preprod.blockfrost.io/api/v0",
@@ -298,9 +312,11 @@ const SingleMintStep3 = () => {
                     JSON.stringify(mintingPolicy)
                   );
                   router.push("/mint");
+                  setIsLoading(false);
                 }
               } catch (e) {
                 console.log(e);
+                setIsLoading(false);
               }
             }
           }
@@ -311,6 +327,7 @@ const SingleMintStep3 = () => {
     } catch (error) {
       console.log("error", error);
       Toast("error", "Error Occured while Minting");
+      setIsLoading(false);
     }
   };
 

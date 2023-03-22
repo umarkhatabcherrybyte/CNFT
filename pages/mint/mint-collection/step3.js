@@ -22,7 +22,7 @@ import { useRouter } from "next/router";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { INSTANCE } from "/config/axiosInstance";
 import { costLovelace, bankWalletAddress } from "../../../config/utils";
-
+import FullScreenLoader from "/components/shared/FullScreenLoader";
 const payData = [
   // {
   // 	title: "Mint for free and list with us ",
@@ -50,7 +50,7 @@ const CollectionStep3 = () => {
   const { wallet, connected } = useWallet();
   const [currentAddr, setCurrentAddr] = useState("");
   const [selectedValue, setSelectedValue] = React.useState();
-
+  const [isLoading, setIsLoading] = useState(false);
   const onMint = async () => {
     try {
       let connectedWallet = window.localStorage.getItem("connectedWallet");
@@ -67,6 +67,7 @@ const CollectionStep3 = () => {
           return;
         } else {
           if (selectedValue == "a") {
+            setIsLoading(true);
             let metadata_objs = JSON.parse(
               window.localStorage.getItem("metadataObjects")
             );
@@ -160,7 +161,9 @@ const CollectionStep3 = () => {
                 router.push("/mint");
               }
             }
+            setIsLoading(false);
           } else if (selectedValue == "b") {
+            setIsLoading(true);
             let metadata_objs = JSON.parse(
               window.localStorage.getItem("metadataObjects")
             );
@@ -252,7 +255,9 @@ const CollectionStep3 = () => {
                 router.push("/mint");
               }
             }
+            setIsLoading(false);
           } else if (selectedValue == "c") {
+            setIsLoading(true);
             if (currentAddr.length > 0) {
               let metadata_objs = JSON.parse(
                 window.localStorage.getItem("metadataObjects")
@@ -350,6 +355,7 @@ const CollectionStep3 = () => {
             } else {
               Toast("error", "Please Set the Recipeint Address");
             }
+            setIsLoading(false);
           }
         }
       } else {
@@ -358,12 +364,14 @@ const CollectionStep3 = () => {
     } catch (error) {
       console.log("error", error);
       Toast("error", "Error Occured while Minting");
+      setIsLoading(false);
     }
   };
 
   return (
     <SingleMintStep3Styled>
       <Strips />
+      {isLoading && <FullScreenLoader />}
       <Baloon />
       <Container>
         <Box sx={{ pt: 15, pb: 3 }} className="text_white">

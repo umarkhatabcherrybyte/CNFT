@@ -49,6 +49,7 @@ const tabData = [
 ];
 const BuyDetail = () => {
   const router = useRouter();
+  const lovelace = useLovelace();
   const { id, item } = router.query;
   const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
   const [open, setOpen] = useState(false);
@@ -78,58 +79,70 @@ const BuyDetail = () => {
 
   const onBuy = async (e) => {
     if (connected) {
-      try {
-        const user_address = getKeyData("user_address");
-        const connectedWallet = getKeyData("connectedWallet");
-        const address = detail.list?.collection_id?.recipient_address;
-        const lovelace = detail.list?.sell_type_id?.price * 1000000;
-        const user_value = Number(lovelace * 0.975);
-        const owner_value = Number(lovelace * 0.025);
-        const owner_address =
-          "addr_test1qpm6srkw5vndavk72khy58cht0f0u796xdmwq9kfu2j63064cwwrleufnnz36s8v0pk0l54kvfn3m7et69xxsvh4ajus55y7tq";
-        const lucid = await Lucid.new(
-          new Blockfrost(
-            "https://cardano-preprod.blockfrost.io/api/v0",
-            "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
-          ),
-          "Preprod"
+      const price =
+        detail.list?.mint_type === "single"
+          ? detail.list?.sell_type_id?.price
+          : detail.list?.collection_id?.assets[item]?.price;
+      if (lovelace < price * 1000000) {
+        Toast(
+          "error",
+          "You do not have enough Ada to complete this transaction"
         );
-        const api = await window.cardano[String(connectedWallet)].enable();
-        lucid.selectWallet(api);
-        console.log(await lucid.wallet.address());
+        return;
+      } else {
+        try {
+          const user_address = getKeyData("user_address");
+          const connectedWallet = getKeyData("connectedWallet");
+          const address = detail.list?.collection_id?.recipient_address;
+          const lovelace = detail.list?.sell_type_id?.price * 1000000;
+          const user_value = Number(lovelace * 0.975);
+          const owner_value = Number(lovelace * 0.025);
+          const owner_address =
+            "addr_test1qpm6srkw5vndavk72khy58cht0f0u796xdmwq9kfu2j63064cwwrleufnnz36s8v0pk0l54kvfn3m7et69xxsvh4ajus55y7tq";
+          const lucid = await Lucid.new(
+            new Blockfrost(
+              "https://cardano-preprod.blockfrost.io/api/v0",
+              "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+            ),
+            "Preprod"
+          );
+          const api = await window.cardano[String(connectedWallet)].enable();
+          lucid.selectWallet(api);
+          console.log(await lucid.wallet.address());
 
-        const tx = await lucid
-          .newTx()
-          .payToAddress(address, { lovelace: BigInt(user_value) })
-          .payToAddress(owner_address, {
-            lovelace: BigInt(owner_value),
-          })
-          .validTo(Date.now() + 100000)
-          .complete();
-        console.log(tx);
-        const signedTx = await tx.sign().complete();
-        const txHash = await signedTx.submit();
-        if (txHash) {
-          try {
-            const res = await INSTANCE.post("/list/approve", {
-              list_id: id,
-              index: item,
-              recipient_address: user_address,
-            });
-            if (res) {
-              Toast("success", "NFT Transfered to Your Wallet");
-              router.push("/buy");
+          const tx = await lucid
+            .newTx()
+            .payToAddress(address, { lovelace: BigInt(user_value) })
+            .payToAddress(owner_address, {
+              lovelace: BigInt(owner_value),
+            })
+            .validTo(Date.now() + 100000)
+            .complete();
+          console.log(tx);
+          const signedTx = await tx.sign().complete();
+          const txHash = await signedTx.submit();
+          if (txHash) {
+            try {
+              const res = await INSTANCE.post("/list/approve", {
+                list_id: id,
+                index: item,
+                recipient_address: user_address,
+              });
+              if (res) {
+                Toast("success", "NFT Transfered to Your Wallet");
+                router.push("/buy");
+              }
+            } catch (e) {
+              Toast("error", "Try again later.");
             }
-          } catch (e) {
-            Toast("error", "Try again later.");
+            // window.localStorage.setItem('policy', mintingPolicy.script)
+            // window.localStorage.setItem('policy-id', policyId)
+            // window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
+            // router.push('/mint')
           }
-          // window.localStorage.setItem('policy', mintingPolicy.script)
-          // window.localStorage.setItem('policy-id', policyId)
-          // window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
-          // router.push('/mint')
+        } catch (e) {
+          console.log(e, "errro");
         }
-      } catch (e) {
-        console.log(e, "errro");
       }
     } else {
       Toast("error", "Please connect your wallet.");
