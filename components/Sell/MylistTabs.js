@@ -62,7 +62,7 @@ const MylistTabs = () => {
         });
 
         if (res) {
-          console.log(res.data);
+          // console.log(res.data);
           setLists(res.data.data);
         }
       }
@@ -95,7 +95,7 @@ const MylistTabs = () => {
     validationSchema: addSingleListingSchema,
     onSubmit: async (values) => {
       try {
-        console.log(values, "values");
+        // console.log(values, "values");
         if (connected) {
           if (lovelace < 1000000) {
             Toast(
@@ -295,7 +295,7 @@ const MylistTabs = () => {
       }
     },
   });
-  console.log(formik.values);
+  // console.log(formik.values);
   const onMintFileChange = (e) => {
     if (e.currentTarget.files[0]) {
       formik.setFieldValue("file", e.currentTarget.files[0]);

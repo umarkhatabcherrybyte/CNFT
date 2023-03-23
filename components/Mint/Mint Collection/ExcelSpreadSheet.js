@@ -67,12 +67,12 @@ const ExcelSpreadSheet = ({
   }
 
   const addTableCol = () => {
-    console.log('here')
+    // console.log('here')
     let metadataObjectsClone = [...metadataObjects]
     for (let index = 0; index < metadataObjectsClone.length; index++) {
       let length = Object.keys(metadataObjectsClone[index]).length + 1
       let name = `dummy` + length
-      console.log(name, 'ddasd')
+      // console.log(name, 'ddasd')
       metadataObjectsClone[index][name] = "";
     }
     setMetadataObjects(metadataObjectsClone)
@@ -88,7 +88,7 @@ const ExcelSpreadSheet = ({
   }
 
   const deleteTableCol = (propIndex) => {
-    console.log(propIndex, 'indexx')
+    // console.log(propIndex, 'indexx')
     let metadata = [...metadataObjectProperties]
     let metadataObjectsClone = [...metadataObjects]
     if (propIndex !== -1) {

@@ -38,9 +38,9 @@ const AuctionDetail = () => {
 
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
-  console.log(detail, "sdada dasdas");
+  // console.log(detail, "sdada dasdas");
   const getData = async () => {
-    console.log("Sdsdadasdasdsad");
+    // console.log("Sdsdadasdasdsad");
     setIsLoading(true);
     try {
       const res = await INSTANCE.get(`/list/get/${item}/${id}`);

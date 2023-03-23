@@ -88,7 +88,7 @@ const WalletDropdown = () => {
 
         let res = await UserService.signIn(addrss[0]);
         if (res.data) {
-          console.log(res.data);
+          // console.log(res.data);
           window.localStorage.setItem("user_id", res.data.data._id);
           dispatch(setUser(res.data.data._id));
         }

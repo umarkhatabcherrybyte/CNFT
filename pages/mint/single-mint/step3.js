@@ -112,7 +112,7 @@ const SingleMintStep3 = () => {
             let metadataX = {};
             let metadata = JSON.parse(window.localStorage.getItem("metadata"));
             metadataX[metadata.name] = metadata;
-            console.log(metadataX, "dsadasd");
+            // console.log(metadataX, "dsadasd");
 
             const unit = policyId + fromText(metadata.name);
             let obj = { [policyId]: metadataX };
@@ -191,7 +191,7 @@ const SingleMintStep3 = () => {
             let metadataX = {};
             let metadata = JSON.parse(window.localStorage.getItem("metadata"));
             metadataX[metadata.name] = metadata;
-            console.log(metadataX, "dsadasd");
+            // console.log(metadataX, "dsadasd");
 
             const unit = policyId + fromText(metadata.name);
             let obj = { [policyId]: metadataX };
@@ -272,7 +272,7 @@ const SingleMintStep3 = () => {
             let metadataX = {};
             let metadata = JSON.parse(window.localStorage.getItem("metadata"));
             metadataX[metadata.name] = metadata;
-            console.log(metadataX, "dsadasd");
+            // console.log(metadataX, "dsadasd");
             const unit = policyId + fromText(metadata.name);
             let obj = { [policyId]: metadataX };
             const tx = await lucid

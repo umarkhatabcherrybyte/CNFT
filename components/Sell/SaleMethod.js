@@ -89,10 +89,10 @@ const SaleMethod = () => {
           // formData.append("user_id", listing_data?.user_id);
           // formData.append("nft_ids", JSON.stringify([listing_data._id]));
           // formData.append("mint_type", listing_data.type);
-          console.log({
-            ...price_data,
-            ...data,
-          })
+          // console.log({
+          //   ...price_data,
+          //   ...data,
+          // })
           // debugger
           const res = await INSTANCE.post("/list/create", {
             ...price_data,

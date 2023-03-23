@@ -45,13 +45,13 @@ const Auction = ({ setIsForm, setTotalAmount }) => {
   const onAuctionArrowChange = (e, val) => {
     if (val === "up") {
       if (auctionDuration.days || auctionDuration.days === 1) {
-        console.log("if");
+        // console.log("if");
         setAuctionDuration({
           ...auctionDuration,
           days: parseInt(auctionDuration.days) + 1,
         });
       } else {
-        console.log("else");
+        // console.log("else");
         setAuctionDuration({
           ...auctionDuration,
           days: 1,

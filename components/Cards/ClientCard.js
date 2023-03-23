@@ -32,11 +32,11 @@ const ClientCard = ({ card }) => {
             component="img"
             height="290"
             image={`/images/download.jpg`}
-            // src={
-            //   !isVideoOrIsAudio(card?.collection_id?.assets[0])
-            //     ? `https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`
-            //     : card?.collection_id?.assets[0]?.feature_image
-            // }
+            src={
+              !isVideoOrIsAudio(card?.collection_id?.assets[0])
+                ? `https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`
+                : card?.collection_id?.assets[0]?.feature_image
+            }
 
             alt="green iguana"
           />

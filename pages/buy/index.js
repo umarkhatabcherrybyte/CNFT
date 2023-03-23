@@ -35,7 +35,7 @@ const Buy = () => {
           mint_type: tabValue,
           ...filter,
         });
-        console.log("filter");
+        // console.log("filter");
 
         setBuy([...res?.data?.data]);
         setIsLoading(false);
@@ -43,7 +43,7 @@ const Buy = () => {
         setBuy([]);
         setIsLoading(false);
 
-        console.log("filter error");
+        // console.log("filter error");
       }
     };
     getData();

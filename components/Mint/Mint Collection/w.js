@@ -23,7 +23,7 @@ const ExcelSpreadSheet = ({ checked }) => {
     const [rowsData, setRowsData] = useState([]);
 
     useEffect(() => {
-        console.log('yo')
+        // console.log('yo')
     }, [metadataObject])
 
     const addTableRow = () => {
@@ -76,7 +76,7 @@ const ExcelSpreadSheet = ({ checked }) => {
 
     const handleChange = (index, evnt) => {
         const { name, value } = evnt.target;
-        console.log(name, value, 'dasdas')
+        // console.log(name, value, 'dasdas')
         const rowsInput = [...rowsData];
         // console.log(rowsInput[index])
         // rowsInput[index][name] = value;

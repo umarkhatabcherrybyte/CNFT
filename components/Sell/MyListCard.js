@@ -52,7 +52,7 @@ const MyListCard = () => {
   }, [connected, user_id]);
 
   const navigationHandler = (type, id, model) => {
-    console.log(type);
+    // console.log(type);
     const route =
       type === "single"
         ? model === "Auction"

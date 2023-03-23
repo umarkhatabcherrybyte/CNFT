@@ -104,7 +104,7 @@ const CollectionStep1 = () => {
       UploadService.uploadMeta(file, path, (event) => {})
         .then((response) => {
           if (response.data.data.length > 0) {
-            console.log(response.data.data, "dara");
+            // console.log(response.data.data, "dara");
             setMetadataObjectsFromFile(response.data.data || []);
             window.localStorage.setItem(
               "metadataObjects",
@@ -144,7 +144,7 @@ const CollectionStep1 = () => {
         let arr = [];
         for (let index = 0; index < selectedFiles.length; index++) {
           const uploaded_image = await client.add(selectedFiles[index]);
-          console.log(uploaded_image, selectedFiles[index], "img");
+          // console.log(uploaded_image, selectedFiles[index], "img");
           if (uploaded_image) {
             arr.push({
               path: uploaded_image.path,
@@ -175,16 +175,17 @@ const CollectionStep1 = () => {
       Toast("error", "please upload NFT files first");
       return;
     } else if (imagePaths.length == 0) {
-      console.log(
-        objs.length != imagePaths.length,
-        objs.length,
-        imagePaths.length
-      );
       Toast("error", "please upload NFT files first");
+      return;
+    } else if (imagePaths.length > metadataObjects.length) {
+      Toast("error", "You Need To Add More Metadata");
+      return;
+    } else if (imagePaths.length < metadataObjects.length) {
+      Toast("error", "You Need To Add More NFT Files");
       return;
     }
     let objs = convertMetadataObjects();
-    console.log(objs, "onjs");
+    // console.log(objs, "onjs");
     if (!validateCollectionData(objs)) {
       console.log("here");
       return;
@@ -255,7 +256,7 @@ const CollectionStep1 = () => {
       // obj["mediaType"] = "image/jpeg"
       metadataArr.push(obj);
     }
-    console.log(metadataArr, "arr");
+    // console.log(metadataArr, "arr");
     return metadataArr;
   };
 
@@ -336,7 +337,7 @@ const CollectionStep1 = () => {
       var isDuplicate = valueArr.some(function (item, idx) {
         return valueArr.indexOf(item) != idx;
       });
-      console.log(isDuplicate, "dup");
+      // console.log(isDuplicate, "dup");
       if (isDuplicate) {
         Toast("error", "You have duplicate names in the webform!");
         // console.log(isDup)

@@ -21,7 +21,7 @@ const AuctionCard = ({ data, index }) => {
   const asset_detail = data?.collection_id?.assets[0];
   const type = data.mint_type === "collection";
   const sell_model = data?.sell_model;
-  console.log("model", sell_model);
+  // console.log("model", sell_model);
   const navigationHanlder = () => {
     const route = type
       ? `${MycollectionRoute}/${sell_model}`

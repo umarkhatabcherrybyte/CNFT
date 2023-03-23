@@ -72,7 +72,7 @@ const ListCollectionStep2 = () => {
         const files = e.target.files[i];
         temp.push(files);
       }
-      console.log(e.target.files.length, temp.length, "length");
+      // console.log(e.target.files.length, temp.length, "length");
       setSeletedFiles(temp);
       selectedFilesLabelRef.current.innerHTML = `${temp.length} files choosen`;
     } else {
@@ -97,7 +97,7 @@ const ListCollectionStep2 = () => {
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => {})
+      UploadService.uploadMeta(file, path, (event) => { })
         .then((response) => {
           if (response.data.data.length > 0) {
             setMetadataObjectsFromFile(response.data.data || []);
@@ -193,19 +193,21 @@ const ListCollectionStep2 = () => {
       mintCollection(metadataObjectsFromFile);
       return;
     } else if (!metadataFileUploaded) {
-      Toast("error", "please upload NFT files first1");
+      Toast("error", "please upload NFT files first");
       return;
     } else if (imagePaths.length == 0) {
-      console.log(
-        objs.length != imagePaths.length,
-        objs.length,
-        imagePaths.length
-      );
-      Toast("error", "please upload NFT files first2");
+      Toast("error", "please upload NFT files first");
+      return;
+
+    } else if (imagePaths.length > metadataObjects.length) {
+      Toast("error", "You Need To Add More Metadata");
+      return;
+    } else if (imagePaths.length < metadataObjects.length) {
+      Toast("error", "You Need To Add More NFT Files");
       return;
     }
     let objs = convertMetadataObjects();
-    console.log(objs, "onjs");
+    // console.log(objs, "onjs");
     if (imagePaths.length == 0) {
       Toast("error", "please upload NFT files first3");
       return;
@@ -308,7 +310,7 @@ const ListCollectionStep2 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => {})
+    UploadService.downloadMetafile(path, (event) => { })
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
@@ -319,7 +321,7 @@ const ListCollectionStep2 = () => {
   };
 
   const onFileInputButton = () => {
-    console.log("onFileInputButton");
+    // console.log("onFileInputButton");
     hiddenFileInputRef.current.click();
   };
 
@@ -358,7 +360,7 @@ const ListCollectionStep2 = () => {
       var isDuplicate = valueArr.some(function (item, idx) {
         return valueArr.indexOf(item) != idx;
       });
-      console.log(isDuplicate, "dup");
+      // console.log(isDuplicate, "dup");
       if (isDuplicate) {
         Toast("error", "You have duplicate names in the webform!");
         // console.log(isDup)

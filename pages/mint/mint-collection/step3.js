@@ -109,13 +109,13 @@ const CollectionStep3 = () => {
               // console.log(element, "elem");
               let metadata = element;
               metadataX[metadata.name] = metadata;
-              console.log(metadataX, "dsadasd");
+              // console.log(metadataX, "dsadasd");
               assetObj[String(policyId + fromText(metadata.name))] = 1n;
               units.push(policyId + fromText(metadata.name));
               obj = { [policyId]: metadataX };
               delete element["price"];
             }
-            console.log(assetObj, "onjf");
+            // console.log(assetObj, "onjf");
 
             const txL = await lucid
               .newTx()
@@ -205,13 +205,13 @@ const CollectionStep3 = () => {
               // console.log(element, "elem");
               let metadata = element;
               metadataX[metadata.name] = metadata;
-              console.log(metadataX, "dsadasd");
+              // console.log(metadataX, "dsadasd");
               assetObj[String(policyId + fromText(metadata.name))] = 1n;
               units.push(policyId + fromText(metadata.name));
               obj = { [policyId]: metadataX };
               delete element["price"];
             }
-            console.log(assetObj, "onjf");
+            // console.log(assetObj, "onjf");
 
             const txL = await lucid
               .newTx()
@@ -298,7 +298,7 @@ const CollectionStep3 = () => {
               for (let index = 0; index < metadata_objs.length; index++) {
                 const element = metadata_objs[index];
 
-                console.log(element, "elem");
+                // console.log(element, "elem");
                 let metadata = element;
                 metadataX[metadata.name] = metadata;
                 // console.log(metadataX, 'dsadasd')
@@ -307,7 +307,7 @@ const CollectionStep3 = () => {
                 prices.push(element.price);
                 delete element["price"];
               }
-              console.log(assetObj, "onjf");
+              // console.log(assetObj, "onjf");
 
               const txL = await lucid
                 .newTx()

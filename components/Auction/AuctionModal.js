@@ -49,6 +49,7 @@ const AuctionModal = ({
         return;
       }
       if (connected) {
+        console.log(lovelace,'dasd', 1000000 * detail?.highest_bid)
         if (lovelace < 1000000 * detail?.highest_bid) {
           Toast(
             "error",
@@ -68,7 +69,7 @@ const AuctionModal = ({
               list_id: listId,
               unit: unit,
             });
-            if (response.status) {
+            if (response.data.status) {
               const transferLucid = await Lucid.new(
                 new Blockfrost(
                   "https://cardano-preprod.blockfrost.io/api/v0",
@@ -86,7 +87,7 @@ const AuctionModal = ({
                 ),
                 "Preprod"
               );
-              console.log(values.price, "dasd");
+              // console.log(values.price, "dasd");
               const api = await window.cardano[
                 String(connectedWallet)
               ].enable();
@@ -125,6 +126,9 @@ const AuctionModal = ({
                 }
               }
             }
+            else {
+              Toast("error", "Current Bid Is Higher, Please Bid More");
+            }
           } catch (e) {
             Toast("error", "Could Not Add Bid");
             console.log(e);
@@ -135,7 +139,7 @@ const AuctionModal = ({
       }
     },
   });
-  console.log(formik.isSubmitting);
+  // console.log(formik.isSubmitting);
 
   if (!open) {
     return null;

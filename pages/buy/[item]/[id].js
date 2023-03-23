@@ -108,7 +108,7 @@ const BuyDetail = () => {
           );
           const api = await window.cardano[String(connectedWallet)].enable();
           lucid.selectWallet(api);
-          console.log(await lucid.wallet.address());
+          // console.log(await lucid.wallet.address());
 
           const tx = await lucid
             .newTx()
@@ -118,7 +118,7 @@ const BuyDetail = () => {
             })
             .validTo(Date.now() + 100000)
             .complete();
-          console.log(tx);
+          // console.log(tx);
           const signedTx = await tx.sign().complete();
           const txHash = await signedTx.submit();
           if (txHash) {
