@@ -14,7 +14,7 @@ export const transactionErrorHanlder = (error, type) => {
   } else if (e?.info === "Wallet could not send the tx.") {
     Toast(
       "error",
-      "Your previous transaction is being validated please try again lator."
+      "Your previous transaction is being validated please try again later."
     );
   } else {
     if (type === "mint") {
