@@ -68,32 +68,20 @@ const SaleMethod = () => {
         const data =
           listing_data.type === "single"
             ? {
-              user_id: listing_data?.user_id,
-              collection_id: listing_data._id,
-              mint_type: listing_data?.type,
-            }
+                user_id: listing_data?.user_id,
+                collection_id: listing_data._id,
+                mint_type: listing_data?.type,
+              }
             : {
-              collection_id: listing_data?._id,
-              user_id: listing_data?.user_id,
-              logo_image: listing_data?.logo_image,
-              feature_image: listing_data?.feature_image,
-              mint_type: listing_data?.type,
-              name: listing_data?.name
-              // sell_type: price_data?.sell_type,
-            };
+                collection_id: listing_data?._id,
+                user_id: listing_data?.user_id,
+                logo_image: listing_data?.logo_image,
+                feature_image: listing_data?.feature_image,
+                mint_type: listing_data?.type,
+                name: listing_data?.name,
+                // sell_type: price_data?.sell_type,
+              };
         try {
-          // let formData = new FormData();
-          // formData.append("price", fixed_data["price"]);
-          // formData.append("is_open_for_offer", fixed_data["is_open_for_offer"]);
-          // formData.append("sell_type", fixed_data["sell_type"]);
-          // formData.append("user_id", listing_data?.user_id);
-          // formData.append("nft_ids", JSON.stringify([listing_data._id]));
-          // formData.append("mint_type", listing_data.type);
-          // console.log({
-          //   ...price_data,
-          //   ...data,
-          // })
-          // debugger
           const res = await INSTANCE.post("/list/create", {
             ...price_data,
             ...data,
@@ -103,7 +91,7 @@ const SaleMethod = () => {
             const route =
               paymentValue === "fixed" ? buyDetailRoute : auctionRoute;
             // window.localStorage.removeItem("listing")
-            Toast("success", "Listed Successfully")
+            Toast("success", "Listed Successfully");
             dispatch(setStep("step1"));
             router.push(route);
           }
@@ -243,8 +231,9 @@ const SaleMethod = () => {
           <Grid xs={12} item>
             <Box sx={{ pt: 0, pb: 1 }}>
               <BarHeading
-                heading={`${listing_data.type === "collection" ? "Collection" : "Asset"
-                  } Details`}
+                heading={`${
+                  listing_data.type === "collection" ? "Collection" : "Asset"
+                } Details`}
               />
             </Box>
           </Grid>
@@ -252,14 +241,16 @@ const SaleMethod = () => {
             <Box>
               <CaptionHeading
                 font="montserrat"
-                heading={`${listing_data.type === "collection" ? "Collection" : "Asset"
-                  } Name`}
+                heading={`${
+                  listing_data.type === "collection" ? "Collection" : "Asset"
+                } Name`}
               />
               <AssetInputField
-                placeholder={`Enter ${listing_data.type === "collection"
-                  ? "Collection Name"
-                  : "Asset Name"
-                  }`}
+                placeholder={`Enter ${
+                  listing_data.type === "collection"
+                    ? "Collection Name"
+                    : "Asset Name"
+                }`}
                 name="asset_name"
                 value={
                   listing_data.type === "collection"

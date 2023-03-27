@@ -85,7 +85,8 @@ const ClaimTable = ({ claim }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {claim.length > 0 &&
+              {claim &&
+                claim.length > 0 &&
                 claim.map((row) => (
                   <TableRow
                     sx={{

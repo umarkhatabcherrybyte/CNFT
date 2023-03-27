@@ -29,6 +29,7 @@ import { getKeyData } from "/helper/localStorage";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
 import useFetchData from "../../../hooks/adaInfo";
 import { isVideoOrIsAudio } from "../../../utils/utils";
+import { transactionErrorHanlder } from "../../../helper/transactionError";
 // import { BigInt } from "lucid-cardano/types/src/core/wasm_modules/cardano_multiplatform_lib_web/cardano_multiplatform_lib";
 const List = [{}, {}, {}, {}];
 
@@ -141,6 +142,7 @@ const BuyDetail = () => {
             // router.push('/mint')
           }
         } catch (e) {
+          transactionErrorHanlder(e, "buy");
           console.log(e, "errro");
         }
       }

@@ -23,6 +23,7 @@ import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { INSTANCE } from "/config/axiosInstance";
 import { costLovelace, bankWalletAddress } from "../../../config/utils";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
+import { transactionErrorHanlder } from "../../../helper/transactionError";
 const payData = [
   // {
   // 	title: "Mint for free and list with us ",
@@ -363,7 +364,8 @@ const CollectionStep3 = () => {
       }
     } catch (error) {
       console.log("error", error);
-      Toast("error", "Error Occured while Minting");
+      transactionErrorHanlder(error, "mint");
+      // Toast("error", "Error Occured while Minting");
       setIsLoading(false);
     }
   };

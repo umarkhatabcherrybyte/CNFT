@@ -182,34 +182,34 @@ const MyListCard = () => {
               ))}
             </Grid>
           ) : (
-            <Layout>
-              <Box className="flex_align_center">
-                <Heading heading="No Data." />
-              </Box>
-            </Layout>
+            <Box
+              className="flex_align_center"
+              sx={{
+                position: "relative",
+                img: {
+                  width: "100%",
+                },
+              }}
+            >
+              <img
+                src="/images/no_list.png"
+                onClick={(e) => {
+                  router.push({
+                    pathname: "/sell",
+                    query: {
+                      type: "add-listing",
+                    },
+                  });
+                }}
+              />
+            </Box>
           )
         ) : (
-          <Box
-            className="flex_align_center"
-            sx={{
-              position: "relative",
-              img: {
-                width: "100%",
-              },
-            }}
-          >
-            <img
-              src="/images/no_list.png"
-              onClick={(e) => {
-                router.push({
-                  pathname: "/sell",
-                  query: {
-                    type: "add-listing",
-                  },
-                });
-              }}
-            />
-          </Box>
+          <Layout>
+            <Box className="flex_align_center">
+              <Heading heading="Please connect your wallet first." />
+            </Box>
+          </Layout>
         )}
       </Box>
     </MyListCardStyled>

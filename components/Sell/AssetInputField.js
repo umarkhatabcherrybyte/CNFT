@@ -1,7 +1,9 @@
 import React from "react";
-import { TextField, InputAdornment } from "@mui/material";
+import { TextField, InputAdornment, IconButton, Tooltip } from "@mui/material";
 import CaptionHeading from "../shared/headings/CaptionHeading";
 import { ContentCopy } from "@mui/icons-material";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+
 const AssetInputField = ({ placeholder, ada, copy, label, name, value }) => {
   // console.log(value);
   return (
@@ -51,7 +53,18 @@ const AssetInputField = ({ placeholder, ada, copy, label, name, value }) => {
               }
             >
               {ada && <CaptionHeading heading="ADA" />}
-              {copy && <ContentCopy className="text_white" />}
+              {copy && (
+                <CopyToClipboard text={value}>
+                  <Tooltip title="Copy policy id">
+                    <IconButton>
+                      <ContentCopy
+                        className="text_white"
+                        sx={{ cursor: "pointer" }}
+                      />
+                    </IconButton>
+                  </Tooltip>
+                </CopyToClipboard>
+              )}
             </InputAdornment>
           ),
         }}

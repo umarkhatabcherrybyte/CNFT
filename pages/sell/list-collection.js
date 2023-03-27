@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLovelace, useWallet } from "@meshsdk/react";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { getObjData } from "../../helper/localStorage";
+import { transactionErrorHanlder } from "../../helper/transactionError";
 
 const ListCollectionStep2 = () => {
   const lovelace = useLovelace();
@@ -97,7 +98,7 @@ const ListCollectionStep2 = () => {
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => { })
+      UploadService.uploadMeta(file, path, (event) => {})
         .then((response) => {
           if (response.data.data.length > 0) {
             setMetadataObjectsFromFile(response.data.data || []);
@@ -198,7 +199,6 @@ const ListCollectionStep2 = () => {
     } else if (imagePaths.length == 0) {
       Toast("error", "please upload NFT files first");
       return;
-
     } else if (imagePaths.length > metadataObjects.length) {
       Toast("error", "You Need To Add More Metadata");
       return;
@@ -310,7 +310,7 @@ const ListCollectionStep2 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => { })
+    UploadService.downloadMetafile(path, (event) => {})
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
@@ -504,6 +504,8 @@ const ListCollectionStep2 = () => {
       }
     } catch (e) {
       console.log("error", e);
+      transactionErrorHanlder(e, "mint");
+
       Toast("error", "Error Occured while Minting");
       // console.log(e)
     }

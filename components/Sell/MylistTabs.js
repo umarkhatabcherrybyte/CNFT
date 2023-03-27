@@ -27,7 +27,7 @@ import { CardanoWallet, useLovelace, useWallet } from "@meshsdk/react";
 import { Toast } from "../shared/Toast";
 import { INSTANCE } from "../../config/axiosInstance";
 import FullScreenLoader from "../shared/FullScreenLoader";
-
+import { transactionErrorHanlder } from "../../helper/transactionError";
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",
@@ -290,8 +290,7 @@ const MylistTabs = () => {
       } catch (error) {
         console.log(error, "err");
         setIsLoading(false);
-
-        Toast("error", "Error Occured During Minting");
+        transactionErrorHanlder(error, "mint");
       }
     },
   });

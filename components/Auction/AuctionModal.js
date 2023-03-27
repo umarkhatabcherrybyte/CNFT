@@ -11,6 +11,7 @@ import { Toast } from "../shared/Toast";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import { LoadingButton } from "@mui/lab";
 import { useRouter } from "next/router";
+import { transactionErrorHanlder } from "../../helper/transactionError";
 const style = {
   fieldset: {
     border: "none",
@@ -49,7 +50,7 @@ const AuctionModal = ({
         return;
       }
       if (connected) {
-        console.log(lovelace,'dasd', 1000000 * detail?.highest_bid)
+        console.log(lovelace, "dasd", 1000000 * detail?.highest_bid);
         if (lovelace < 1000000 * detail?.highest_bid) {
           Toast(
             "error",
@@ -119,19 +120,19 @@ const AuctionModal = ({
                 if (res) {
                   setOpen(false);
                   Toast("success", "Bid Added Successfully");
-                  router.push("/");
+                  window.location.href = "/";
                   getData();
                 } else {
                   Toast("error", "Could Not Add Bid");
                 }
               }
-            }
-            else {
+            } else {
               Toast("error", "Current Bid Is Higher, Please Bid More");
             }
           } catch (e) {
-            Toast("error", "Could Not Add Bid");
+            transactionErrorHanlder(e, "auction");
             console.log(e);
+            console.log(e.info);
           }
         }
       } else {
