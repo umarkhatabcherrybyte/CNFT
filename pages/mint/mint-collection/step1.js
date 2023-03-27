@@ -167,20 +167,20 @@ const CollectionStep1 = () => {
   };
 
   function onNextStep() {
-    // debugger
-    if (!isWebform && metadataObjectsFromFile.length > 0) {
+    debugger
+    if (!isWebform && metaFile && metadataObjectsFromFile.length > 0) {
       router.push(mintCollectionStep3);
       return;
-    } else if (!metadataFileUploaded) {
-      Toast("error", "please upload NFT files first");
+    } else if (!isWebform && metaFile && !metadataFileUploaded) {
+      Toast("error", "Please Upload Metadata File First");
       return;
-    } else if (imagePaths.length == 0) {
-      Toast("error", "please upload NFT files first");
+    } else if (isWebform && imagePaths.length == 0) {
+      Toast("error", "Please Upload NFT Files");
       return;
-    } else if (imagePaths.length > metadataObjects.length) {
+    } else if (isWebform && imagePaths.length > metadataObjects.length) {
       Toast("error", "You Need To Add More Metadata");
       return;
-    } else if (imagePaths.length < metadataObjects.length) {
+    } else if (isWebform && imagePaths.length < metadataObjects.length) {
       Toast("error", "You Need To Add More NFT Files");
       return;
     }

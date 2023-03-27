@@ -64,7 +64,11 @@ const ListCollectionStep2 = () => {
     const files = selectedFiles.filter((item, index) => {
       return index !== index_num;
     });
+    const imagePathObjs = imagePaths.filter((item, index) => {
+      return index !== index_num;
+    });
     setSeletedFiles(files);
+    setImagePaths(imagePathObjs)
   };
   const onSelectedFiles = (e) => {
     if (e.target.files) {
@@ -75,6 +79,7 @@ const ListCollectionStep2 = () => {
       }
       // console.log(e.target.files.length, temp.length, "length");
       setSeletedFiles(temp);
+      setMetadataFileUploaded(false)
       selectedFilesLabelRef.current.innerHTML = `${temp.length} files choosen`;
     } else {
       selectedFilesLabelRef.current.innerHTML = `No file choosen`;
@@ -94,11 +99,11 @@ const ListCollectionStep2 = () => {
 
   function uploadMeta() {
     if (metaFile == undefined || metaFile == null) {
-      Toast("error", "No File Selected");
+      Toast("error", "Select A File And Try Again");
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => {})
+      UploadService.uploadMeta(file, path, (event) => { })
         .then((response) => {
           if (response.data.data.length > 0) {
             setMetadataObjectsFromFile(response.data.data || []);
@@ -158,7 +163,7 @@ const ListCollectionStep2 = () => {
         Toast("error", "Uploading failed.");
       }
     } else {
-      Toast("error", "Select a file and try again.");
+      Toast("error", "Select A File And Try Again.");
       setIsUploading(false);
     }
   };
@@ -190,26 +195,26 @@ const ListCollectionStep2 = () => {
   }
 
   async function onNextStep() {
-    if (!isWebform && metadataObjectsFromFile.length > 0) {
+    if (!isWebform && metaFile && metadataObjectsFromFile.length > 0) {
       mintCollection(metadataObjectsFromFile);
       return;
-    } else if (!metadataFileUploaded) {
-      Toast("error", "please upload NFT files first");
+    } else if (!isWebform && metaFile && !metadataFileUploaded) {
+      Toast("error", "Please Upload Metadata File First");
       return;
-    } else if (imagePaths.length == 0) {
-      Toast("error", "please upload NFT files first");
+    } else if (isWebform && imagePaths.length == 0) {
+      Toast("error", "Please Upload NFT Files");
       return;
-    } else if (imagePaths.length > metadataObjects.length) {
+    } else if (isWebform && imagePaths.length > metadataObjects.length) {
       Toast("error", "You Need To Add More Metadata");
       return;
-    } else if (imagePaths.length < metadataObjects.length) {
+    } else if (isWebform && imagePaths.length < metadataObjects.length) {
       Toast("error", "You Need To Add More NFT Files");
       return;
     }
     let objs = convertMetadataObjects();
     // console.log(objs, "onjs");
     if (imagePaths.length == 0) {
-      Toast("error", "please upload NFT files first3");
+      Toast("error", "Please Upload NFT Files");
       return;
     } else if (!validateCollectionData(objs)) {
       console.log("here");
@@ -310,7 +315,7 @@ const ListCollectionStep2 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => {})
+    UploadService.downloadMetafile(path, (event) => { })
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
