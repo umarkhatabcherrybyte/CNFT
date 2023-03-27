@@ -97,7 +97,7 @@ const CollectionStep1 = () => {
 
   function uploadMeta() {
     if (metaFile == undefined || metaFile == null) {
-      Toast("error", "No File Selected");
+      Toast("error", "Select A File And Try Again");
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
@@ -113,7 +113,7 @@ const CollectionStep1 = () => {
             setMetadataFileUploaded(true);
             metaFileInputRef.current.value = null;
             metaFileLabelRef.current.innerHTML = "No file choosen";
-            setMetaFile(null);
+            // setMetaFile(null);
             Toast("success", "Uploaded Metadata Successfully");
           }
         })
@@ -161,7 +161,7 @@ const CollectionStep1 = () => {
         Toast("error", "Uploading failed.");
       }
     } else {
-      Toast("error", "Select a file and try again.");
+      Toast("error", "Select A File And Try Again");
       setIsUploading(false);
     }
   };

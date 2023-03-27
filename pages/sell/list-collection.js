@@ -114,7 +114,7 @@ const ListCollectionStep2 = () => {
             setMetadataFileUploaded(true);
             metaFileInputRef.current.value = null;
             metaFileLabelRef.current.innerHTML = "No file choosen";
-            setMetaFile(null);
+            // setMetaFile(null);
             Toast("success", "Uploaded Metadata Successfully");
           }
         })
@@ -195,6 +195,7 @@ const ListCollectionStep2 = () => {
   }
 
   async function onNextStep() {
+    console.log( metaFile,'dasd')
     if (!isWebform && metaFile && metadataObjectsFromFile.length > 0) {
       mintCollection(metadataObjectsFromFile);
       return;
@@ -202,7 +203,7 @@ const ListCollectionStep2 = () => {
       Toast("error", "Please Upload Metadata File First");
       return;
     } else if (isWebform && imagePaths.length == 0) {
-      Toast("error", "Please Upload NFT Files");
+      Toast("error", "Please Upload NFT Files1");
       return;
     } else if (isWebform && imagePaths.length > metadataObjects.length) {
       Toast("error", "You Need To Add More Metadata");
@@ -214,7 +215,7 @@ const ListCollectionStep2 = () => {
     let objs = convertMetadataObjects();
     // console.log(objs, "onjs");
     if (imagePaths.length == 0) {
-      Toast("error", "Please Upload NFT Files");
+      Toast("error", "Please Upload NFT Files2");
       return;
     } else if (!validateCollectionData(objs)) {
       console.log("here");
