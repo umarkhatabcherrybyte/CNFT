@@ -121,7 +121,7 @@ const CollectionDetail = () => {
                 <Grid item xs={12} md={6}>
                   <Button
                     className="btn2 w_100"
-                  // onClick={() => navigate(`${buyPaymentRoute}/3434`)}
+                    // onClick={() => navigate(`${buyPaymentRoute}/3434`)}
                   >
                     Buy now
                   </Button>
@@ -277,7 +277,7 @@ const CollectionDetail = () => {
           </Box>
           <Box>
             <BarHeading heading="Our Collections" />
-            <Box sx={{ py: 5 }}>
+            {/* <Box sx={{ py: 5 }}>
               <Grid container spacing={3}>
                 {cardData.map((item, index) => (
                   <Grid xs={12} sm={6} md={3} item key={index}>
@@ -285,7 +285,7 @@ const CollectionDetail = () => {
                   </Grid>
                 ))}
               </Grid>
-            </Box>
+            </Box> */}
           </Box>
         </Box>
       </ContainerLayout>

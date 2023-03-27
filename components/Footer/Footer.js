@@ -20,7 +20,7 @@ const Footer = () => {
                 both an exchange and minting on the same platform. Additionally,
                 we offer an auction feature as another way to sell your NFTs.{" "}
                 <br></br>If you need any help, then please Contact Us, and we
-                will be happy to assist` you!
+                will be happy to assist` you
               </Box>
             </Grid>
             {/* <Grid item md={2} sm={6} xs={12}>

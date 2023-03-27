@@ -71,7 +71,7 @@ const Collection = () => {
                 </Grid>
               </Grid>
             </Box>
-            <TabPanel value="items">
+            {/* <TabPanel value="items">
               <Grid container spacing={3}>
                 {cardData.map((item, index) => (
                   <Grid item xs={12} sm={6} md={4} lg={3}>
@@ -79,8 +79,8 @@ const Collection = () => {
                   </Grid>
                 ))}
               </Grid>
-            </TabPanel>
-            <TabPanel value="collections">
+            </TabPanel> */}
+            {/* <TabPanel value="collections">
               <Grid container spacing={3}>
                 {cardData.map((item, index) => (
                   <Grid item xs={12} sm={6} md={4} lg={3}>
@@ -88,8 +88,8 @@ const Collection = () => {
                   </Grid>
                 ))}
               </Grid>
-            </TabPanel>
-            <TabPanel value="trending">
+            </TabPanel> */}
+            {/* <TabPanel value="trending">
               <Grid container spacing={3}>
                 {cardData.map((item, index) => (
                   <Grid item xs={12} sm={6} md={4} lg={3}>
@@ -97,7 +97,7 @@ const Collection = () => {
                   </Grid>
                 ))}
               </Grid>
-            </TabPanel>
+            </TabPanel> */}
           </TabContext>
         </ContainerLayout>
       </CollectionStyled>
