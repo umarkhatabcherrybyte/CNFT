@@ -68,7 +68,7 @@ const ListCollectionStep2 = () => {
       return index !== index_num;
     });
     setSeletedFiles(files);
-    setImagePaths(imagePathObjs)
+    setImagePaths(imagePathObjs);
   };
   const onSelectedFiles = (e) => {
     if (e.target.files) {
@@ -79,7 +79,7 @@ const ListCollectionStep2 = () => {
       }
       // console.log(e.target.files.length, temp.length, "length");
       setSeletedFiles(temp);
-      setMetadataFileUploaded(false)
+      setMetadataFileUploaded(false);
       selectedFilesLabelRef.current.innerHTML = `${temp.length} files choosen`;
     } else {
       selectedFilesLabelRef.current.innerHTML = `No file choosen`;
@@ -103,7 +103,7 @@ const ListCollectionStep2 = () => {
     } else {
       const file = metaFile;
       const path = connectedWallet + "_" + walletAddress;
-      UploadService.uploadMeta(file, path, (event) => { })
+      UploadService.uploadMeta(file, path, (event) => {})
         .then((response) => {
           if (response.data.data.length > 0) {
             setMetadataObjectsFromFile(response.data.data || []);
@@ -195,7 +195,7 @@ const ListCollectionStep2 = () => {
   }
 
   async function onNextStep() {
-    console.log( metaFile,'dasd')
+    console.log(metaFile, "dasd");
     if (!isWebform && metaFile && metadataObjectsFromFile.length > 0) {
       mintCollection(metadataObjectsFromFile);
       return;
@@ -316,7 +316,7 @@ const ListCollectionStep2 = () => {
 
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => { })
+    UploadService.downloadMetafile(path, (event) => {})
       .then((response) => {
         const metadata = JSON.stringify(response.data, null, 2);
         download(metadata, "metadata.json");
@@ -511,8 +511,6 @@ const ListCollectionStep2 = () => {
     } catch (e) {
       console.log("error", e);
       transactionErrorHanlder(e, "mint");
-
-      Toast("error", "Error Occured while Minting");
       // console.log(e)
     }
   };
