@@ -41,7 +41,7 @@ export async function createTransaction(
   try {
     // const forgingScript = ForgeScript.withOneSignature(recipientAddress);
     console.log('here')
-    const slot = resolveSlotNo('preprod', Date.now() + 100000);
+    const slot = resolveSlotNo('mainnet', Date.now() + 100000);
     const keyHash = resolvePaymentKeyHash('addr1v9vx0sacufuypa2k4sngk7q40zc5c4npl337uusdh64kv0c93pyfx');
     const nativeScript = {
       type: "all",

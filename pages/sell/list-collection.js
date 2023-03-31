@@ -395,8 +395,8 @@ const ListCollectionStep2 = () => {
         } else {
           const transferLucid = await Lucid.new(
             new Blockfrost(
-              "https://cardano-preprod.blockfrost.io/api/v0",
-              "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+              "https://cardano-mainnet.blockfrost.io/api/v0",
+              "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
             ),
             "Preprod"
           );
@@ -407,8 +407,8 @@ const ListCollectionStep2 = () => {
 
           const lucid = await Lucid.new(
             new Blockfrost(
-              "https://cardano-preprod.blockfrost.io/api/v0",
-              "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+              "https://cardano-mainnet.blockfrost.io/api/v0",
+              "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
             ),
             "Preprod"
           );

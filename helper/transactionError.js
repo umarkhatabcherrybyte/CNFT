@@ -13,11 +13,11 @@ export const transactionErrorHanlder = (error, type) => {
     );
   } else if (
     error?.message &&
-    error?.message?.includes("Expected address with network id 0")
+    error?.message?.includes("Expected address with network id 1")
   ) {
     Toast(
       "error",
-      "Sorry, it looks like you're currently connected to the mainnet. Please switch your network to preprod in order to continue."
+      "Sorry, it looks like you're currently connected to the testnet. Please switch your network to Mainnet in order to continue."
     );
   } else if (error?.info === "Wallet could not send the tx.") {
     Toast(
