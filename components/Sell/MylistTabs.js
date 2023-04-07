@@ -29,6 +29,8 @@ import { INSTANCE } from "../../config/axiosInstance";
 import FullScreenLoader from "../shared/FullScreenLoader";
 import { transactionErrorHanlder } from "../../helper/transactionError";
 import { seedPhraseMainnet } from "../../config/utils";
+import { getClientIp } from "../../helper/clientIP";
+
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",
@@ -292,6 +294,19 @@ const MylistTabs = () => {
         console.log(error, "err");
         setIsLoading(false);
         transactionErrorHanlder(error, "mint");
+        const clientIp = await getClientIp();
+        if (clientIp) {
+          try {
+            const response = await INSTANCE.post(`/log/create`, {
+              error: JSON.stringify(error),
+              ip: clientIp,
+              type: "list item by user, MyListTabs",
+            });
+            console.log(response.data);
+          } catch (error) {
+            console.error(error);
+          }
+        }
       }
     },
   });

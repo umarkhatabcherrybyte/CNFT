@@ -24,6 +24,8 @@ import { INSTANCE } from "/config/axiosInstance";
 import { costLovelace, bankWalletAddress } from "../../../config/utils";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
 import { transactionErrorHanlder } from "../../../helper/transactionError";
+import { getClientIp } from "../../../helper/clientIP";
+
 const payData = [
   // {
   // 	title: "Mint for free and list with us ",
@@ -365,6 +367,19 @@ const CollectionStep3 = () => {
     } catch (error) {
       console.log("error", error);
       transactionErrorHanlder(error, "mint");
+      const clientIp = await getClientIp();
+      if (clientIp) {
+        try {
+          const response = await INSTANCE.post(`/log/create`, {
+            error: JSON.stringify(error),
+            ip: clientIp,
+            type: "collection mint",
+          });
+          console.log(response.data);
+        } catch (error) {
+          console.error(error);
+        }
+      }
       // Toast("error", "Error Occured while Minting");
       setIsLoading(false);
     }

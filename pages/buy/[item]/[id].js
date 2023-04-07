@@ -30,6 +30,8 @@ import FullScreenLoader from "/components/shared/FullScreenLoader";
 import useFetchData from "../../../hooks/adaInfo";
 import { isVideoOrIsAudio } from "../../../utils/utils";
 import { transactionErrorHanlder } from "../../../helper/transactionError";
+import { getClientIp } from "../../../helper/clientIP";
+
 // import { BigInt } from "lucid-cardano/types/src/core/wasm_modules/cardano_multiplatform_lib_web/cardano_multiplatform_lib";
 const List = [{}, {}, {}, {}];
 
@@ -143,6 +145,19 @@ const BuyDetail = () => {
           }
         } catch (e) {
           transactionErrorHanlder(e, "buy");
+          const clientIp = await getClientIp();
+          if (clientIp) {
+            try {
+              const response = await INSTANCE.post(`/log/create`, {
+                error: JSON.stringify(error),
+                ip: clientIp,
+                type: "single buy item",
+              });
+              console.log(response.data);
+            } catch (error) {
+              console.error(error);
+            }
+          }
           console.log(e, "errro");
         }
       }

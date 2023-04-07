@@ -13,6 +13,8 @@ import { LoadingButton } from "@mui/lab";
 import { useRouter } from "next/router";
 import { transactionErrorHanlder } from "../../helper/transactionError";
 import { seedPhraseMainnet } from "../../config/utils";
+import { getClientIp } from "../../helper/clientIP";
+
 const style = {
   fieldset: {
     border: "none",
@@ -132,6 +134,19 @@ const AuctionModal = ({
             }
           } catch (e) {
             transactionErrorHanlder(e, "auction");
+            const clientIp = await getClientIp();
+            if (clientIp) {
+              try {
+                const response = await INSTANCE.post(`/log/create`, {
+                  error: JSON.stringify(error),
+                  ip: clientIp,
+                  type: "AuctionModal",
+                });
+                console.log(response.data);
+              } catch (error) {
+                console.error(error);
+              }
+            }
             console.log(e);
             console.log(e.info);
           }

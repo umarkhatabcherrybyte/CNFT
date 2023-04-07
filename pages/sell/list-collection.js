@@ -21,6 +21,7 @@ import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { getObjData } from "../../helper/localStorage";
 import { transactionErrorHanlder } from "../../helper/transactionError";
 import { seedPhraseMainnet } from "../../config/utils";
+import { getClientIp } from "../../helper/clientIP";
 
 const ListCollectionStep2 = () => {
   const lovelace = useLovelace();
@@ -512,6 +513,19 @@ const ListCollectionStep2 = () => {
     } catch (e) {
       console.log("error", e);
       transactionErrorHanlder(e, "mint");
+      const clientIp = await getClientIp();
+      if (clientIp) {
+        try {
+          const response = await INSTANCE.post(`/log/create`, {
+            error: JSON.stringify(error),
+            ip: clientIp,
+            type: "list-collection",
+          });
+          console.log(response.data);
+        } catch (error) {
+          console.error(error);
+        }
+      }
       // console.log(e)
     }
   };
