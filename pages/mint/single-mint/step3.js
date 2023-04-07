@@ -4,6 +4,8 @@ import Layout from "../../../components/Mint/Layout";
 import { CardanoWallet, useLovelace, useWallet } from "@meshsdk/react";
 import { Toast } from "../../../components/shared/Toast";
 import { createTransaction, signTransaction } from "../../../backend";
+import CircularJSON from "circular-json";
+
 import {
   Box,
   Container,
@@ -35,6 +37,7 @@ import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { INSTANCE } from "/config/axiosInstance";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
 import { transactionErrorHanlder } from "../../../helper/transactionError";
+import { getClientIp } from "../../../helper/clientIP";
 const payData = [
   // {
   //   title: "Mint for free and list with us ",
@@ -68,7 +71,7 @@ const SingleMintStep3 = () => {
     try {
       if (!connected) {
         Toast("error", "Please Connect Your Wallet First");
-      } else if (lovelace < 1000000) {
+      } else if (lovelace > 1000000) {
         Toast(
           "error",
           "You do not have enough Ada to complete this transaction"
@@ -325,10 +328,24 @@ const SingleMintStep3 = () => {
         }
       }
     } catch (error) {
-      console.log("error", error);
       transactionErrorHanlder(error, "mint");
-      console.log("heeee");
       setIsLoading(false);
+
+      const errorString = JSON.stringify(Object.values(error));
+      const clientIp = await getClientIp();
+      if (clientIp) {
+        try {
+          console.log(error, "sdsdfdsf error");
+          const response = await INSTANCE.post(`/log/create`, {
+            error: errorString,
+            ip: clientIp,
+            type: "single mint",
+          });
+          console.log(response.data);
+        } catch (error) {
+          console.error(error);
+        }
+      }
     }
   };
 
