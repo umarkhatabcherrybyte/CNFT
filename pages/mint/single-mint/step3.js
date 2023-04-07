@@ -90,17 +90,11 @@ const SingleMintStep3 = () => {
                 "https://cardano-mainnet.blockfrost.io/api/v0",
                 "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
               ),
-              "Mainnet"
+              "Preprod"
             );
 
             const api = await window.cardano[String(connectedWallet)].enable();
             lucid.selectWallet(api);
-
-            let network = await lucid.network
-            let addDeet = await lucid.utils.getAddressDetails(await lucid.wallet.address())
-            let seed =  await lucid.utils.generateSeedPhrase()
-
-            console.log(network, addDeet)
 
             const { paymentCredential } = lucid.utils.getAddressDetails(
               await lucid.wallet.address()
@@ -175,16 +169,11 @@ const SingleMintStep3 = () => {
                 "https://cardano-mainnet.blockfrost.io/api/v0",
                 "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
               ),
-              "Mainnet"
+              "Preprod"
             );
 
             const api = await window.cardano[String(connectedWallet)].enable();
             lucid.selectWallet(api);
-
-            let network = await lucid.network
-            let addDeet = await lucid.utils.getAddressDetails(await lucid.wallet.address())
-
-            console.log(network, addDeet)
 
             const { paymentCredential } = lucid.utils.getAddressDetails(
               await lucid.wallet.address()
@@ -205,11 +194,10 @@ const SingleMintStep3 = () => {
             let metadataX = {};
             let metadata = JSON.parse(window.localStorage.getItem("metadata"));
             metadataX[metadata.name] = metadata;
-            console.log(metadataX, "dsadasd");
+            // console.log(metadataX, "dsadasd");
 
             const unit = policyId + fromText(metadata.name);
             let obj = { [policyId]: metadataX };
-            console.log(obj,'objd')
             const tx = await lucid
               .newTx()
               .attachMetadata("721", obj)
@@ -262,7 +250,7 @@ const SingleMintStep3 = () => {
                 "https://cardano-mainnet.blockfrost.io/api/v0",
                 "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
               ),
-              "Mainnet"
+              "Preprod"
             );
 
             const api = await window.cardano[String(connectedWallet)].enable();
@@ -342,14 +330,14 @@ const SingleMintStep3 = () => {
     } catch (error) {
       transactionErrorHanlder(error, "mint");
       setIsLoading(false);
-      console.log(error, "sdsdfdsf error", JSON.stringify(error));
 
       const errorString = JSON.stringify(Object.values(error));
       const clientIp = await getClientIp();
       if (clientIp) {
         try {
+          console.log(error, "sdsdfdsf error");
           const response = await INSTANCE.post(`/log/create`, {
-            error: JSON.stringify(error),
+            error: errorString,
             ip: clientIp,
             type: "single mint",
           });
