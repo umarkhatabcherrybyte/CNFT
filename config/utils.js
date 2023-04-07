@@ -1,6 +1,10 @@
 const costLovelace = "10000000";
 
-const bankWalletAddress = `addr_test1qzmwuzc0qjenaljs2ytquyx8y8x02en3qxswlfcldwetaeuvldqg2n2p8y4kyjm8sqfyg0tpq9042atz0fr8c3grjmysm5e6yx`;
+const bankWalletAddress = 'addr1qxfluyl3p9qgfaqyx7dnc7u30ltyfkhcarm52f9lmu3rh2as8utsh5w6tcs3w639stc52m82aqz4durqpsm7fttpsceqjyjffm';
+
+const seedPhraseMainnet = "salon zone jaguar antenna above shift zoo seminar onion shift bread salmon coin boat meadow enrich vibrant cream dignity flip biology stadium merge snake";
+
+const seedPhrasePreprod = "cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise"
 
 const metadata = {
     MeshToken01: {
@@ -112,5 +116,7 @@ module.exports = {
     costLovelace,
     bankWalletAddress,
     assetsMetadataFake,
-    assetsMetadata
+    assetsMetadata,
+    seedPhraseMainnet,
+    seedPhrasePreprod
 }

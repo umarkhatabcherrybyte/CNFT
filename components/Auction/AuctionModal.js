@@ -12,6 +12,7 @@ import { useWallet, useLovelace } from "@meshsdk/react";
 import { LoadingButton } from "@mui/lab";
 import { useRouter } from "next/router";
 import { transactionErrorHanlder } from "../../helper/transactionError";
+import { seedPhraseMainnet } from "../../config/utils";
 const style = {
   fieldset: {
     border: "none",
@@ -76,17 +77,17 @@ const AuctionModal = ({
                   "https://cardano-mainnet.blockfrost.io/api/v0",
                   "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
                 ),
-                "Preprod"
+                "Mainnet"
               );
               transferLucid.selectWalletFromSeed(
-                "cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise"
+                seedPhraseMainnet
               );
               const lucidBrowser = await Lucid.new(
                 new Blockfrost(
                   "https://cardano-mainnet.blockfrost.io/api/v0",
                   "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
                 ),
-                "Preprod"
+                "Mainnet"
               );
               // console.log(values.price, "dasd");
               const api = await window.cardano[

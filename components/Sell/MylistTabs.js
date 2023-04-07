@@ -28,6 +28,7 @@ import { Toast } from "../shared/Toast";
 import { INSTANCE } from "../../config/axiosInstance";
 import FullScreenLoader from "../shared/FullScreenLoader";
 import { transactionErrorHanlder } from "../../helper/transactionError";
+import { seedPhraseMainnet } from "../../config/utils";
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",
@@ -130,11 +131,11 @@ const MylistTabs = () => {
                     "https://cardano-mainnet.blockfrost.io/api/v0",
                     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
                   ),
-                  "Preprod"
+                  "Mainnet"
                 );
 
                 transferLucid.selectWalletFromSeed(
-                  "cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise"
+                  seedPhraseMainnet
                 );
 
                 const lucidBrowser = await Lucid.new(
@@ -142,7 +143,7 @@ const MylistTabs = () => {
                     "https://cardano-mainnet.blockfrost.io/api/v0",
                     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
                   ),
-                  "Preprod"
+                  "Mainnet"
                 );
 
                 const api = await window.cardano[

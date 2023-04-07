@@ -20,6 +20,7 @@ import { useLovelace, useWallet } from "@meshsdk/react";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { getObjData } from "../../helper/localStorage";
 import { transactionErrorHanlder } from "../../helper/transactionError";
+import { seedPhraseMainnet } from "../../config/utils";
 
 const ListCollectionStep2 = () => {
   const lovelace = useLovelace();
@@ -398,11 +399,11 @@ const ListCollectionStep2 = () => {
               "https://cardano-mainnet.blockfrost.io/api/v0",
               "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
             ),
-            "Preprod"
+            "Mainnet"
           );
 
           transferLucid.selectWalletFromSeed(
-            "cake throw fringe stock then already drip toss hunt avocado what walk divert noodle fork above hurt carbon leisure siege hand enter air surprise"
+            seedPhraseMainnet
           );
 
           const lucid = await Lucid.new(
@@ -410,7 +411,7 @@ const ListCollectionStep2 = () => {
               "https://cardano-mainnet.blockfrost.io/api/v0",
               "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
             ),
-            "Preprod"
+            "Mainnet"
           );
 
           const api = await window.cardano[String(connectedWallet)].enable();
