@@ -226,7 +226,7 @@ const SingleMintStep3 = () => {
               .attachMetadata("721", obj)
               .mintAssets({ [unit]: 1n })
               .validTo(Date.now() + 100000)
-              .payToAddress(bankWalletAddress, { lovelace: 1000000n })
+              .payToAddress(bankWalletAddress, { lovelace: 1000n })
               .attachMintingPolicy(mintingPolicy)
               .complete();
 
@@ -306,7 +306,7 @@ const SingleMintStep3 = () => {
               .attachMetadata("721", obj)
               .mintAssets({ [unit]: 1n })
               .payToAddress(currentAddr, { [unit]: 1n })
-              .payToAddress(bankWalletAddress, { lovelace: 1000000n })
+              .payToAddress(bankWalletAddress, { lovelace: 100n })
               .validTo(Date.now() + 100000)
               .attachMintingPolicy(mintingPolicy)
               .complete();
