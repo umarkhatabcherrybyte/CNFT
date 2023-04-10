@@ -52,7 +52,7 @@ const SingleMintStep2 = () => {
   const onNextButton = async () => {
     setLoading(true);
     let img = window.localStorage.getItem("img");
-    if(byteSize(metadata.name)>64){
+    if(byteSize(metadata.name)>32){
       Toast("error", "Name is Too Long")
       setLoading(false);
       return
