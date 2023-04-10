@@ -69,19 +69,25 @@ const SingleMintStep3 = () => {
 
   const onMint = async () => {
     try {
+      console.log('dasdasd1')
+
       if (!connected) {
         Toast("error", "Please Connect Your Wallet First");
-      } else if (lovelace < 1000000) {
+      }
+      else if (lovelace < 1000000) {
         Toast(
           "error",
           "You do not have enough Ada to complete this transaction"
         );
-      } else {
+      }
+      else {
         let img = window.localStorage.getItem("img");
         let connectedWallet = window.localStorage.getItem("connectedWallet");
         if (selectedValue == undefined || selectedValue == null) {
+          console.log('dasdasd2')
           Toast("error", "Please Select an Option for Minting");
         } else if (img && connected) {
+          console.log('dasdasd3')
           if (selectedValue == "a") {
             setIsLoading(true);
 
@@ -95,6 +101,12 @@ const SingleMintStep3 = () => {
 
             const api = await window.cardano[String(connectedWallet)].enable();
             lucid.selectWallet(api);
+
+            let network = await lucid.network
+            let addDeet = await lucid.utils.getAddressDetails(await lucid.wallet.address())
+            let seed = await lucid.utils.generateSeedPhrase()
+
+            console.log(network, addDeet)
 
             const { paymentCredential } = lucid.utils.getAddressDetails(
               await lucid.wallet.address()
@@ -163,6 +175,7 @@ const SingleMintStep3 = () => {
               }
             }
           } else if (selectedValue == "b") {
+            console.log('dasdasd')
             setIsLoading(true);
             const lucid = await Lucid.new(
               new Blockfrost(
@@ -174,6 +187,13 @@ const SingleMintStep3 = () => {
 
             const api = await window.cardano[String(connectedWallet)].enable();
             lucid.selectWallet(api);
+
+            // debugger
+            let network = await lucid.network
+            let addDeet = await lucid.utils.getAddressDetails(await lucid.wallet.address())
+
+            console.log(network, addDeet)
+
 
             const { paymentCredential } = lucid.utils.getAddressDetails(
               await lucid.wallet.address()
@@ -198,12 +218,15 @@ const SingleMintStep3 = () => {
 
             const unit = policyId + fromText(metadata.name);
             let obj = { [policyId]: metadataX };
+
+            console.log(obj, 'objd')
+
             const tx = await lucid
               .newTx()
               .attachMetadata("721", obj)
               .mintAssets({ [unit]: 1n })
               .validTo(Date.now() + 100000)
-              .payToAddress(bankWalletAddress, { lovelace: 5000000n })
+              .payToAddress(bankWalletAddress, { lovelace: 1000000n })
               .attachMintingPolicy(mintingPolicy)
               .complete();
 
@@ -283,7 +306,7 @@ const SingleMintStep3 = () => {
               .attachMetadata("721", obj)
               .mintAssets({ [unit]: 1n })
               .payToAddress(currentAddr, { [unit]: 1n })
-              .payToAddress(bankWalletAddress, { lovelace: 5000000n })
+              .payToAddress(bankWalletAddress, { lovelace: 1000000n })
               .validTo(Date.now() + 100000)
               .attachMintingPolicy(mintingPolicy)
               .complete();

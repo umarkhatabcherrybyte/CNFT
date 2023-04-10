@@ -19,6 +19,7 @@ import {
 } from "../../../components/Routes/constants";
 import CaptionHeading from "/components/shared/headings/CaptionHeading";
 
+
 const SingleMintStep2 = () => {
   const router = useRouter();
   const { wallet, connected } = useWallet();
@@ -46,10 +47,32 @@ const SingleMintStep2 = () => {
     setRangeValue(e.target.value);
   };
 
+  const byteSize = str => new Blob([str]).size;
+
   const onNextButton = async () => {
     setLoading(true);
     let img = window.localStorage.getItem("img");
-    if (!metadata.name || metadata.name === null || metadata.name === "") {
+    if(byteSize(metadata.name)>64){
+      Toast("error", "Name is Too Long")
+      setLoading(false);
+      return
+    }
+    else if(byteSize(metadata.description)>64){
+      Toast("error", "Description is Too Long");
+      setLoading(false);
+      return
+    }
+    else if(byteSize(metadata.link)>64){
+      Toast("error", "Link is Too Long");
+      setLoading(false);
+      return
+    }
+    else if(byteSize(metadata.creator)>64){
+      Toast("error", "Creator is Too Long");
+      setLoading(false);
+      return
+    }
+    else if (!metadata.name || metadata.name === null || metadata.name === "") {
       Toast("error", "Name is invalid.");
       setLoading(false);
       return;
