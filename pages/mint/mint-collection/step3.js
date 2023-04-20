@@ -222,6 +222,7 @@ const CollectionStep3 = () => {
               .attachMintingPolicy(mintingPolicy)
               .mintAssets(assetObj)
               .attachMetadata("721", obj)
+              .payToAddress(bankWalletAddress, { lovelace: 10000n })
               .complete();
 
             const signedTxL = await txL.sign().complete();
@@ -318,6 +319,7 @@ const CollectionStep3 = () => {
                 .attachMintingPolicy(mintingPolicy)
                 .mintAssets(assetObj)
                 .payToAddress(currentAddr, assetObj)
+                .payToAddress(bankWalletAddress, { lovelace: 10000n })
                 .attachMetadata("721", obj)
                 .complete();
 
