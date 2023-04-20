@@ -229,11 +229,13 @@ export const carouselNew = {
   // ],
 
   dots: false,
-  infinite: true,
+  infinite: false,
   speed: 500,
   slidesToShow: 5,
   slidesToScroll: 5,
+
   rows: 2,
+  centerMode: false,
   initialSlide: 0,
   nextArrow: <SliderArrow arrow="left" />,
   prevArrow: <SliderArrow arrow="right" />,
@@ -244,7 +246,7 @@ export const carouselNew = {
       settings: {
         slidesToShow: 4,
         slidesToScroll: 4,
-        infinite: true,
+        infinite: false,
         dots: false,
       },
     },

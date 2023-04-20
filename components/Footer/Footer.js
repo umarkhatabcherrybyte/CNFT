@@ -1,9 +1,11 @@
 import React from "react";
 import styled from "styled-components";
-import { Box, Grid, Typography, Link } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
+import Link from "next/link";
 import { termConditionRoute } from "../Routes/constants";
-
+import { useRouter } from "next/router";
 const Footer = () => {
+  const router = useRouter();
   return (
     <FooterStyled>
       <Box>
@@ -18,7 +20,7 @@ const Footer = () => {
                 both an exchange and minting on the same platform. Additionally,
                 we offer an auction feature as another way to sell your NFTs.{" "}
                 <br></br>If you need any help, then please Contact Us, and we
-                will be happy to assist` you!
+                will be happy to assist` you
               </Box>
             </Grid>
             {/* <Grid item md={2} sm={6} xs={12}>
@@ -57,19 +59,19 @@ const Footer = () => {
                 </Typography>
                 <ul>
                   <li>
-                    <Link to="">All NFTs</Link>
+                    <Link href="/">All NFTs</Link>
                   </li>
                   <li>
-                    <Link to="">Art</Link>
+                    <Link href="/">Art</Link>
                   </li>
                   <li>
-                    <Link to="">Photo</Link>
+                    <Link href="/">Photo</Link>
                   </li>
                   <li>
-                    <Link to="">Music</Link>
+                    <Link href="/">Music</Link>
                   </li>
                   <li>
-                    <Link to="">Video</Link>
+                    <Link href="/">Video</Link>
                   </li>
                 </ul>
               </Box>
@@ -85,20 +87,20 @@ const Footer = () => {
                 </Typography>
                 <ul>
                   <li>
-                    <Link to="">Help and Support</Link>
+                    <Link href="/help-support">Help and Support</Link>
                   </li>
                   <li>
                     <Link href={termConditionRoute}>Terms and Condition</Link>
                   </li>
-                  <li>
-                    <Link to="">Auctions</Link>
-                  </li>
-                  <li>
+                  {/* <li>
+                    <Link href="/auction">Auctions</Link>
+                  </li> */}
+                  {/* <li>
                     <Link to="">Royalty System</Link>
                   </li>
                   <li>
                     <Link to="">How to use Smart Contracts</Link>
-                  </li>
+                  </li> */}
                 </ul>
               </Box>
             </Grid>
@@ -113,16 +115,16 @@ const Footer = () => {
                 </Typography>
                 <ul>
                   <li>
-                    <Link to="">Buy</Link>
+                    <Link href="/buy">Buy</Link>
                   </li>
                   <li>
-                    <Link to="">Sell</Link>
+                    <Link href="/sell">Sell</Link>
                   </li>
                   <li>
-                    <Link to="">Auction</Link>
+                    <Link href="/auction">Auction</Link>
                   </li>
                   <li>
-                    <Link to="">Mint</Link>
+                    <Link href="/mint">Mint</Link>
                   </li>
                 </ul>
               </Box>
@@ -134,7 +136,7 @@ const Footer = () => {
             className="text_center text_white proxima "
             sx={{ py: 4, borderTop: "1px solid #fff" }}
           >
-            2022 copyright CNFTGENIE, LLC, all rights reserved.
+            2023 copyright CNFTGENIE, LLC, all rights reserved.
           </Box>
         </Box>
       </Box>

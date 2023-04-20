@@ -2,56 +2,72 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import CaptionHeading from "/components/shared/headings/CaptionHeading";
-import { Toast } from "../shared/Toast";
-
+import UserService from "../../services/user.service";
+import { useDispatch } from "react-redux";
 import { Box, Select, MenuItem, Button, Typography } from "@mui/material";
-
+import { Toast } from "../shared/Toast";
+import { setUser } from "../../redux/user/userActions";
+import { formatAmount } from "/helper/formatAmount";
 const wallets = [
   {
     img: "/images/wallet/nami_small.png",
     value: "Nami",
     label: "Nami",
+    extension: "nami",
   },
   {
     img: "/images/wallet/eternl_small.png",
     value: "eternl",
     label: "Eternl",
+    extension: "eternl",
   },
   {
     img: "/images/wallet/flint_small.png",
     value: "Flint Wallet",
     label: "Flint",
+    extension: "flint",
   },
   {
     img: "/images/wallet/nufi_small.png",
     value: "NuFi",
     label: "Nufi",
+    extension: "nufi",
   },
   {
     img: "/images/wallet/gerowallet_small.png",
     value: "GeroWallet",
     label: "Gero",
+    extension: "gerowallet",
   },
   {
     img: "/images/wallet/typhoncip30_small.png",
     value: "Typhon Wallet",
     label: "Typhon",
+    extension: "typhoncip30",
   },
 ];
 
-const WalletDropDown = () => {
+const WalletDropdown = () => {
+  const dispatch = useDispatch();
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
 
   const lovelace = useLovelace();
 
-  // console.info(wallet, "1");
-  // console.info(name, "2");
-  // console.log(error);
   const [walletName, setWalletName] = React.useState("default");
   useEffect(() => {
     disconnect();
   }, []);
+  useEffect(() => {
+    if (!connected) {
+      localStorage.removeItem("user_id");
+      disconnect(setUser(""));
+    }
+  }, [connected]);
+
+  useEffect(() => {
+    signIn();
+  }, [connected, wallet]);
   useEffect(() => {
     if (error) {
       setWalletName(name);
@@ -61,12 +77,38 @@ const WalletDropDown = () => {
   const handleWalletChange = (event) => {
     setWalletName(event.target.value);
   };
+
+  const signIn = async () => {
+    try {
+      if (connected) {
+        // console.log(wallet, 'weawdas')
+        let addrss = await wallet?.getUsedAddresses();
+        // console.log('here', await wallet?.getUsedAddress(), await wallet?.getUsedAddresses())
+        window.localStorage.setItem("user_address", addrss[0]);
+
+        let res = await UserService.signIn(addrss[0]);
+        if (res.data) {
+          // console.log(res.data);
+          window.localStorage.setItem("user_id", res.data.data._id);
+          dispatch(setUser(res.data.data._id));
+        }
+      }
+    } catch (error) {
+      console.log(error, "err");
+    }
+  };
+
   const handleWalletClick = async (event, walletV) => {
-    if (walletV.value === walletName) {
-      setWalletName("default");
-      disconnect();
+    if (walletV.extension && window?.cardano[walletV?.extension] != undefined) {
+      if (walletV.value === walletName) {
+        setWalletName("default");
+        disconnect();
+      } else {
+        connect(walletV.value);
+        window.localStorage.setItem("connectedWallet", walletV.extension);
+      }
     } else {
-      connect(walletV.value);
+      Toast("error", "Please install your wallet");
     }
   };
 
@@ -174,7 +216,7 @@ const WalletDropDown = () => {
               <CaptionHeading
                 heading={
                   connected && name === wallet.value
-                    ? parseInt(lovelace) / 1000000 + " ADA"
+                    ? formatAmount(parseInt(lovelace) / 1000000) + " ADA"
                     : wallet.label
                 }
               />
@@ -206,9 +248,9 @@ const WalletDropDown = () => {
         ) : (
           <>
             {walletName != "default" && lovelace ? (
-              parseInt(lovelace) / 1000000 + " ADA"
+              formatAmount(parseInt(lovelace) / 1000000) + " ADA"
             ) : (
-              <p className="font_12">Connect Wallet</p>
+              <p className="font_12">Connect Here</p>
             )}
           </>
         )}
@@ -217,7 +259,7 @@ const WalletDropDown = () => {
   );
 };
 
-export default WalletDropDown;
+export default WalletDropdown;
 
 const WalletDropDownStyled = styled.section`
   display: flex;

@@ -9,7 +9,6 @@ import {
   useTheme,
   Container,
   Typography,
-  Link,
   Menu,
   MenuItem,
   Button,
@@ -18,7 +17,7 @@ import {
 } from "@mui/material";
 import Drawer from "./Drawer";
 import styled from "styled-components";
-
+import Link from "next/link";
 import { useRouter } from "next/router";
 import WalletDropDown from "./WalletDropDown";
 import {
@@ -42,6 +41,7 @@ const Navbar = () => {
   const [value, setValue] = useState("/");
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  console.log(anchorEl, "sdfffsf");
   // useEffect(() => {
   //   setValue(location.pathname);
   // }, [location.pathname]);
@@ -57,11 +57,11 @@ const Navbar = () => {
       navigate: "/",
       icon: Home,
     },
-    {
-      value: "Collection",
-      navigate: collectionRoute,
-      icon: Apps,
-    },
+    // {
+    //   value: "Collection",
+    //   navigate: collectionRoute,
+    //   icon: Apps,
+    // },
     // {
     //   value: "sell",
     //   navigate: "/sell",
@@ -88,7 +88,7 @@ const Navbar = () => {
   //   window.addEventListener("scroll", function () {
   //     if (window.pageYOffset > 0) {
   //       setNavScroll("active");
-  //     } else { 
+  //     } else {
   //       setNavScroll("");
   //     }
   //   });
@@ -127,7 +127,7 @@ const Navbar = () => {
             }}
           >
             <Box className="flex_item">
-              <Link to="/" sx={{ textDecoration: "none" }}>
+              <Link href="/" style={{ textDecoration: "none" }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                   <img src="/images/logo.png" alt="logo" className="logo" />
                   <Typography
@@ -143,9 +143,14 @@ const Navbar = () => {
             <Box className="flex_item">
               {!isMatch && (
                 <>
-                  <SearchBar />
+                  {/* <SearchBar /> */}
+                  {/* {navData.map((data) => (
+                    <Link href={data.navigate} className="proxima">
+                      {data.value}
+                    </Link>
+                  ))} */}
                   <Tabs
-                    // value={value}
+                    value={value}
                     onChange={(e, value) => {
                       router.push(value);
                       setValue(value);
@@ -162,13 +167,15 @@ const Navbar = () => {
                         display: "none",
                       },
                       "& .Mui-selected": {
-                        color: "var(--secondary-color) !important",
+                        color: "#fff !important",
                       },
                     }}
                   >
                     {navData.map((data) => (
                       <Tab
-                        value={data.navigate}
+                        onClick={() => router.push(data.navigate)}
+                        key={data?.value}
+                        value={data?.navigate}
                         label={data.value}
                         className="proxima"
                       />
@@ -200,10 +207,18 @@ const Navbar = () => {
                       onClose={handleClose}
                       MenuListProps={{
                         "aria-labelledby": "basic-button",
+                        // sx: {
+                        //   width: 250,
+                        //   border: "1px solid rgba(255, 255, 255, 0.2)",
+                        //   backgroundColor: "red",
+                        //   color: "#fff",
+                        //   borderRadius: "10px",
+                        // },
                       }}
                     >
                       <MenuItem
                         onClick={(e) => {
+                          setAnchorEl(null);
                           router.push({
                             pathname: "/sell",
                             query: {
@@ -216,6 +231,7 @@ const Navbar = () => {
                       </MenuItem>
                       <MenuItem
                         onClick={(e) => {
+                          setAnchorEl(null);
                           router.push({
                             pathname: "/sell",
                             query: {
@@ -250,7 +266,7 @@ const Navbar = () => {
               <Divider sx={{ borderColor: "#fff" }} />
               <Grid container spacing={1} alignItems="center" sx={{ py: 2 }}>
                 <Grid item xs={6}>
-                  <SearchBar />
+                  {/* <SearchBar /> */}
                 </Grid>
                 <Grid
                   item

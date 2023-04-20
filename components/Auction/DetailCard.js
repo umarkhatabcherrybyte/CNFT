@@ -3,7 +3,12 @@ import styled from "styled-components";
 import { Box, Card, CardMedia, Typography, CardContent } from "@mui/material";
 import { auctionDetailRoute } from "../Routes/constants";
 import { useRouter } from "next/router";
-const DetailCard = () => {
+import dynamic from "next/dynamic";
+import { isVideoOrIsAudio } from "../../utils/utils";
+const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
+  ssr: false,
+});
+const DetailCard = ({ card }) => {
   const router = useRouter();
 
   return (
@@ -26,13 +31,19 @@ const DetailCard = () => {
               justifyContent: "space-between",
             },
           }}
-          onClick={() => router.push(`${auctionDetailRoute}/2323`)}
+          onClick={() => router.push(`${auctionDetailRoute}/0/${card?._id}`)}
         >
           <Box sx={{ position: "relative" }}>
             <CardMedia
               component="img"
               height="290"
-              image="/images/Buy Our Tokens/Layer 61.png"
+              src={
+                !isVideoOrIsAudio(card.collection_id?.assets[0])
+                  ? `https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`
+                  : card?.collection_id?.assets[0]?.feature_image
+              }
+              // src="/images/download.jpg"
+              // image={`https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`}
               alt="green iguana"
             />
             <Box sx={{ position: "absolute", bottom: "10px" }}></Box>
@@ -44,9 +55,9 @@ const DetailCard = () => {
               component="div"
               className="uppercase poppin text_center"
             >
-              iNDUSTRIAL REvolution
+              {card?.collection_id?.assets[0]?.asset_name}
             </Typography>
-            <Typography
+            {/* <Typography
               gutterBottom
               variant="caption"
               component="div"
@@ -57,7 +68,7 @@ const DetailCard = () => {
               <span style={{ color: "var(--secondary-color)" }}>
                 julian_jokey
               </span>
-            </Typography>
+            </Typography> */}
 
             <Typography
               variant="h6"
@@ -68,7 +79,8 @@ const DetailCard = () => {
               }}
               className="bold  poppin text_center flex"
             >
-              1500
+              {card?.sell_type_id?.price}
+
               <Typography
                 variant="caption"
                 component="div"
@@ -84,7 +96,12 @@ const DetailCard = () => {
               Time Remaining
             </Typography>
             <Typography className="gray text_center bold poppin">
-              03D : 19H : 54M : 05S
+              {card?.list?.sell_type_id?.end_time}
+              <DateCountdown
+                dateTo={card?.sell_type_id?.end_time}
+                // callback={() => alert("Hello")}
+                locales_plural={["Y:", "M:", "D:", "H:", "M:", "S"]}
+              />
             </Typography>
           </CardContent>
         </Card>

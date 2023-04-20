@@ -1,9 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    esmExternals: 'loose',
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
-  reactStrictMode: true,
+  reactStrictMode: false,
   trailingSlash: true,
   images: {
     loader: "akamai",
@@ -13,6 +16,7 @@ const nextConfig = {
     config.experiments = {
       asyncWebAssembly: true,
       layers: true,
+      topLevelAwait: true,
     };
     return config;
   },

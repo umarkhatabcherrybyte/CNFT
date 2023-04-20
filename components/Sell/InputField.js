@@ -1,6 +1,6 @@
 import React from "react";
 import { TextField, Box, Typography } from "@mui/material";
-const InputField = ({ placeholder, label }) => {
+const InputField = ({ placeholder, label, name, formik }) => {
   return (
     <>
       <Box sx={{ position: "relative" }}>
@@ -13,7 +13,12 @@ const InputField = ({ placeholder, label }) => {
         </Typography>
         <TextField
           placeholder={placeholder}
-          fullWidth
+          fullWidth={true}
+          name={name}
+          value={formik.values[name]}
+          onChange={formik.handleChange}
+          error={formik.touched[name] && Boolean(formik.errors[name])}
+          helperText={formik.touched[name] && formik.errors[name]}
           sx={{
             fieldset: {
               border: "none",

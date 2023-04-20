@@ -1,9 +1,10 @@
 import http from "../config/apiInstance";
 class UploadFilesService {
+
   upload(file, path, onUploadProgress) {
     let formData = new FormData();
     formData.append("file", file, file.name);
-    return http.post("/api/uploadMultiFiles/upload/images", formData, {
+    return http.post("api/collection/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         path: path,
@@ -24,7 +25,7 @@ class UploadFilesService {
   uploadMeta(file, path, onUploadProgress) {
     let formData = new FormData();
     formData.append("file", file);
-    return http.post("/api/uploadMultiFiles/upload/meta", formData, {
+    return http.post("/collection/file", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         path: path,
@@ -45,7 +46,6 @@ class UploadFilesService {
       }
     );
   }
-
   uploadWebExcelMeta(convertedJson, path) {
     return http.post(
       "/api/uploadMultiFiles/upload/webExcelMeta",
@@ -65,5 +65,6 @@ class UploadFilesService {
       },
     });
   }
+
 }
 export default new UploadFilesService();

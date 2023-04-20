@@ -4,49 +4,84 @@ import Header from "/components/Mint/shared/Header";
 import Layout from "/components/Mint/Layout";
 import styled from "styled-components";
 import VerifyMetaFileService from "/services/verify-metafile.service";
-import { Toast } from "/components/shared/Toast";
 import UploadService from "/services/upload-files.service";
+import MintService from "/services/mint.service";
+import { Toast } from "/components/shared/Toast";
 import imageCompression from "browser-image-compression";
 import download from "js-file-download";
-import { Delete, DeleteForever } from "@mui/icons-material";
+import {
+  Delete,
+  DeleteForever,
+  DeleteForeverOutlined,
+} from "@mui/icons-material";
 import ExcelSpreadSheet from "/components/Mint/Mint Collection/ExcelSpreadSheet";
 import { Box, Button, Grid } from "@mui/material";
 import CaptionHeading from "/components/shared/headings/CaptionHeading";
 import LightText from "/components/shared/headings/LightText";
 import Heading from "/components/shared/headings/Heading";
 import { List } from "@mui/icons-material";
-import { mintCollectionStep2 } from "/components/Routes/constants";
+import {
+  mintCollectionStep2,
+  mintRoute,
+  mintCollectionStep3,
+} from "/components/Routes/constants";
 import { useRouter } from "next/router";
-const Step1 = () => {
+import { create } from "ipfs-http-client";
+
+const CollectionStep1 = () => {
   const router = useRouter();
-  const [selectedFiles, setSeletedFiles] = useState(undefined);
+  const [selectedFiles, setSeletedFiles] = useState([]);
   const [metaFile, setMetaFile] = useState(undefined);
   const [metaData, setMetaData] = useState([]);
   const [progressInfos, setProgressInfos] = useState([]);
   const [fileInfos, setFileInfos] = useState([]);
-  const [metaFileInfos, setMetaFileInfos] = useState([]);
+  const [imagePaths, setImagePaths] = useState([]);
   const [walletAddress, setWalletAddress] = useState("");
   const [connectedWallet, setConnectedWallet] = useState("");
-  const [checked, setChecked] = useState(true);
-  const [metaDataUrl, setMetaDataURL] = useState(null);
+  const [isWebform, setIsWebform] = useState(false);
+  const [metadataFileUploaded, setMetadataFileUploaded] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
+  const [metadataObjects, setMetadataObjects] = useState([]);
+  const [metadataObjectsFromFile, setMetadataObjectsFromFile] = useState([]);
+  const [metadataObjectProperties, setMetadataObjectProperties] = useState([]);
   let _progressInfos = [];
 
   const metaFileInputRef = useRef(null);
   const hiddenFileInputRef = useRef(null);
   const metaFileLabelRef = useRef(null);
   const selectedFilesLabelRef = useRef(null);
-  const excelRef = useRef(null);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.localStorage.getItem("connectedWallet", imagePaths);
+      // window.localStorage.getItem("metadataObjects", metadataObjects);
+    }
+  }, []);
+
+  const onDeleteFile = (index_num) => {
+    const files = selectedFiles.filter((item, index) => {
+      return index !== index_num;
+    });
+    setSeletedFiles(files);
+  };
   const onSelectedFiles = (e) => {
-    if (e.target.files) {
-      selectedFilesLabelRef.current.innerHTML = `${e.target.files.length} files choosen`;
+    if (e.target.files && e.target.files[0]) {
+      const name = e.target.files[0]?.name.toLowerCase();
+      if (name.match(/\.(jpg|jpeg|png|gif|mp3|mp4)$/)) {
+        var temp = selectedFiles ? [...selectedFiles] : [];
+        for (let i = 0; i < e.target.files.length; i++) {
+          const files = e.target.files[i];
+          temp.push(files);
+        }
+        setSeletedFiles(temp);
+        selectedFilesLabelRef.current.innerHTML = `${temp.length} files choosen`;
+      } else {
+        Toast("error", "Please upload correct file format.");
+      }
     } else {
       selectedFilesLabelRef.current.innerHTML = `No file choosen`;
     }
-
-    setProgressInfos([]);
-    setSeletedFiles(e.target.files);
   };
 
   const onSelectMetaFile = (e) => {
@@ -60,128 +95,136 @@ const Step1 = () => {
     setMetaFile(e.target.files[0]);
   };
 
-  function verifyMeta() {
-    const path = connectedWallet + "_" + walletAddress;
-    VerifyMetaFileService.verify(path)
-      .then((response) => {
-        if (response.data.err == "") {
-          setMetaData(response.data.data.Metadata);
-          Toast("success", response.data.msg);
-        } else {
-          Toast("error", response.data.err);
-        }
-      })
-      .catch((e) => {
-        Toast("error", "Server Error: " + e.message);
-      });
-  }
-
   function uploadMeta() {
-    const file = metaFile;
-    const path = connectedWallet + "_" + walletAddress;
-    UploadService.uploadMeta(file, path, (event) => {})
-      .then((response) => {
-        metaFileInputRef.current.value = null;
-        metaFileLabelRef.current.innerHTML = "No file choosen";
-        setMetaFile(null);
-        Toast("success", "Upload Metadata successed.");
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    if (metaFile == undefined || metaFile == null) {
+      Toast("error", "Select A File And Try Again");
+    } else {
+      const file = metaFile;
+      const path = connectedWallet + "_" + walletAddress;
+      UploadService.uploadMeta(file, path, (event) => {})
+        .then((response) => {
+          if (response.data.data.length > 0) {
+            // console.log(response.data.data, "dara");
+            setMetadataObjectsFromFile(response.data.data || []);
+            window.localStorage.setItem(
+              "metadataObjects",
+              JSON.stringify(response.data.data)
+            );
+            setMetadataFileUploaded(true);
+            metaFileInputRef.current.value = null;
+            metaFileLabelRef.current.innerHTML = "No file choosen";
+            // setMetaFile(null);
+            Toast("success", "Uploaded Metadata Successfully");
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          setMetadataFileUploaded(false);
+        });
+    }
   }
 
-  const uploadFiles = async () => {
-    async function t() {
-      if (connectedWallet == "" || walletAddress == "") {
-        setConnectedWallet(sessionStorage.getItem("connectedWallet"));
-        setWalletAddress(sessionStorage.getItem("walletAddress"));
-        return;
-      }
-      const path = connectedWallet + "_" + walletAddress;
-
-      const _selectedFiles = selectedFiles;
-      _progressInfos = [];
-      for (let i = 0; i < _selectedFiles.length; i++) {
-        _progressInfos.push({
-          percentage: 0,
-          fileName: _selectedFiles[i].name,
+  const uploadFilesIPFS = async () => {
+    if (selectedFiles.length > 0) {
+      setImagePaths([]);
+      try {
+        const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
+        const projectSecret = "136393a5b7f4e47a9e153a88eb636003";
+        const auth = `Basic ${Buffer.from(
+          `${projectId}:${projectSecret}`
+        ).toString("base64")}`;
+        const client = create({
+          host: "ipfs.infura.io",
+          port: 5001,
+          protocol: "https",
+          headers: {
+            authorization: auth,
+          },
         });
-      }
-      const compressOptions = {
-        maxSizeMB: 0.5,
-        useWebWorker: true,
-      };
-      //_message = [];
-      setProgressInfos(_progressInfos);
-      for (let i = 0; i < _selectedFiles.length; i++) {
-        const originalFileSize = _selectedFiles[i].size / 1024 / 1024;
-        let compressedFile = _selectedFiles[i];
-        if (originalFileSize >= 0.5) {
-          compressedFile = await imageCompression(
-            _selectedFiles[i],
-            compressOptions
-          );
+        let arr = [];
+        for (let index = 0; index < selectedFiles.length; index++) {
+          const uploaded_image = await client.add(selectedFiles[index]);
+          // console.log(uploaded_image, selectedFiles[index], "img");
+          if (uploaded_image) {
+            arr.push({
+              path: uploaded_image.path,
+              file_mimeType: selectedFiles[index].type,
+            });
+          }
         }
-        upload(path, i, compressedFile);
+        setImagePaths(arr);
+        setMetadataFileUploaded(true);
+        Toast("success", "Files Uploaded Successfully");
+      } catch (error) {
+        console.log(error, "err");
+        setIsUploading(false);
+        Toast("error", "Uploading failed.");
       }
+    } else {
+      Toast("error", "Select A File And Try Again");
+      setIsUploading(false);
     }
-    await t();
   };
 
-  function upload(path, idx, file) {
-    _progressInfos = [..._progressInfos];
-    UploadService.upload(file, path, (event) => {
-      _progressInfos[idx].percentage = Math.round(
-        (100 * event.loaded) / event.total
-      );
-      setProgressInfos(_progressInfos);
-    })
-      .then((response) => {
-        setMetaData([]);
-        t();
-      })
-      .catch(() => {
-        _progressInfos[idx].percentage = 0;
-        setProgressInfos(_progressInfos);
-      });
-
-    function t() {
-      UploadService.getFiles(connectedWallet + "_" + walletAddress).then(
-        (files) => {
-          setFileInfos(files.data);
-        }
-      );
-    }
-  }
-
   function onNextStep() {
-    router.push(mintCollectionStep2);
-    // const path = connectedWallet + "_" + walletAddress;
-    // VerifyMetaFileService.verify(path)
-    //   .then((response) => {
-    //     if (response.data.err == "") {
-    //       setMetaData(response.data.data.Metadata);
-    //       Toast("success", response.data.msg);
-    //       sessionStorage.setItem("item_amount", metaData.length);
-    //       navigate(mintCollectionStep2);
-    //     } else {
-    //       Toast("error", response.data.err);
-    //     }
-    //   })
-    //   .catch((e) => {
-    //     Toast("error", "Server Error: " + e.message);
-    //   });
-  }
-  function onBackStep() {
-    navigate("/mint");
-  }
-  function onResetData() {
-    onRemoveImage("");
-    if (checked) {
-      excelRef.current.resetData();
+    debugger
+    if (!isWebform && metaFile && metadataObjectsFromFile.length > 0) {
+      router.push(mintCollectionStep3);
+      return;
+    } else if (!isWebform && metaFile && !metadataFileUploaded) {
+      Toast("error", "Please Upload Metadata File First");
+      return;
+    } else if (isWebform && imagePaths.length == 0) {
+      Toast("error", "Please Upload NFT Files");
+      return;
+    } else if (isWebform && imagePaths.length > metadataObjects.length) {
+      Toast("error", "You Need To Add More Metadata");
+      return;
+    } else if (isWebform && imagePaths.length < metadataObjects.length) {
+      Toast("error", "You Need To Add More NFT Files");
+      return;
+    }
+    let objs = convertMetadataObjects();
+    // console.log(objs, "onjs");
+    if (!validateCollectionData(objs)) {
+      console.log("here");
+      return;
+    } else if (isWebform && objs.length != imagePaths.length) {
+      Toast("error", "missing metadata of some Files");
+      return;
+    } else if (!isWebform && metadataObjects.length != imagePaths.length) {
+      Toast("error", "missing metadata of some Files");
+      return;
+    } else if (
+      !isWebform &&
+      metadataObjects.length == imagePaths.length &&
+      metadataFileUploaded
+    ) {
+      window.localStorage.setItem(
+        "metadataObjects",
+        JSON.stringify(metadataObjects)
+      );
+      window.localStorage.setItem("images", JSON.stringify(imagePaths));
+      window.localStorage.setItem(
+        "metadataObjectsProperties",
+        JSON.stringify(metadataObjectProperties)
+      );
+      router.push(mintCollectionStep3);
+    } else if (isWebform) {
+      window.localStorage.setItem("images", JSON.stringify(imagePaths));
+      window.localStorage.setItem("metadataObjects", JSON.stringify(objs));
+      window.localStorage.setItem(
+        "metadataObjectsProperties",
+        JSON.stringify(metadataObjectProperties)
+      );
+      router.push(mintCollectionStep3);
     }
   }
+
+  function onBackStep() {
+    router.push(mintRoute);
+  }
+
   function onRemoveImage(fileName) {
     const path = connectedWallet + "_" + walletAddress;
     UploadService.remove(fileName, path)
@@ -196,23 +239,26 @@ const Step1 = () => {
         Toast("error", "Remove images failed. " + e.message);
       });
   }
-  useEffect(() => {
-    const connected = sessionStorage.getItem("connected");
-    if (connected == false) {
-      Toast("error", "Please connect your wallet.");
-      navigate("/");
-    } else {
-      setWalletAddress(sessionStorage.getItem("walletAddress"));
-      setConnectedWallet(sessionStorage.getItem("connectedWallet"));
-      UploadService.getFiles(
-        sessionStorage.getItem("connectedWallet") +
-          "_" +
-          sessionStorage.getItem("walletAddress")
-      ).then((response) => {
-        setFileInfos(response.data);
-      });
+
+  const convertMetadataObjects = () => {
+    let metadataObjectPropertiesClone = metadataObjects;
+    let metadataArr = [];
+    for (let index = 0; index < metadataObjectPropertiesClone.length; index++) {
+      let obj = {};
+      const element = metadataObjectPropertiesClone[index];
+      for (let index = 0; index < metadataObjectProperties.length; index++) {
+        obj[metadataObjectProperties[index]] =
+          element[Object.keys(element)[index]];
+      }
+      obj["ipfs"] = imagePaths[index].path;
+      obj["image"] = `ipfs://${imagePaths[index].path}`;
+      obj["mediaType"] = imagePaths[index].file_mimeType;
+      // obj["mediaType"] = "image/jpeg"
+      metadataArr.push(obj);
     }
-  }, []);
+    // console.log(metadataArr, "arr");
+    return metadataArr;
+  };
 
   const convertToJson = () => {
     const excelData = excelRef.current.convertToJson();
@@ -235,22 +281,23 @@ const Step1 = () => {
       }
     });
 
-    const path = connectedWallet + "_" + walletAddress;
-    UploadService.uploadWebExcelMeta(
-      JSON.stringify(convertedJson),
-      path,
-      (event) => {}
-    )
-      .then((response) => {
-        Toast("success", "Upload Metadata successed.");
-        setMetaDataURL(
-          `/resources/static/assets/uploads/meta/${path}/metadata.json`
-        );
-      })
-      .catch((e) => {
-        Toast("error", e.message);
-      });
+    // const path = connectedWallet + "_" + walletAddress;
+    // UploadService.uploadWebExcelMeta(
+    //   JSON.stringify(convertedJson),
+    //   path,
+    //   (event) => {}
+    // )
+    //   .then((response) => {
+    //     Toast("success", "Upload Metadata successed.");
+    //     setMetaDataURL(
+    //       `/resources/static/assets/uploads/meta/${path}/metadata.json`
+    //     );
+    //   })
+    //   .catch((e) => {
+    //     Toast("error", e.message);
+    //   });
   };
+
   const metaFileDown = () => {
     const path = connectedWallet + "_" + walletAddress;
     UploadService.downloadMetafile(path, (event) => {})
@@ -262,13 +309,62 @@ const Step1 = () => {
         Toast("error", e.message);
       });
   };
+
+  const validateCollectionData = (objs) => {
+    if (objs.length > 0) {
+      for (let index = 0; index < objs.length; index++) {
+        if (
+          !(
+            Object.keys(objs[index]).includes("name") ||
+            Object.keys(objs[index]).includes("Name")
+          ) ||
+          !(
+            Object.keys(objs[index]).includes("price") ||
+            Object.keys(objs[index]).includes("Price")
+          )
+        ) {
+          Toast(
+            "error",
+            "You need to have both name and price properties in the webform"
+          );
+          return false;
+        }
+      }
+
+      var valueArr = objs.map(function (item) {
+        return item.name;
+      });
+      var isDuplicate = valueArr.some(function (item, idx) {
+        return valueArr.indexOf(item) != idx;
+      });
+      // console.log(isDuplicate, "dup");
+      if (isDuplicate) {
+        Toast("error", "You have duplicate names in the webform!");
+        // console.log(isDup)
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      // console.log('no itemsd')
+      Toast("error", "No Metadata Objects Found");
+      return false;
+    }
+  };
+
   const onFileInputButton = () => {
     console.log("onFileInputButton");
     hiddenFileInputRef.current.click();
   };
+
   const onMetaFileInputButton = () => {
     metaFileInputRef.current.click();
   };
+
+  const viewImagesPaths = () => {
+    console.log(imagePaths, "o");
+  };
+
   return (
     <Step1Styled>
       <ContainerLayout>
@@ -294,9 +390,7 @@ const Step1 = () => {
                         onFileInputButton();
                       }}
                     >
-                      <label style={{ padding: "10px", fontSize: "14px" }}>
-                        Choose File
-                      </label>
+                      <label style={{ fontSize: "14px" }}>Choose File</label>
                       <Box sx={{ padding: "10px" }}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -351,14 +445,16 @@ const Step1 = () => {
                         className="upload-file-label"
                         ref={selectedFilesLabelRef}
                       >
-                        No file choosen
+                        {selectedFiles.length > 0
+                          ? `${selectedFiles.length} files choosen`
+                          : "No file chosen"}
                       </label>
                     </div>
                     <input
                       type="file"
                       accept="image/*"
                       ref={hiddenFileInputRef}
-                      multiple
+                      // multiple
                       onChange={(e) => onSelectedFiles(e)}
                     />
                   </Box>
@@ -367,7 +463,7 @@ const Step1 = () => {
                   <Button
                     className="btn w_100"
                     // disabled={!selectedFiles}
-                    onClick={() => uploadFiles()}
+                    onClick={() => uploadFilesIPFS()}
                   >
                     Upload
                   </Button>
@@ -377,31 +473,44 @@ const Step1 = () => {
                     className="br_15"
                     sx={{ background: "var(--box-color)" }}
                   >
-                    {Array(4)
-                      .fill()
-                      .map(() => (
+                    {selectedFiles.length > 0 &&
+                      selectedFiles.map((file, index) => (
                         <Box
+                          key={index}
                           className="space_between"
                           sx={{
                             py: 1,
+                            px: 2,
                             borderBottom: "1px solid #fff",
                             "&:last-child": {
                               border: "none",
                             },
                           }}
                         >
-                          <Box sx={{ pl: 2 }}>
-                            <LightText heading="Emma.jpg" />
+                          <Box>
+                            <Box className="flex_align">
+                              <Box sx={{ pr: 2 }}>
+                                <CaptionHeading heading={index + 1} />
+                              </Box>
+                              <LightText heading={`${file?.name}`} />
+                            </Box>
                           </Box>
-                          <Box sx={{ pr: 2 }}>
-                            <Delete sx={{ p: 0.2 }} />
+                          <Box
+                            sx={{
+                              "&:hover": {
+                                opacity: "0.7",
+                                cursor: "pointer",
+                              },
+                            }}
+                          >
+                            <Delete onClick={() => onDeleteFile(index)} />
                           </Box>
                         </Box>
                       ))}
                   </Box>
                 </Grid>
               </Grid>
-              {/* {progressInfos &&
+              {progressInfos &&
                 progressInfos.map((progressInfo, index) => (
                   <>
                     {progressInfo.percentage !== 100 && (
@@ -422,7 +531,7 @@ const Step1 = () => {
                       </div>
                     )}
                   </>
-                ))} */}
+                ))}
               {/* <div className="row file-list">
                 {fileInfos && !metaData.length ? (
                   <table className="table text-white file-list-table">
@@ -490,9 +599,7 @@ const Step1 = () => {
                     className="file-select-button"
                     onClick={() => onMetaFileInputButton()}
                   >
-                    <label style={{ padding: "10px", fontSize: "14px" }}>
-                      Choose File
-                    </label>
+                    <label style={{ fontSize: "14px" }}>Choose File</label>
                     <div style={{ padding: "10px" }}>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -543,9 +650,7 @@ const Step1 = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="upload-file-label" ref={metaFileLabelRef}>
-                      No file choosen
-                    </label>
+                    <label ref={metaFileLabelRef}>No file choosen</label>
                   </div>
                   <input
                     type="file"
@@ -555,82 +660,47 @@ const Step1 = () => {
                   />
                 </div>
               </Grid>
-              <Grid item md={2} xs={12}>
+              <Grid item md={4} xs={12}>
                 <Button
                   className="btn  w_100"
                   // disabled={!metaFile}
                   onClick={() => uploadMeta()}
                 >
-                  Upload
+                  Upload Files
                 </Button>
               </Grid>
-              <Grid item md={2} xs={12}>
-                <Button className="btn w_100">Verify</Button>
-              </Grid>
+              {/* <Grid item md={2} xs={12}>
+                <Button onClick={viewImagesPaths} className="btn w_100">
+                  Verify
+                </Button>
+              </Grid> */}
               <Grid xs={12} item>
                 <label className="form-check-label">
                   <input
                     type="checkbox"
                     className="form-check-input"
-                    checked={checked}
-                    onChange={() => setChecked(!checked)}
+                    checked={isWebform}
+                    onChange={() => setIsWebform(!isWebform)}
                   />
                   Use a webform
                 </label>
               </Grid>
-              <Grid item xs={12} md={8}>
-                <div className={checked ? "" : "disabled-div"}>
-                  <ExcelSpreadSheet ref={excelRef} checked={checked} />
-                </div>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <Box
-                  className={`${checked ? "" : "disabled-div"} br_15 flex`}
-                  sx={{
-                    background: "var(--box-color)",
-                    height: "100%",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Button
-                    className="btn2"
-                    onClick={() => convertToJson()}
-                    sx={{ my: 2 }}
-                  >
-                    Convert to JSON
-                  </Button>
-                  <Box className="flex_align">
-                    <List />
-                    <Button
-                      onClick={() => {
-                        if (metaDataUrl) metaFileDown();
-                      }}
-                      sx={{ background: "none", color: "#fff" }}
-                    >
-                      Download Your JSON File
-                    </Button>
-                  </Box>
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                <Box className="max_btn">
-                  <Button className="btn2 w_100" onClick={() => onResetData()}>
-                    Reset Data
-                  </Button>
-                </Box>
-              </Grid>
-              <Grid item xs={12} sx={{ display: "flex" }}>
+
+              <ExcelSpreadSheet
+                metadataObjects={metadataObjects}
+                setMetadataObjects={setMetadataObjects}
+                metadataObjectProperties={metadataObjectProperties}
+                setMetadataObjectProperties={setMetadataObjectProperties}
+                isWebform={isWebform}
+              />
+              <Grid item xs={12} sx={{ marginTop: 5, display: "flex" }}>
                 <Box className="max_btn w_100" sx={{ mr: 2 }}>
                   <Button className="btn2 w_100 " onClick={() => onBackStep()}>
                     Back
                   </Button>
                 </Box>
                 <Box className="max_btn w_100">
-                  <Button
-                    className="btn2 w_100"
-                    onClick={() => onNextStep()}
-                    //  onClick={() => onNextStep()}
-                  >
+                  <Button className="btn2 w_100" onClick={() => onNextStep()}>
                     Next
                   </Button>
                 </Box>
@@ -643,7 +713,7 @@ const Step1 = () => {
   );
 };
 
-export default Step1;
+export default CollectionStep1;
 
 const Step1Styled = styled.section`
   .file-input-wrapper {
@@ -665,6 +735,7 @@ const Step1Styled = styled.section`
     background: white;
     border-radius: 10px;
     height: 100%;
+    margin-right: 10px;
   }
   .file-input-button {
     display: flex;
@@ -803,6 +874,9 @@ const Step1Styled = styled.section`
       border: none !important;
     }
     .upload-file-label {
+      color: white;
+    }
+    .upload-file-label-x {
       color: white;
       margin-left: 10px;
     }

@@ -55,6 +55,10 @@ const GlobalStyle = createGlobalStyle`
   .font_12 {
     font-size: 12px !important ;
   }
+
+  .error {
+    color : var(--error-color)
+  }
   .space_between {
     display: flex ;
     align-items: center ;
@@ -116,6 +120,15 @@ const GlobalStyle = createGlobalStyle`
   .flex_align {
     display: flex;
     align-items: center;
+  }
+  .table_icon {
+
+  }
+
+  .flex_align_center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .br_15 {

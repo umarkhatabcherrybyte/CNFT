@@ -1,6 +1,5 @@
-import { logDOM } from "@testing-library/react";
 import axios from "axios";
-import { baseURL } from "./endpoint";
+import { baseURL, testBaseURL } from "./endpoint";
 
 export const INSTANCE = axios.create({
   baseURL: baseURL,

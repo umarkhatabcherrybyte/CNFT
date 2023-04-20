@@ -3,25 +3,41 @@ import Header from "/components/Mint/shared/Header";
 import Layout from "/components/Mint/Layout";
 import ContainerLayout from "/components/shared/ContainerLayout";
 import { Grid, Box, Button, Typography, TextField } from "@mui/material";
-import { mintSingleStep3 } from "/components/Routes/constants";
+import { mintCollectionStep3 } from "/components/Routes/constants";
 import styled from "styled-components";
 import { useRouter } from "next/router";
+import { Toast } from "../../../components/shared/Toast";
 
-const Step2 = () => {
+const CollectionStep2 = () => {
   const router = useRouter();
   const [rangeValue, setRangeValue] = React.useState(10);
+  const [metadata, setMetadata] = React.useState({
+    item_name: "",
+    item_description: "",
+    item_creator: "",
+    item_link: "",
+  });
   var params = {};
+
   const onInputChange = (e) => {
-    params = { ...params, [e.target.name]: e.target.value };
+    setMetadata({ ...metadata, [e.target.name]: e.target.value });
   };
+
   const onInputRangeChange = (e) => {
     params = { ...params, [e.target.name]: e.target.value };
     setRangeValue(e.target.value);
   };
 
   const onNextButton = () => {
-    router.push(mintSingleStep3);
+    console.log(params, 'lolxxx')
+    if (metadata?.item_name == undefined || metadata?.item_name == null) {
+      Toast('error', 'Name Field is Missing')
+      return
+    }
+    window.localStorage.setItem("params", JSON.stringify(params));
+    router.push(mintCollectionStep3);
   };
+
   return (
     <Step2Styled>
       <ContainerLayout>
@@ -29,9 +45,7 @@ const Step2 = () => {
           <Grid item xs={12} md={8}>
             <Header
               heading="Add additional metadata"
-              desc="
-      Royalty fees may be set up to 15%; However, the lower your royalty fee, the better chance that your NFT(s) will sell, Royalty fees in excess of 10% are not recommended.
-      "
+              desc="Royalty fees may be set up to 15%; However, the lower your royalty fee, the better chance that your NFT(s) will sell, Royalty fees in excess of 10% are not recommended."
             />
           </Grid>
         </Grid>
@@ -40,7 +54,7 @@ const Step2 = () => {
             placeholder="Name your item"
             name="item_name"
             onChange={(e) => onInputChange(e)}
-            fullWidth
+            fullWidth={true}
             sx={{
               fieldset: {
                 border: "none",
@@ -64,7 +78,7 @@ const Step2 = () => {
             placeholder="Description(optional)"
             name="item_description"
             onChange={(e) => onInputChange(e)}
-            fullWidth
+            fullWidth={true}
             sx={{
               fieldset: {
                 border: "none",
@@ -90,7 +104,7 @@ const Step2 = () => {
             name="item_creator"
             placeholder="Creator(optional)"
             onChange={(e) => onInputChange(e)}
-            fullWidth
+            fullWidth={true}
             sx={{
               fieldset: {
                 border: "none",
@@ -114,7 +128,7 @@ const Step2 = () => {
             name="item_link"
             placeholder="Web link(optional)"
             onChange={(e) => onInputChange(e)}
-            fullWidth
+            fullWidth={true}
             sx={{
               fieldset: {
                 border: "none",
@@ -135,58 +149,7 @@ const Step2 = () => {
             }}
           ></TextField>
           <Box className="text_white">
-            <Typography variant="body" sx={{ pt: 1 }} component="div">
-              Set your royalties
-            </Typography>
             <Box>
-              <div align="left">
-                <div className="range-wrap">
-                  <div
-                    className="range-value"
-                    style={{
-                      left:
-                        25 -
-                        Math.floor(rangeValue / 10) * 19 -
-                        Math.floor(rangeValue / 12) * 3 -
-                        (1 - Math.floor(rangeValue / 10)) * rangeValue +
-                        (rangeValue / 15) * 300 +
-                        "px",
-                      position: "relative",
-                      top: "12px",
-                    }}
-                    id="rangeV"
-                  >
-                    <span>{rangeValue}%</span>
-                  </div>
-                  <div
-                    className="progress-bar"
-                    style={{ width: (rangeValue / 15) * 300 + "px" }}
-                  ></div>
-                  <span className="form-label">0%&nbsp;</span>
-                  <input
-                    type="range"
-                    className="slider"
-                    id="royalty_range"
-                    name="item_royalty"
-                    step="0.1"
-                    max="15"
-                    min="0"
-                    value={rangeValue}
-                    onChange={(e) => onInputRangeChange(e)}
-                  />
-                  <span className="form-label">&nbsp;15%</span>
-                </div>
-              </div>
-            </Box>
-            <Box>
-              <Typography variant="body" sx={{ pt: 1 }} component="div">
-                You can set up 15% royalty and get paid every time your nft
-                sells.
-              </Typography>
-              <Typography variant="body" sx={{ pt: 1 }} component="div">
-                * We collect a 2.55 royalty fee each tome your NFT sells, click
-                here for more information
-              </Typography>
               <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
                 <Button className="btn" onClick={onNextButton}>
                   Next
@@ -200,7 +163,7 @@ const Step2 = () => {
   );
 };
 
-export default Step2;
+export default CollectionStep2;
 
 const Step2Styled = styled.section`
   .slider {

@@ -1,11 +1,34 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { ArrowForwardIos } from "@mui/icons-material";
 import { Box, Card, CardMedia, Typography, CardContent } from "@mui/material";
-import { auctionDetailRoute } from "../Routes/constants";
+import { auctionDetailRoute, MycollectionRoute } from "../Routes/constants";
 import { useRouter } from "next/router";
-const AuctionCard = () => {
+import GetAdaPriceService from "/services/get-ada-price.service";
+import useFetchData from "../../hooks/adaInfo";
+// import DateCountdown from "react-date-countdown-timer";
+// import Countdown from "react-countdown";
+import dynamic from "next/dynamic";
+import { isVideoOrIsAudio } from "../../utils/utils";
+const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
+  ssr: false,
+});
+const AuctionCard = ({ data, index }) => {
   const router = useRouter();
+  const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
+  const [date, setDate] = useState("");
+
+  const asset_detail = data?.collection_id?.assets[0];
+  const type = data.mint_type === "collection";
+  const sell_model = data?.sell_model;
+  // console.log("model", sell_model);
+  const navigationHanlder = () => {
+    const route = type
+      ? `${MycollectionRoute}/${sell_model}`
+      : `${auctionDetailRoute}/0`;
+    router.push(`${route}/${data._id}`);
+  };
+
   return (
     <AuctionCardStyled>
       <Card
@@ -25,13 +48,17 @@ const AuctionCard = () => {
             justifyContent: "space-between",
           },
         }}
-        onClick={() => router.push(`${auctionDetailRoute}/2323`)}
+        onClick={navigationHanlder}
       >
         <Box sx={{ position: "relative" }}>
           <CardMedia
             component="img"
             height="290"
-            image="/images/Buy Our Tokens/Layer 61.png"
+            image={
+              isVideoOrIsAudio(asset_detail)
+                ? asset_detail?.feature_image
+                : `https://ipfs.io/ipfs/${asset_detail?.ipfs}`
+            }
             alt="green iguana"
           />
           <Box sx={{ position: "absolute", bottom: "10px" }}></Box>
@@ -43,9 +70,11 @@ const AuctionCard = () => {
             component="div"
             className="uppercase poppin "
           >
-            iNDUSTRIAL REvolution
+            {data.mint_type === "collection"
+              ? data?.name
+              : asset_detail?.asset_name}
           </Typography>
-          <Typography
+          {/* <Typography
             gutterBottom
             variant="caption"
             component="div"
@@ -56,16 +85,23 @@ const AuctionCard = () => {
             <span style={{ color: "var(--secondary-color)" }}>
               julian_jokey
             </span>
+          </Typography> */}
+          <Typography
+            sx={{ pt: 2 }}
+            variant="caption"
+            component="div"
+            className="bold uppercase poppin"
+          >
+            Base Price
           </Typography>
-
-          <Box className="space_between" sx={{ pt: 2 }}>
+          <Box className="space_between">
             <Typography
               variant="h6"
               component="div"
               sx={{ color: "var(--secondary-color)" }}
               className="bold flex poppin"
             >
-              1500
+              {data?.sell_type_id?.price}
               <Typography
                 variant="caption"
                 component="div"
@@ -80,7 +116,15 @@ const AuctionCard = () => {
               component="div"
               className="bold gray poppin"
             >
-              $199.53
+              ${" "}
+              {!adaInfo
+                ? "..."
+                : parseFloat(
+                    adaInfo?.current_price * data?.sell_type_id?.price
+                  ).toFixed(2)}
+              {/* {parseFloat(
+                adaInfo?.current_price * data?.sell_type_id?.price
+              ).toFixed(2)} */}
             </Typography>
           </Box>
         </CardContent>
@@ -88,8 +132,13 @@ const AuctionCard = () => {
           <Typography className="gray text_center poppin">
             Time Remaining
           </Typography>
+
           <Typography className="gray text_center bold poppin">
-            03D : 19H : 54M : 05S
+            <DateCountdown
+              dateTo={data?.sell_type_id?.end_time}
+              // callback={() => alert("Hello")}
+              locales_plural={["Y:", "M:", "D:", "H:", "M:", "S"]}
+            />
           </Typography>
         </CardContent>
       </Card>

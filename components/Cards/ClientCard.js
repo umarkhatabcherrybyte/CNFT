@@ -1,16 +1,16 @@
 import React from "react";
 import { Box, Card, CardMedia, Typography, CardContent } from "@mui/material";
 import { ArrowForwardIos } from "@mui/icons-material";
-
+import { isVideoOrIsAudio } from "../../utils/utils";
 import styled from "styled-components";
-import { MycollectionRoute } from "../Routes/constants";
+import { MycollectionRoute, buyDetailRoute } from "../Routes/constants";
 import { useRouter } from "next/router";
-const ClientCard = () => {
+const ClientCard = ({ card }) => {
   const router = useRouter();
   return (
     <ClientCardStyled>
       <Card
-        onClick={() => router.push(MycollectionRoute)}
+        onClick={() => router.push(`${buyDetailRoute}/0/${card._id}`)}
         sx={{
           boxShadow: "none",
           background: "#193361",
@@ -31,10 +31,15 @@ const ClientCard = () => {
           <CardMedia
             component="img"
             height="290"
-            image="/images/Buy Our Tokens/Layer 61.png"
+            // image={`/images/download.jpg`}
+            src={
+              !isVideoOrIsAudio(card?.collection_id?.assets[0])
+                ? `https://ipfs.io/ipfs/${card?.collection_id?.assets[0]?.ipfs}`
+                : card?.collection_id?.assets[0]?.feature_image
+            }
             alt="green iguana"
           />
-          <Box
+          {/* <Box
             sx={{
               position: "absolute",
               bottom: "-32px",
@@ -49,7 +54,7 @@ const ClientCard = () => {
             >
               <img src="/images/client.jfif" className="w_100" />
             </Box>
-          </Box>
+          </Box> */}
         </Box>
         <CardContent>
           <Typography
@@ -58,10 +63,10 @@ const ClientCard = () => {
             className="bold text_center poppin"
             sx={{ textTransform: "uppercase", pt: 3 }}
           >
-            iNDUSTRIAL REvolution
+            {card?.collection_id?.assets[0]?.asset_name}
           </Typography>
 
-          <Typography
+          {/* <Typography
             variant="caption"
             sx={{ color: "#fff", display: "block" }}
             className="text_center"
@@ -70,14 +75,13 @@ const ClientCard = () => {
             <span style={{ color: "var(--secondary-color)" }}>
               julian_jokey
             </span>
-          </Typography>
+          </Typography> */}
           <Typography
             variant="caption"
             sx={{ color: "#3263BB", display: "block" }}
             className="text_center"
           >
-            It is a long established fact that a reader will be distracted by
-            the readable content of a page when looking at its layout.
+            {card?.collection_id?.assets[0]?.description}
           </Typography>
         </CardContent>
       </Card>

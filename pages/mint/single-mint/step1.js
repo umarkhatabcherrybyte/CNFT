@@ -24,7 +24,6 @@ const SingleMint = () => {
   const onSelectFile = ({ currentTarget: input }) => {
     if (input.files && input.files[0]) {
       const files = input.files[0];
-      const _url = URL.createObjectURL(files);
       setMintFile(files);
       const name = files?.name.toLowerCase();
       if (name.match(/\.(jpg|jpeg|png|gif)$/)) {
@@ -40,7 +39,7 @@ const SingleMint = () => {
   };
 
   const onNextButton = async () => {
-    if (mintFile !== null) {
+    if (mintFile !== null && mintFileFormat != "invalid") {
       setIsUploading(true);
       try {
         const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
@@ -57,13 +56,13 @@ const SingleMint = () => {
           },
         });
         const uploaded_image = await client.add(mintFile);
+        console.log(uploaded_image);
         if (uploaded_image) {
-          if (typeof window !== "undefined") {
-            Toast("success", "Uploading succeed.");
-            setIsUploading(false);
-            window.localStorage.setItem("img", JSON.stringify(uploaded_image));
-            router.push(mintSingleStep2);
-          }
+          Toast("success", "Uploaded Successfully");
+          setIsUploading(false);
+          window.localStorage.setItem("img", uploaded_image.path);
+          window.localStorage.setItem("file_mimeType", mintFile.type);
+          router.push(mintSingleStep2);
         }
       } catch (error) {
         setIsUploading(false);
@@ -74,6 +73,7 @@ const SingleMint = () => {
       setIsUploading(false);
     }
   };
+
   return (
     <SingleMintStyled>
       <Container>
@@ -90,26 +90,33 @@ const SingleMint = () => {
         >
           {!isUploading ? (
             <>
-              <Grid container spacing={{ md: 50, xs: 3 }}>
-                <Grid item md={6} xs={12}>
-                  <Box className="upload_panel">
+              <Grid container spacing={{ md: 3, xs: 3 }}>
+                <Grid item md={4} xs={12}>
+                  <Box
+                    className="upload_panel"
+                    sx={{ height: { xs: "auto", md: "100%" } }}
+                  >
                     <img src="/images/Upload_icon.png" alt="mint" />
                   </Box>
                   <Box
                     sx={{ py: 3, display: "flex", justifyContent: "center" }}
                   >
-                    <Button className="btn" component="label">
+                    <Button className="btn2" component="label">
                       <input
                         hidden
                         type="file"
                         onChange={(e) => onSelectFile(e)}
                       />
-                      Select file
+                      Select File
                     </Button>
                   </Box>
                 </Grid>
-                <Grid item md={6} xs={12}>
-                  <Box className="upload_panel bg">
+                <Grid item md={4} xs={12}></Grid>
+                <Grid item md={4} xs={12}>
+                  <Box
+                    className="upload_panel bg"
+                    sx={{ height: { xs: "auto", md: "100%" } }}
+                  >
                     {mintFile ? (
                       <>
                         {mintFileFormat === "image" && (
@@ -151,7 +158,7 @@ const SingleMint = () => {
                 </Grid>
               </Grid>
               <Box sx={{ display: "flex", justifyContent: "center", pt: 10 }}>
-                <Button className="btn" onClick={onNextButton}>
+                <Button className="btn2" onClick={onNextButton}>
                   Next
                 </Button>
               </Box>
@@ -180,7 +187,7 @@ const SingleMintStyled = styled.section`
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    /* height: 100%; */
     padding: 30px;
     border: 2px dashed rgba(255, 255, 255, 0.45);
     border-radius: 1rem;

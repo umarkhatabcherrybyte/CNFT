@@ -182,7 +182,7 @@ const Payment = () => {
           <Box sx={{ py: 2 }}>
             <BarHeading heading="Explore More of Our Tokens" />
           </Box>
-          <Box sx={{ py: 5 }}>
+          {/* <Box sx={{ py: 5 }}>
             <Grid container spacing={3}>
               {cardData.map((item) => (
                 <Grid xs={12} sm={6} md={3} item>
@@ -190,7 +190,7 @@ const Payment = () => {
                 </Grid>
               ))}
             </Grid>
-          </Box>
+          </Box> */}
         </Box>
       </ContainerLayout>
     </>

@@ -3,13 +3,27 @@ import { Box, Card, CardMedia, Typography, CardContent } from "@mui/material";
 import { ArrowForwardIos } from "@mui/icons-material";
 import styled from "styled-components";
 import { useRouter } from "next/router";
-import { buyDetailRoute } from "../Routes/constants";
-const NftCard = () => {
+import {
+  buyDetailRoute,
+  MycollectionRoute,
+  auctionDetailRoute,
+} from "../Routes/constants";
+import { isVideoOrIsAudio } from "../../utils/utils";
+const NftCard = ({ card }) => {
+  const asset_detail = card?.collection_id?.assets[0];
+  const type = card.mint_type === "collection";
+  const sell_model = card.sell_model;
   const router = useRouter();
+  const navigationHanlder = () => {
+    const route = type
+      ? `${MycollectionRoute}/${sell_model}`
+      : `${buyDetailRoute}/0`;
+    router.push(`${route}/${card._id}`);
+  };
   return (
     <NftCardStyled>
       <Card
-        onClick={() => router.push(`${buyDetailRoute}/2323`)}
+        onClick={navigationHanlder}
         sx={{
           boxShadow: "none",
           background: "var(--main-color)",
@@ -30,10 +44,16 @@ const NftCard = () => {
           <CardMedia
             component="img"
             height="290"
-            image="/images/Buy Our Tokens/Layer 61.png"
+            image={`${
+              type
+                ? card.feature_image
+                : isVideoOrIsAudio(asset_detail)
+                ? asset_detail?.feature_image
+                : `https://ipfs.io/ipfs/${asset_detail?.ipfs}`
+            }`}
             alt="green iguana"
           />
-          <Box
+          {/* <Box
             sx={{
               position: "absolute",
               bottom: "10px",
@@ -63,7 +83,7 @@ const NftCard = () => {
                 Created by@Julian
               </Typography>
             </Box>
-          </Box>
+          </Box> */}
         </Box>
         <CardContent>
           <Box className="flex">
@@ -74,7 +94,7 @@ const NftCard = () => {
               className="bold"
               sx={{ textTransform: "uppercase" }}
             >
-              iNDUSTRIAL REvolution
+              {type ? card.name : asset_detail?.asset_name}
             </Typography>
             <Typography
               gutterBottom
@@ -83,7 +103,8 @@ const NftCard = () => {
               sx={{ color: "var(--secondary-color)" }}
               className="bold"
             >
-              1000{" "}
+              {card?.sell_type_id?.price}
+
               <Typography
                 variant="caption"
                 component="div"
@@ -95,7 +116,7 @@ const NftCard = () => {
               </Typography>
             </Typography>
           </Box>
-          <Box className="flex">
+          {/* <Box className="flex">
             <Box
               sx={{
                 display: "flex",
@@ -118,7 +139,7 @@ const NftCard = () => {
                 <ArrowForwardIos sx={{ color: "var(--secondary-color)" }} />
               </Box>
             </Box>
-          </Box>
+          </Box> */}
         </CardContent>
       </Card>
     </NftCardStyled>

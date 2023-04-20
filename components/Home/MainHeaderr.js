@@ -11,28 +11,13 @@ import {
 import GetAdaPriceService from "../../services/get-ada-price.service";
 import { Straight } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
-
+import useFetchData from "/hooks/adaInfo";
 const MainHeaderr = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMatch = useMediaQuery(theme.breakpoints.down("lg"));
-  const [adaInfo, setAdaInfo] = React.useState({});
-  React.useEffect(() => {
-    GetAdaPriceService.getPrice()
-      .then((response) => {
-        setAdaInfo(response.data[0]);
-      })
-      .catch(() => {});
-    const interval = setInterval(() => {
-      GetAdaPriceService.getPrice()
-        .then((response) => {
-          setAdaInfo(response.data[0]);
-        })
-        .catch(() => {});
-    }, 30000);
-    return () => clearInterval(interval);
-  }, []);
-  console.log(router.isReady);
+  const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
+  // console.log(router.isReady);
   // if (!router.isReady) {
   //   // return;
   // }
@@ -43,7 +28,7 @@ const MainHeaderr = () => {
           <Grid container spacing={3}>
             <Grid item md={8} xs={12}>
               <Box sx={{ my: 1 }}>
-                <Typography
+                {/* <Typography
                   variant="body"
                   className="text_white proxima"
                   sx={{
@@ -52,7 +37,7 @@ const MainHeaderr = () => {
                   }}
                 >
                   CNFT GENIE
-                </Typography>
+                </Typography> */}
               </Box>
               <Typography
                 variant="h2"

@@ -17,7 +17,6 @@ import {
 } from "@mui/icons-material";
 import CaptionHeading from "../../components/shared/headings/CaptionHeading";
 import { useRouter } from "next/router";
-import { GetStaticPaths, GetStaticProps, GetServerSideProps } from "next";
 
 const List = [{}, {}, {}, {}];
 
@@ -278,7 +277,7 @@ const CollectionDetail = () => {
           </Box>
           <Box>
             <BarHeading heading="Our Collections" />
-            <Box sx={{ py: 5 }}>
+            {/* <Box sx={{ py: 5 }}>
               <Grid container spacing={3}>
                 {cardData.map((item, index) => (
                   <Grid xs={12} sm={6} md={3} item key={index}>
@@ -286,7 +285,7 @@ const CollectionDetail = () => {
                   </Grid>
                 ))}
               </Grid>
-            </Box>
+            </Box> */}
           </Box>
         </Box>
       </ContainerLayout>
