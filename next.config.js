@@ -1,13 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    esmExternals: 'loose',
+    esmExternals: "loose",
   },
   eslint: {
     ignoreDuringBuilds: true,
   },
   reactStrictMode: false,
   trailingSlash: true,
+  swcMinify: false,
+
   images: {
     loader: "akamai",
     path: "/",
