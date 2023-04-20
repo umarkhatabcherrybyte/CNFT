@@ -88,7 +88,7 @@ const HomeStyled = styled.section`
     position: absolute;
     z-index: -1;
     top: -6%;
-    right: 54%;
+    right: 48%;
     transform: translate(50%, 0px);
     width: 408px;
   }

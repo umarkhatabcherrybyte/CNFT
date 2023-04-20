@@ -28,7 +28,7 @@ const MainHeaderr = () => {
           <Grid container spacing={3}>
             <Grid item md={8} xs={12}>
               <Box sx={{ my: 1 }}>
-                <Typography
+                {/* <Typography
                   variant="body"
                   className="text_white proxima"
                   sx={{
@@ -37,7 +37,7 @@ const MainHeaderr = () => {
                   }}
                 >
                   CNFT GENIE
-                </Typography>
+                </Typography> */}
               </Box>
               <Typography
                 variant="h2"

@@ -18,7 +18,6 @@ import { useWallet } from "@meshsdk/react";
 import { getKeyData } from "../../helper/localStorage";
 import { INSTANCE } from "/config/axiosInstance";
 import ClaimTable from "../../components/Sell/ClaimTable";
-// import NoBid from ""
 const Sell = () => {
   const router = useRouter();
   const { listing, user } = useSelector((store) => store);

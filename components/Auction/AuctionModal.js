@@ -53,102 +53,107 @@ const AuctionModal = ({
         return;
       }
       if (connected) {
-        console.log(lovelace, "dasd", 1000000 * detail?.highest_bid);
-        if (lovelace < 1000000 * detail?.highest_bid) {
+        if (lovelace < 1000000) {
           Toast(
             "error",
             "You do not have enough Ada to complete this transaction"
           );
           return;
         } else {
-          try {
-            const connectedWallet = getKeyData("connectedWallet");
-            const unit =
-              detail?.list?.collection_id.policy_id +
-              fromText(
-                detail?.list?.collection_id.assets[auctionIndex]?.asset_name
-              );
-            const response = await INSTANCE.post("/bid/validate", {
-              price: values.price,
-              list_id: listId,
-              unit: unit,
-            });
-            if (response.data.status) {
-              const transferLucid = await Lucid.new(
-                new Blockfrost(
-                  "https://cardano-mainnet.blockfrost.io/api/v0",
-                  "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-                ),
-                "Mainnet"
-              );
-              transferLucid.selectWalletFromSeed(
-                seedPhraseMainnet
-              );
-              const lucidBrowser = await Lucid.new(
-                new Blockfrost(
-                  "https://cardano-mainnet.blockfrost.io/api/v0",
-                  "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-                ),
-                "Mainnet"
-              );
-              // console.log(values.price, "dasd");
-              const api = await window.cardano[
-                String(connectedWallet)
-              ].enable();
-              const price_value = Number(values.price * 1000000);
-              lucidBrowser.selectWallet(api);
-              const tx = await lucidBrowser
-                .newTx()
-                .payToAddress(await transferLucid.wallet.address(), {
-                  lovelace: BigInt(price_value),
-                })
-                .validTo(Date.now() + 100000)
-                .complete();
-              const signedTx = await tx.sign().complete();
-              const txHash = await signedTx.submit();
-              if (txHash) {
-                // bidder_id  current user
-                // lister_id user who list this auction
-                // list_id  _id that's on the top of the page
-                // asset_index  index that's on the top of the page
-                const res = await INSTANCE.post("/bid/create", {
-                  bidder_id: getKeyData("user_id"),
-                  lister_id: detail.list.user_id._id,
-                  list_id: listId,
-                  list_id: listId,
-                  asset_index: auctionIndex,
-                  price: Number(values.price),
-                  unit: unit,
-                });
-                if (res) {
-                  setOpen(false);
-                  Toast("success", "Bid Added Successfully");
-                  window.location.href = "/";
-                  getData();
-                } else {
-                  Toast("error", "Could Not Add Bid");
+          if (lovelace < 1000000 * detail?.highest_bid) {
+            Toast(
+              "error",
+              "You do not have enough Ada to complete this transaction"
+            );
+            return;
+          } else {
+            try {
+              const connectedWallet = getKeyData("connectedWallet");
+              const unit =
+                detail?.list?.collection_id.policy_id +
+                fromText(
+                  detail?.list?.collection_id.assets[auctionIndex]?.asset_name
+                );
+              const response = await INSTANCE.post("/bid/validate", {
+                price: values.price,
+                list_id: listId,
+                unit: unit,
+              });
+              if (response.data.status) {
+                const transferLucid = await Lucid.new(
+                  new Blockfrost(
+                    "https://cardano-mainnet.blockfrost.io/api/v0",
+                    "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+                  ),
+                  "Mainnet"
+                );
+                transferLucid.selectWalletFromSeed(seedPhraseMainnet);
+                const lucidBrowser = await Lucid.new(
+                  new Blockfrost(
+                    "https://cardano-mainnet.blockfrost.io/api/v0",
+                    "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+                  ),
+                  "Mainnet"
+                );
+                // console.log(values.price, "dasd");
+                const api = await window.cardano[
+                  String(connectedWallet)
+                ].enable();
+                const price_value = Number(values.price * 1000000);
+                lucidBrowser.selectWallet(api);
+                const tx = await lucidBrowser
+                  .newTx()
+                  .payToAddress(await transferLucid.wallet.address(), {
+                    lovelace: BigInt(price_value),
+                  })
+                  .validTo(Date.now() + 100000)
+                  .complete();
+                const signedTx = await tx.sign().complete();
+                const txHash = await signedTx.submit();
+                if (txHash) {
+                  // bidder_id  current user
+                  // lister_id user who list this auction
+                  // list_id  _id that's on the top of the page
+                  // asset_index  index that's on the top of the page
+                  const res = await INSTANCE.post("/bid/create", {
+                    bidder_id: getKeyData("user_id"),
+                    lister_id: detail.list.user_id._id,
+                    list_id: listId,
+                    list_id: listId,
+                    asset_index: auctionIndex,
+                    price: Number(values.price),
+                    unit: unit,
+                  });
+                  if (res) {
+                    setOpen(false);
+                    Toast("success", "Bid Added Successfully");
+                    window.location.href = "/";
+                    getData();
+                  } else {
+                    Toast("error", "Could Not Add Bid");
+                  }
+                }
+              } else {
+                Toast("error", "Current Bid Is Higher, Please Bid More");
+              }
+            } catch (e) {
+              transactionErrorHanlder(e, "auction");
+              const clientIp = await getClientIp();
+              if (clientIp) {
+                try {
+                  const response = await INSTANCE.post(`/log/create`, {
+                    error: JSON.stringify(error),
+                    ip: clientIp,
+                    type: "AuctionModal",
+                  });
+                  console.log(response.data);
+                } catch (error) {
+                  console.error(error);
                 }
               }
-            } else {
-              Toast("error", "Current Bid Is Higher, Please Bid More");
+              console.log(e);
+              console.log(e.info);
             }
-          } catch (e) {
-            transactionErrorHanlder(e, "auction");
-            const clientIp = await getClientIp();
-            if (clientIp) {
-              try {
-                const response = await INSTANCE.post(`/log/create`, {
-                  error: JSON.stringify(error),
-                  ip: clientIp,
-                  type: "AuctionModal",
-                });
-                console.log(response.data);
-              } catch (error) {
-                console.error(error);
-              }
-            }
-            console.log(e);
-            console.log(e.info);
           }
         }
       } else {

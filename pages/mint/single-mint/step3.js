@@ -90,7 +90,7 @@ const SingleMintStep3 = () => {
                 "https://cardano-mainnet.blockfrost.io/api/v0",
                 "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
               ),
-              "Preprod"
+              "Mainnet"
             );
 
             const api = await window.cardano[String(connectedWallet)].enable();
@@ -169,7 +169,7 @@ const SingleMintStep3 = () => {
                 "https://cardano-mainnet.blockfrost.io/api/v0",
                 "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
               ),
-              "Preprod"
+              "Mainnet"
             );
 
             const api = await window.cardano[String(connectedWallet)].enable();
@@ -250,7 +250,7 @@ const SingleMintStep3 = () => {
                 "https://cardano-mainnet.blockfrost.io/api/v0",
                 "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
               ),
-              "Preprod"
+              "Mainnet"
             );
 
             const api = await window.cardano[String(connectedWallet)].enable();

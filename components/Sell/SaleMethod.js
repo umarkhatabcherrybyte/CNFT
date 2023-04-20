@@ -255,7 +255,9 @@ const SaleMethod = () => {
                 value={
                   listing_data.type === "collection"
                     ? listing_data.name
-                    : listing_data?.assets[0]?.asset_name
+                    : listing_data?.assets.length > 0
+                    ? listing_data?.assets[0]?.asset_name
+                    : listing_data?.onchain_metadata?.name
                 }
               />
             </Box>
@@ -287,22 +289,30 @@ const SaleMethod = () => {
               <AssetInputField
                 placeholder="Enter Quantity"
                 name="quantity"
-                value={listing_data?.assets?.length}
+                // value={listing_data?.assets?.length}
+                value={
+                  listing_data?.assets
+                    ? listing_data?.assets?.length
+                    : listing_data?.quantity
+                }
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <Box>
-              <CaptionHeading heading="Minted On" font="montserrat" />
-              <AssetInputField
-                placeholder="Enter Minted Date"
-                name="minted_on"
-                value={moment(new Date(listing_data?.createdAt)).format(
-                  "Do MMMM YYYY"
-                )}
-              />
-            </Box>
-          </Grid>
+          {listing_data?.createdAt && (
+            <Grid item xs={12} md={6}>
+              <Box>
+                <CaptionHeading heading="Minted On" font="montserrat" />
+                <AssetInputField
+                  placeholder="Enter Minted Date"
+                  name="minted_on"
+                  value={moment(new Date(listing_data?.createdAt)).format(
+                    "Do MMMM YYYY"
+                  )}
+                />
+              </Box>
+            </Grid>
+          )}
+
           <Grid item xs={12} className="flex">
             <Button
               sx={{ width: "150px" }}

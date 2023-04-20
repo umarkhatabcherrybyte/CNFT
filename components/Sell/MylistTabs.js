@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import {
   Box,
@@ -30,7 +30,10 @@ import FullScreenLoader from "../shared/FullScreenLoader";
 import { transactionErrorHanlder } from "../../helper/transactionError";
 import { seedPhraseMainnet } from "../../config/utils";
 import { getClientIp } from "../../helper/clientIP";
-
+import Heading from "../shared/headings/Heading";
+import axios from "axios";
+import Layout from "../Mint/Layout";
+import Mynft from "../Cards/Mynft";
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",
@@ -41,19 +44,73 @@ const inputFileStyle = {
   alignItems: "center",
   justifyContent: "center",
 };
-const names = [
-  "Oliver Hansen",
-  "Van Henry",
-  "April Tucker",
-  "Ralph Hubbard",
-  "Omar Alexander",
-  "Carlos Abbott",
+
+// user id , type
+const f = [
+  {
+    user_id: "6412bbe5ab27d2c9ebaa7307",
+    asset:
+      "d88c75a4b316dbdd387789a6eaed235e265ff90b3ae67b808d55c90254657374206c697665206d696e74",
+    policy_id: "d88c75a4b316dbdd387789a6eaed235e265ff90b3ae67b808d55c902",
+    asset_name: "54657374206c697665206d696e74",
+    fingerprint: "asset19welxnfl0px73a6n5qr9ed25h3xlmva2xgarda",
+    quantity: "1",
+    type: "single",
+    initial_mint_tx_hash:
+      "48b7c67f3bd796621fc3becf1a18f7820501f86f0ee616e04a7d9f41ed57f7cf",
+    mint_or_burn_count: 1,
+    onchain_metadata: {
+      link: "Test",
+      name: "Test live mint",
+      image: "ipfs://QmamkL42Rz6wZGD8YZeEG58YJvCvKBFNc4EhrQsUnkzxrD",
+      creator: "Test",
+      mediaType: "image/jpg",
+      description: "Test",
+    },
+    onchain_metadata_standard: "CIP25v1",
+    metadata: null,
+  },
 ];
+const hello = {
+  user_id: "6412bbe5ab27d2c9ebaa7307",
+  type: "single",
+  assets: [
+    {
+      price: null,
+      feature_image: "",
+      asset_name: "23 mar 3 ",
+      asset_quantity: 1,
+      image: "ipfs://QmVYJgLxzBmxZAc2pZTsCTjYj16GDoyF4gVEPGLn7rZC3X",
+      media_type: "image/jpeg",
+      description: "",
+      artist: "",
+      ipfs: "QmVYJgLxzBmxZAc2pZTsCTjYj16GDoyF4gVEPGLn7rZC3X",
+      is_sold: false,
+      _id: "641c2d329a4080ee3d9013d3",
+    },
+  ],
+  total_supply: 1,
+  minting_policy:
+    '{"type":"Native","script":"8201828200581c04074187b909c0754f026839a852dc380a47a944d599de22e16b6de282051a01745da8"}',
+  policy_id: "4ce42d1798e66f42dfbbca0c1b8c1d53edbc0fd14b152f9dec6ec97a",
+  recipient_address:
+    "addr_test1qqzqwsv8hyyuqa20qf5rn2zjmsuq53afgn2enh3zu94kmcsa80ahhs9psx7lfvyy2krh9kpfts58tdtkc33wv47u78usrxuqgn",
+  _id: "641c2d329a4080ee3d9013d2",
+  createdAt: "2023-03-23T10:42:58.385Z",
+  updatedAt: "2023-03-23T10:42:58.385Z",
+  __v: 0,
+};
 
 const MylistTabs = () => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const lovelace = useLovelace();
   const { wallet, connected } = useWallet();
   const [recipientAddress, setRecipientAddress] = useState("");
   const [lists, setLists] = useState([]);
+  const [tabValue, setTabValue] = useState("add");
+  const [isLoading, setIsLoading] = useState(false);
+  const [assets, setAssets] = useState([]);
   React.useEffect(() => {
     async function getAddress() {
       if (connected) {
@@ -72,14 +129,16 @@ const MylistTabs = () => {
     }
     getAddress();
   }, [wallet]);
+  useEffect(() => {
+    if (connected && recipientAddress) {
+      setIsLoading(true);
+      getCardanoWalletNFTs(
+        "addr1qyzqwsv8hyyuqa20qf5rn2zjmsuq53afgn2enh3zu94kmcsa80ahhs9psx7lfvyy2krh9kpfts58tdtkc33wv47u78usqspqyv"
+      );
+    }
+  }, [recipientAddress]);
   const listing = useSelector((state) => state.listing.data);
   // console.log(listing);
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const lovelace = useLovelace();
-  const [tabValue, setTabValue] = useState("add");
-  const [isLoading, setIsLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState(null);
 
   const onTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -136,9 +195,7 @@ const MylistTabs = () => {
                   "Mainnet"
                 );
 
-                transferLucid.selectWalletFromSeed(
-                  seedPhraseMainnet
-                );
+                transferLucid.selectWalletFromSeed(seedPhraseMainnet);
 
                 const lucidBrowser = await Lucid.new(
                   new Blockfrost(
@@ -329,9 +386,98 @@ const MylistTabs = () => {
       // formik.setFieldValue("imageFile", null);
     }
   };
+  async function getCardanoWalletNFTs(walletAddress) {
+    console.log("add", walletAddress);
+    let AssetsArray = [];
+    try {
+      const endpoint = `https://cardano-mainnet.blockfrost.io/api/v0/addresses/${walletAddress}/utxos`;
+      // `https://cardano-mainnet.blockfrost.io/api/v0/accounts/${walletAddress}/addresses/assets`;
+      const response = await axios.get(endpoint, {
+        headers: {
+          project_id: "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj",
+        },
+      });
+      let assets = response.data[0].amount;
+
+      // console.log({assets});
+      let index = 0;
+      for (let i = 0; i < assets.length; i++) {
+        const asset = assets[i];
+
+        try {
+          let assetEndPoint = `https://cardano-mainnet.blockfrost.io/api/v0/assets/${asset.unit}`;
+          let asset_info = await axios.get(assetEndPoint, {
+            headers: {
+              project_id: "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj",
+            },
+          });
+          let { data } = asset_info;
+          AssetsArray.push(data);
+          console.log(AssetsArray);
+          setAssets([...AssetsArray]);
+          setIsLoading(false);
+        } catch (e) {
+          console.log(e);
+          setIsLoading(false);
+          setAssets([]);
+        }
+        // console.log({asset_info});
+      }
+      console.log("Assets are ", AssetsArray);
+      return AssetsArray;
+    } catch (error) {
+      setIsLoading(false);
+      // setaAssets([]);
+      console.error(error);
+    }
+  }
   return (
     <>
       {isLoading && <FullScreenLoader />}
+      <Box sx={{ my: 5 }}>
+        <Box
+          sx={{
+            py: 2,
+            px: 2,
+            background: "var(--secondary-color) !important",
+            borderRadius: "15px 15px 0 0",
+            span: {
+              color: "#fff !important",
+            },
+          }}
+        >
+          <Heading heading="My NFT's" color="#000" />
+        </Box>
+        <Box sx={{ py: 4 }}>
+          {!connected ? (
+            <Layout>
+              <Box className="flex_align_center">
+                <Heading heading="Please connect your wallet first." />
+              </Box>
+            </Layout>
+          ) : isLoading ? (
+            <FullScreenLoader />
+          ) : assets.length > 0 ? (
+            <Grid container spacing={2}>
+              {assets.map((card, index) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                  <Mynft card={card} />
+                  {/* <NftCard tabValue={tabValue} card={card} /> */}
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <Box>
+              <img
+                src="/images/no_nft.png"
+                alt=""
+                className="w_100"
+                onClick={() => router.push("/mint")}
+              />
+            </Box>
+          )}
+        </Box>
+      </Box>
       <TabContext value={tabValue}>
         <TabList
           onChange={onTabChange}
