@@ -68,7 +68,7 @@ const MainHeaderr = () => {
                   sx={{ mr: 2 }}
                   onClick={() => router.push("/buy")}
                 >
-                  Browse
+                  Brows
                 </Button>
                 <Button
                   variant="contained"
