@@ -7,49 +7,55 @@ import {
   CardContent,
   Button,
 } from "@mui/material";
-import { ArrowForwardIos } from "@mui/icons-material";
 import styled from "styled-components";
-import { useRouter } from "next/router";
-import {
-  buyDetailRoute,
-  MycollectionRoute,
-  auctionDetailRoute,
-} from "../Routes/constants";
-import { isVideoOrIsAudio } from "../../utils/utils";
-import { useDispatch } from "react-redux";
 import { setStep } from "../../redux/listing/ListingActions";
 import { INSTANCE } from "/config/axiosInstance";
 import FullScreenLoader from "../shared/FullScreenLoader";
+import { BlockfrostProvider } from "@meshsdk/core";
+import { useDispatch } from "react-redux";
 const Mynft = ({ card }) => {
-  const router = useRouter();
+  console.log(card);
   const dispatch = useDispatch();
+  const [metadata, setMetadata] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const user_id = window.localStorage.getItem("user_id");
-  console.log(user_id, "user_id");
   const recipientAddress = window.localStorage.getItem("user_address");
-  const imgURL = card?.onchain_metadata.image;
-  const url = new URL(imgURL);
-  const hash = url.pathname.slice(1);
+  const blockfrostProvider = new BlockfrostProvider(
+    "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+  );
+  React.useEffect(() => {
+    getMetaData();
+  }, []);
+  const getMetaData = async () => {
+    const data = await blockfrostProvider.fetchAssetMetadata(card.unit);
+    setMetadata(data);
+  };
+  if (metadata) {
+    const imgURL = metadata?.image;
+    const url = new URL(imgURL);
+    var hash = url.pathname.slice(1);
+  }
+
   const navigationHanlder = async () => {
     setIsLoading(true);
     try {
-      const ipfsHash = card?.onchain_metadata?.image.replace("ipfs://", "");
+      const ipfsHash = metadata?.image.replace("ipfs://", "");
       const data = {
         metadata: [
           {
-            name: card?.onchain_metadata?.name || "",
+            name: metadata?.name || "",
             asset_quantity: card?.quantity || 1,
-            link: card?.onchain_metadata?.link || "",
-            mediaType: card?.onchain_metadata?.mediaType || "",
-            artist: card?.onchain_metadata?.creator || "",
-            description: card?.onchain_metadata?.description || "",
+            link: metadata?.link || "",
+            mediaType: metadata?.mediaType || "",
+            artist: metadata?.creator || "",
+            description: metadata?.description || "",
             ipfs: ipfsHash || "",
             image: ipfsHash || "",
           },
         ],
         user_id: user_id,
         recipient_address: recipientAddress,
-        policy_id: card.policy_id,
+        policy_id: card.policyId,
         type: "single",
         image_file: ``,
       };
@@ -67,11 +73,6 @@ const Mynft = ({ card }) => {
       console.log(e);
       setIsLoading(false);
     }
-
-    // const route = type
-    //   ? `${MycollectionRoute}/${sell_model}`
-    //   : `${buyDetailRoute}/0`;
-    // router.push(`${route}/${card._id}`);
   };
 
   return (
@@ -157,7 +158,7 @@ const Mynft = ({ card }) => {
                 className="bold"
                 sx={{ textTransform: "uppercase" }}
               >
-                {card?.onchain_metadata.name}
+                {metadata?.name}
               </Typography>
               {/* <Typography
               gutterBottom

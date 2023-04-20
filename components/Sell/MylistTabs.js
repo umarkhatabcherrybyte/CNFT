@@ -23,7 +23,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { create } from "ipfs-http-client";
 import { setListing } from "../../redux/listing/ListingActions";
 import { setStep } from "../../redux/listing/ListingActions";
-import { CardanoWallet, useLovelace, useWallet } from "@meshsdk/react";
+import {
+  CardanoWallet,
+  useAssets,
+  useLovelace,
+  useWallet,
+} from "@meshsdk/react";
 import { Toast } from "../shared/Toast";
 import { INSTANCE } from "../../config/axiosInstance";
 import FullScreenLoader from "../shared/FullScreenLoader";
@@ -105,12 +110,13 @@ const MylistTabs = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const lovelace = useLovelace();
+  const assets = useAssets();
   const { wallet, connected } = useWallet();
   const [recipientAddress, setRecipientAddress] = useState("");
   const [lists, setLists] = useState([]);
   const [tabValue, setTabValue] = useState("add");
   const [isLoading, setIsLoading] = useState(false);
-  const [assets, setAssets] = useState([]);
+  // const [assets, setAssets] = useState([]);
   React.useEffect(() => {
     async function getAddress() {
       if (connected) {
@@ -129,17 +135,23 @@ const MylistTabs = () => {
     }
     getAddress();
   }, [wallet]);
+  // useEffect(() => {
+  //   if (connected && recipientAddress) {
+  //     setIsLoading(true);
+  //     getCardanoWalletNFTs(
+  //       "addr1qyzqwsv8hyyuqa20qf5rn2zjmsuq53afgn2enh3zu94kmcsa80ahhs9psx7lfvyy2krh9kpfts58tdtkc33wv47u78usqspqyv"
+  //     );
+  //   }
+  // }, [recipientAddress, connected]);
   useEffect(() => {
-    if (connected && recipientAddress) {
-      setIsLoading(true);
-      getCardanoWalletNFTs(
-        "addr1qyzqwsv8hyyuqa20qf5rn2zjmsuq53afgn2enh3zu94kmcsa80ahhs9psx7lfvyy2krh9kpfts58tdtkc33wv47u78usqspqyv"
-      );
+    if (connected) {
+      if (assets && assets.length > 0) {
+        setIsLoading(false);
+      } else {
+        setIsLoading(true);
+      }
     }
-  }, [recipientAddress]);
-  const listing = useSelector((state) => state.listing.data);
-  // console.log(listing);
-
+  }, [assets, connected]);
   const onTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -386,51 +398,51 @@ const MylistTabs = () => {
       // formik.setFieldValue("imageFile", null);
     }
   };
-  async function getCardanoWalletNFTs(walletAddress) {
-    console.log("add", walletAddress);
-    let AssetsArray = [];
-    try {
-      const endpoint = `https://cardano-mainnet.blockfrost.io/api/v0/addresses/${walletAddress}/utxos`;
-      // `https://cardano-mainnet.blockfrost.io/api/v0/accounts/${walletAddress}/addresses/assets`;
-      const response = await axios.get(endpoint, {
-        headers: {
-          project_id: "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj",
-        },
-      });
-      let assets = response.data[0].amount;
+  // async function getCardanoWalletNFTs(walletAddress) {
+  //   console.log("add", walletAddress);
+  //   let AssetsArray = [];
+  //   try {
+  //     const endpoint = `https://cardano-mainnet.blockfrost.io/api/v0/addresses/${walletAddress}/utxos`;
+  //     // `https://cardano-mainnet.blockfrost.io/api/v0/accounts/${walletAddress}/addresses/assets`;
+  //     const response = await axios.get(endpoint, {
+  //       headers: {
+  //         project_id: "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj",
+  //       },
+  //     });
+  //     let assets = response.data[0].amount;
 
-      // console.log({assets});
-      let index = 0;
-      for (let i = 0; i < assets.length; i++) {
-        const asset = assets[i];
+  //     // console.log({assets});
+  //     let index = 0;
+  //     for (let i = 0; i < assets.length; i++) {
+  //       const asset = assets[i];
 
-        try {
-          let assetEndPoint = `https://cardano-mainnet.blockfrost.io/api/v0/assets/${asset.unit}`;
-          let asset_info = await axios.get(assetEndPoint, {
-            headers: {
-              project_id: "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj",
-            },
-          });
-          let { data } = asset_info;
-          AssetsArray.push(data);
-          console.log(AssetsArray);
-          setAssets([...AssetsArray]);
-          setIsLoading(false);
-        } catch (e) {
-          console.log(e);
-          setIsLoading(false);
-          setAssets([]);
-        }
-        // console.log({asset_info});
-      }
-      console.log("Assets are ", AssetsArray);
-      return AssetsArray;
-    } catch (error) {
-      setIsLoading(false);
-      // setaAssets([]);
-      console.error(error);
-    }
-  }
+  //       try {
+  //         let assetEndPoint = `https://cardano-mainnet.blockfrost.io/api/v0/assets/${asset.unit}`;
+  //         let asset_info = await axios.get(assetEndPoint, {
+  //           headers: {
+  //             project_id: "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj",
+  //           },
+  //         });
+  //         let { data } = asset_info;
+  //         AssetsArray.push(data);
+  //         console.log(AssetsArray);
+  //         setAssets([...AssetsArray]);
+  //         setIsLoading(false);
+  //       } catch (e) {
+  //         console.log(e);
+  //         setIsLoading(false);
+  //         setAssets([]);
+  //       }
+  //       // console.log({asset_info});
+  //     }
+  //     console.log("Assets are ", AssetsArray);
+  //     return AssetsArray;
+  //   } catch (error) {
+  //     setIsLoading(false);
+  //     // setaAssets([]);
+  //     console.error(error);
+  //   }
+  // }
   return (
     <>
       {isLoading && <FullScreenLoader />}
@@ -457,7 +469,7 @@ const MylistTabs = () => {
             </Layout>
           ) : isLoading ? (
             <FullScreenLoader />
-          ) : assets.length > 0 ? (
+          ) : assets && assets.length > 0 ? (
             <Grid container spacing={2}>
               {assets.map((card, index) => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={index}>

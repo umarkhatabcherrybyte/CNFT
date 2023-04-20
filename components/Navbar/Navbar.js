@@ -41,7 +41,6 @@ const Navbar = () => {
   const [value, setValue] = useState("/");
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  console.log(anchorEl, "sdfffsf");
   // useEffect(() => {
   //   setValue(location.pathname);
   // }, [location.pathname]);

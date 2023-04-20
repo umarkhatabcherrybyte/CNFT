@@ -21,7 +21,6 @@ import ClaimTable from "../../components/Sell/ClaimTable";
 const Sell = () => {
   const router = useRouter();
   const { listing, user } = useSelector((store) => store);
-  console.log(user, "user");
   const { connected } = useWallet();
   const { type } = router.query;
   const [tabValue, setTabValue] = useState("list");
