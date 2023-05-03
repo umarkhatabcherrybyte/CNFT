@@ -90,7 +90,7 @@ const Footer = () => {
                     <Link href="/help-support">Help and Support</Link>
                   </li>
                   <li>
-                    <Link href={termConditionRoute}>Terms and Condition</Link>
+                    <Link href={termConditionRoute}>Terms and Conditions</Link>
                   </li>
                   {/* <li>
                     <Link href="/auction">Auctions</Link>
