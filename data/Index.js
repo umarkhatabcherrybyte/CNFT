@@ -10,10 +10,17 @@ export const recent_listing = [
 ];
 export const price_range_data = [
   {
+    title: "All",
+    value: {
+      min: "0",
+      max: "99999999999999999999999999999999999999999999999",
+    },
+  },
+  {
     title: "0 to 500 ADA",
     value: {
       min: "0",
-      max: "50",
+      max: "500",
     },
   },
   {
@@ -26,7 +33,7 @@ export const price_range_data = [
   {
     title: "1001 to max ADA",
     value: {
-      min: "10001",
+      min: "1001",
       max: "99999999999999999999999999999999999999999999999",
     },
   },
