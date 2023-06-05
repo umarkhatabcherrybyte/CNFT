@@ -147,8 +147,6 @@ const MylistTabs = () => {
     if (connected) {
       if (assets && assets.length > 0) {
         setIsLoading(false);
-      } else {
-        setIsLoading(true);
       }
     }
   }, [assets, connected]);
