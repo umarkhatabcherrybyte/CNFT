@@ -13,6 +13,8 @@ import { LoadingButton } from "@mui/lab";
 import { useRouter } from "next/router";
 import { transactionErrorHanlder } from "../../helper/transactionError";
 import { seedPhraseMainnet } from "../../config/utils";
+import { seedPhrasePreprod } from "../../config/utils";
+import { network_name, network_url, network_key } from "../../../base_network";
 import { getClientIp } from "../../helper/clientIP";
 
 const style = {
@@ -40,8 +42,15 @@ const AuctionModal = ({
   const lovelace = useLovelace();
   const [total, setTotal] = useState("");
   const [inputVal, setInputVal] = useState("");
-  const { wallet, connected, name, connecting, connect, disconnect, error } =
-    useWallet();
+  const {
+    wallet,
+    connected,
+    name,
+    connecting,
+    connect,
+    disconnect,
+    error,
+  } = useWallet();
   const formik = useFormik({
     initialValues: {
       price: "",
@@ -80,20 +89,30 @@ const AuctionModal = ({
                 unit: unit,
               });
               if (response.data.status) {
+                // const transferLucid = await Lucid.new(
+                //   new Blockfrost(
+                //     "https://cardano-mainnet.blockfrost.io/api/v0",
+                //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+                //   ),
+                //   "Mainnet"
+                // );
                 const transferLucid = await Lucid.new(
-                  new Blockfrost(
-                    "https://cardano-mainnet.blockfrost.io/api/v0",
-                    "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-                  ),
-                  "Mainnet"
+                  new Blockfrost(network_url, network_key),
+
+                  network_name
                 );
                 transferLucid.selectWalletFromSeed(seedPhraseMainnet);
+                // const lucidBrowser = await Lucid.new(
+                //   new Blockfrost(
+                //     "https://cardano-mainnet.blockfrost.io/api/v0",
+                //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+                //   ),
+                //   "Mainnet"
+                // );
                 const lucidBrowser = await Lucid.new(
-                  new Blockfrost(
-                    "https://cardano-mainnet.blockfrost.io/api/v0",
-                    "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-                  ),
-                  "Mainnet"
+                  new Blockfrost(network_url, network_key),
+
+                  network_name
                 );
                 // console.log(values.price, "dasd");
                 const api = await window.cardano[

@@ -31,7 +31,7 @@ import useFetchData from "../../../hooks/adaInfo";
 import { isVideoOrIsAudio } from "../../../utils/utils";
 import { transactionErrorHanlder } from "../../../helper/transactionError";
 import { getClientIp } from "../../../helper/clientIP";
-
+import { network_name, network_url, network_key } from "../../../base_network";
 // import { BigInt } from "lucid-cardano/types/src/core/wasm_modules/cardano_multiplatform_lib_web/cardano_multiplatform_lib";
 const List = [{}, {}, {}, {}];
 
@@ -60,8 +60,15 @@ const BuyDetail = () => {
   const [detail, setDetail] = useState({});
 
   const [isLoading, setIsLoading] = useState(true);
-  const { wallet, connected, name, connecting, connect, disconnect, error } =
-    useWallet();
+  const {
+    wallet,
+    connected,
+    name,
+    connecting,
+    connect,
+    disconnect,
+    error,
+  } = useWallet();
   console.log(detail);
   useEffect(() => {
     const getData = async () => {
@@ -102,13 +109,19 @@ const BuyDetail = () => {
           const owner_value = Number(lovelace * 0.025);
           const owner_address =
             "addr_test1qpm6srkw5vndavk72khy58cht0f0u796xdmwq9kfu2j63064cwwrleufnnz36s8v0pk0l54kvfn3m7et69xxsvh4ajus55y7tq";
+          // const lucid = await Lucid.new(
+          //   new Blockfrost(
+          //     "https://cardano-mainnet.blockfrost.io/api/v0",
+          //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+          //   ),
+          //   "Mainnet"
+          // );
           const lucid = await Lucid.new(
-            new Blockfrost(
-              "https://cardano-mainnet.blockfrost.io/api/v0",
-              "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-            ),
-            "Mainnet"
+            new Blockfrost(network_url, network_key),
+
+            network_name
           );
+
           const api = await window.cardano[String(connectedWallet)].enable();
           lucid.selectWallet(api);
           // console.log(await lucid.wallet.address());

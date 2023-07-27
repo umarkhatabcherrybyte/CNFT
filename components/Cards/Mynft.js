@@ -13,6 +13,7 @@ import { INSTANCE } from "/config/axiosInstance";
 import FullScreenLoader from "../shared/FullScreenLoader";
 import { BlockfrostProvider } from "@meshsdk/core";
 import { useDispatch } from "react-redux";
+import { network_key } from "../../base_network";
 const Mynft = ({ card }) => {
   console.log(card);
   const dispatch = useDispatch();
@@ -21,7 +22,8 @@ const Mynft = ({ card }) => {
   const user_id = window.localStorage.getItem("user_id");
   const recipientAddress = window.localStorage.getItem("user_address");
   const blockfrostProvider = new BlockfrostProvider(
-    "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+    // "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj" //this was the mainnet key
+    network_key // I added the key declared globally but importing in this file
   );
   React.useEffect(() => {
     getMetaData();
