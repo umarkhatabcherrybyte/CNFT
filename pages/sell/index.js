@@ -96,7 +96,7 @@ const Sell = () => {
       <ContainerLayout>
         <Ballon />
         <Strips />
-        <BreadCrumHeader heading="Sell your token" />
+        {/* <BreadCrumHeader heading="Sell your token" /> */}
 
         <Box sx={{ py: 5 }}>
           <TabContext value={tabValue}>

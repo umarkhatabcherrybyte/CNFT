@@ -119,6 +119,7 @@ const MylistTabs = () => {
   const [lists, setLists] = useState([]);
   const [tabValue, setTabValue] = useState("add");
   const [isLoading, setIsLoading] = useState(false);
+  console.log(assets, "assetsassetsassetsassetsassetsassetsassetsassetsassets");
   // const [assets, setAssets] = useState([]);
   React.useEffect(() => {
     async function getAddress() {
@@ -180,9 +181,8 @@ const MylistTabs = () => {
             return;
           } else {
             setIsLoading(true);
-            let connectedWallet = window.localStorage.getItem(
-              "connectedWallet"
-            );
+            let connectedWallet =
+              window.localStorage.getItem("connectedWallet");
             if (values.file != null || values.file != undefined) {
               const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
               const projectSecret = "136393a5b7f4e47a9e153a88eb636003";
@@ -234,11 +234,10 @@ const MylistTabs = () => {
                 ].enable();
                 lucidBrowser.selectWallet(api);
 
-                const {
-                  paymentCredential,
-                } = lucidBrowser.utils.getAddressDetails(
-                  await lucidBrowser.wallet.address()
-                );
+                const { paymentCredential } =
+                  lucidBrowser.utils.getAddressDetails(
+                    await lucidBrowser.wallet.address()
+                  );
                 const mintingPolicy = lucidBrowser.utils.nativeScriptFromJson({
                   type: "all",
                   scripts: [
@@ -252,9 +251,8 @@ const MylistTabs = () => {
                   ],
                 });
 
-                const policyId = lucidBrowser.utils.mintingPolicyToId(
-                  mintingPolicy
-                );
+                const policyId =
+                  lucidBrowser.utils.mintingPolicyToId(mintingPolicy);
                 // console.log(mintingPolicy, policyId, "pm");
                 let metadataX = {};
                 let metadata = {
