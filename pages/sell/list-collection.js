@@ -21,8 +21,9 @@ import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { getObjData } from "../../helper/localStorage";
 import { transactionErrorHanlder } from "../../helper/transactionError";
 import { seedPhraseMainnet } from "../../config/utils";
+import { seedPhrasePreprod } from "../../config/utils";
 import { getClientIp } from "../../helper/clientIP";
-
+import { network_name, network_url, network_key } from "../../../base_network";
 const ListCollectionStep2 = () => {
   const lovelace = useLovelace();
 
@@ -395,24 +396,31 @@ const ListCollectionStep2 = () => {
           );
           return;
         } else {
+          // const transferLucid = await Lucid.new(
+          //   new Blockfrost(
+          //     "https://cardano-mainnet.blockfrost.io/api/v0",
+          //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+          //   ),
+          //   "Mainnet"
+          // );
           const transferLucid = await Lucid.new(
-            new Blockfrost(
-              "https://cardano-mainnet.blockfrost.io/api/v0",
-              "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-            ),
-            "Mainnet"
-          );
+            new Blockfrost(network_url, network_key),
 
-          transferLucid.selectWalletFromSeed(
-            seedPhraseMainnet
+            network_name
           );
+          transferLucid.selectWalletFromSeed(seedPhraseMainnet);
 
+          // const lucid = await Lucid.new(
+          //   new Blockfrost(
+          //     "https://cardano-mainnet.blockfrost.io/api/v0",
+          //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+          //   ),
+          //   "Mainnet"
+          // );
           const lucid = await Lucid.new(
-            new Blockfrost(
-              "https://cardano-mainnet.blockfrost.io/api/v0",
-              "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-            ),
-            "Mainnet"
+            new Blockfrost(network_url, network_key),
+
+            network_name
           );
 
           const api = await window.cardano[String(connectedWallet)].enable();

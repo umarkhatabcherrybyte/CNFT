@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Layout from "../../../components/Mint/Layout";
+import { network_name, network_url, network_key } from "../../../base_network";
 import {
   Box,
   Container,
@@ -74,14 +75,18 @@ const CollectionStep3 = () => {
             let metadata_objs = JSON.parse(
               window.localStorage.getItem("metadataObjects")
             );
+            // const lucid = await Lucid.new(
+            //   new Blockfrost(
+            //     "https://cardano-mainnet.blockfrost.io/api/v0",
+            //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+            //   ),
+            //   "Mainnet"
+            // );
             const lucid = await Lucid.new(
-              new Blockfrost(
-                "https://cardano-mainnet.blockfrost.io/api/v0",
-                "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-              ),
-              "Mainnet"
-            );
+              new Blockfrost(network_url, network_key),
 
+              network_name
+            );
             const api = await window.cardano[String(connectedWallet)].enable();
             lucid.selectWallet(api);
 
@@ -170,12 +175,17 @@ const CollectionStep3 = () => {
             let metadata_objs = JSON.parse(
               window.localStorage.getItem("metadataObjects")
             );
+            // const lucid = await Lucid.new(
+            //   new Blockfrost(
+            //     "https://cardano-mainnet.blockfrost.io/api/v0",
+            //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+            //   ),
+            //   "Mainnet"
+            // );
             const lucid = await Lucid.new(
-              new Blockfrost(
-                "https://cardano-mainnet.blockfrost.io/api/v0",
-                "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-              ),
-              "Mainnet"
+              new Blockfrost(network_url, network_key),
+
+              network_name
             );
 
             const api = await window.cardano[String(connectedWallet)].enable();
@@ -266,12 +276,17 @@ const CollectionStep3 = () => {
               let metadata_objs = JSON.parse(
                 window.localStorage.getItem("metadataObjects")
               );
+              // const lucid = await Lucid.new(
+              //   new Blockfrost(
+              //     "https://cardano-mainnet.blockfrost.io/api/v0",
+              //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+              //   ),
+              //   "Mainnet"
+              // );
               const lucid = await Lucid.new(
-                new Blockfrost(
-                  "https://cardano-mainnet.blockfrost.io/api/v0",
-                  "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-                ),
-                "Mainnet"
+                new Blockfrost(network_url, network_key),
+
+                network_name
               );
 
               const api = await window.cardano[

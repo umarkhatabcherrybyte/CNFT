@@ -11,6 +11,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
+import axios from "axios";
 import Heading from "../shared/headings/Heading";
 import FixedPrice from "/public/images/fixed price.svg";
 import Auction from "/public/images/auction.svg";
@@ -45,6 +46,7 @@ const SaleMethod = () => {
   // const { auction } = useSelector((state) => state.listing);
   // console.log(auction);
   // console.log(listing);
+
   const dispatch = useDispatch();
 
   const listing_data = getObjData("listing");
@@ -56,7 +58,34 @@ const SaleMethod = () => {
   const onPaymentChange = (event, newValue) => {
     setPaymentValue(newValue);
   };
+  // const getMintingTime = async() => {
+  //   const {time} = await axios.get("https://api.koios.rest/api/v0/asset_info?_asset_policy=750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501&_asset_name=424f4f4b" \
+  //   -H "accept: application/json")
 
+  // }
+  async function getAssetInfo(assetPolicy, assetName) {
+    try {
+      const baseURL = "https://api.koios.rest/api/v0/asset_info";
+      const queryParams = `_asset_policy=${assetPolicy}&_asset_name=${assetName}`;
+
+      const response = await axios.get(
+        `https://api.koios.rest/api/v0/asset_info?_asset_policy=e8a578c7ac07051bd5879f02de00ff12d7e88e0bf85d2f49e0a552f9&_asset_name=e8a578c7ac07051bd5879f02de00ff12d7e88e0bf85d2f49e0a552f974657374206d696e74`,
+        {
+          headers: {
+            accept: "application/json",
+          },
+        }
+      );
+
+      // Handle the response data here (e.g., print it)
+      console.log("Asset Info:---------------------", response.data);
+
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching asset info:", error.message);
+      return null;
+    }
+  }
   const submitData = async () => {
     if (isForm) {
       setIsLoading(true);
@@ -104,8 +133,17 @@ const SaleMethod = () => {
       Toast("error", "Please set your price.");
     }
   };
+  useEffect(() => {
+    getAssetInfo(
+      "e8a578c7ac07051bd5879f02de00ff12d7e88e0bf85d2f49e0a552f9",
+      "test mint"
+    );
+  }, []);
   return (
     <>
+      <p onClick={() => getAssetInfo()}>
+        sdfffffffffffffffffffffffffffffffffff
+      </p>
       {isLoading && <FullScreenLoader />}
       {/* <Button
         className="btn2"
@@ -305,9 +343,10 @@ const SaleMethod = () => {
                 <AssetInputField
                   placeholder="Enter Minted Date"
                   name="minted_on"
-                  value={moment(new Date(listing_data?.createdAt)).format(
-                    "Do MMMM YYYY"
-                  )}
+                  // value={moment(new Date(listing_data?.createdAt)).format(
+                  //   "Do MMMM YYYY"
+                  // )}
+                  value={localStorage.getItem("policyId")}
                 />
               </Box>
             </Grid>

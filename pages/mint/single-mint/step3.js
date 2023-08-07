@@ -5,7 +5,8 @@ import { CardanoWallet, useLovelace, useWallet } from "@meshsdk/react";
 import { Toast } from "../../../components/shared/Toast";
 import { createTransaction, signTransaction } from "../../../backend";
 import CircularJSON from "circular-json";
-
+//import { Lucid } from "lucid-cardano";
+import { network_name, network_url, network_key } from "../../../base_network";
 import {
   Box,
   Container,
@@ -69,44 +70,58 @@ const SingleMintStep3 = () => {
 
   const onMint = async () => {
     try {
-      console.log('dasdasd1')
+      console.log("dasdasd1");
 
       if (!connected) {
         Toast("error", "Please Connect Your Wallet First");
-      }
-      else if (lovelace < 1000000) {
+      } else if (lovelace < 1000000) {
         Toast(
           "error",
           "You do not have enough Ada to complete this transaction"
         );
-      }
-      else {
+      } else {
         let img = window.localStorage.getItem("img");
         let connectedWallet = window.localStorage.getItem("connectedWallet");
         if (selectedValue == undefined || selectedValue == null) {
-          console.log('dasdasd2')
+          console.log("dasdasd2");
           Toast("error", "Please Select an Option for Minting");
         } else if (img && connected) {
-          console.log('dasdasd3')
+          console.log("dasdasd3");
           if (selectedValue == "a") {
             setIsLoading(true);
+            //------------------Lucid mainnet---------------
+            // const lucid = await Lucid.new(
+            //   new Blockfrost(
+            //     "https://cardano-mainnet.blockfrost.io/api/v0",
+            //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+            //   ),
+            //   "Mainnet"
+            // );
 
             const lucid = await Lucid.new(
-              new Blockfrost(
-                "https://cardano-mainnet.blockfrost.io/api/v0",
-                "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-              ),
-              "Mainnet"
+              new Blockfrost(network_url, network_key),
+
+              network_name
             );
+            //-------------------Lucid preprod---------------
+            // const lucid = await Lucid.new(
+            //   new Blockfrost(
+            //     "https://cardano-preprod.blockfrost.io/api/v0",
+            //     "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+            //   ),
+            //   "Preprod"
+            // );
 
             const api = await window.cardano[String(connectedWallet)].enable();
             lucid.selectWallet(api);
 
-            let network = await lucid.network
-            let addDeet = await lucid.utils.getAddressDetails(await lucid.wallet.address())
-            let seed = await lucid.utils.generateSeedPhrase()
+            let network = await lucid.network;
+            let addDeet = await lucid.utils.getAddressDetails(
+              await lucid.wallet.address()
+            );
+            let seed = await lucid.utils.generateSeedPhrase();
 
-            console.log(network, addDeet)
+            console.log(network, addDeet);
 
             const { paymentCredential } = lucid.utils.getAddressDetails(
               await lucid.wallet.address()
@@ -175,25 +190,41 @@ const SingleMintStep3 = () => {
               }
             }
           } else if (selectedValue == "b") {
-            console.log('dasdasd')
+            console.log("dasdasd");
             setIsLoading(true);
-            const lucid = await Lucid.new(
-              new Blockfrost(
-                "https://cardano-mainnet.blockfrost.io/api/v0",
-                "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-              ),
-              "Mainnet"
-            );
+            //-----------Lucid mainnet----------------
+            // const lucid = await Lucid.new(
+            //   new Blockfrost(
+            //      "https://cardano-mainnet.blockfrost.io/api/v0",
 
+            //      "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+
+            //   ),
+            //    "Mainnet"
+
+            // );
+            const lucid = await Lucid.new(
+              new Blockfrost(network_url, network_key),
+              network_name
+            );
+            //----------Lucid preprod----------------
+            // const lucid = await Lucid.new(
+            //   new Blockfrost(
+            //     "https://cardano-preprod.blockfrost.io/api/v0",
+            //     "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
+            //   ),
+            //   "Preprod"
+            // );
             const api = await window.cardano[String(connectedWallet)].enable();
             lucid.selectWallet(api);
 
             // debugger
-            let network = await lucid.network
-            let addDeet = await lucid.utils.getAddressDetails(await lucid.wallet.address())
+            let network = await lucid.network;
+            let addDeet = await lucid.utils.getAddressDetails(
+              await lucid.wallet.address()
+            );
 
-            console.log(network, addDeet)
-
+            console.log(network, addDeet);
 
             const { paymentCredential } = lucid.utils.getAddressDetails(
               await lucid.wallet.address()
@@ -219,7 +250,7 @@ const SingleMintStep3 = () => {
             const unit = policyId + fromText(metadata.name);
             let obj = { [policyId]: metadataX };
 
-            console.log(obj, 'objd')
+            console.log(obj, "objd");
 
             const tx = await lucid
               .newTx()
@@ -268,12 +299,16 @@ const SingleMintStep3 = () => {
           } else if (selectedValue == "c") {
             setIsLoading(true);
 
+            // const lucid = await Lucid.new(
+            //   new Blockfrost(
+            //     "https://cardano-mainnet.blockfrost.io/api/v0",
+            //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+            //   ),
+            //   "Mainnet"
+            // );
             const lucid = await Lucid.new(
-              new Blockfrost(
-                "https://cardano-mainnet.blockfrost.io/api/v0",
-                "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-              ),
-              "Mainnet"
+              new Blockfrost(netwok_url, network_key),
+              network_name
             );
 
             const api = await window.cardano[String(connectedWallet)].enable();
