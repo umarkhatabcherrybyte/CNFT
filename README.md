@@ -33,3 +33,4 @@ Whether you are new to web development or a seasoned blockchain full-stack devel
 Follow us on [Twitter](https://twitter.com/MartifyLabs) for updates.
 
 Join our [Discord](https://discord.gg/Z6AH9dahdH) for any questions and suggestions.
+ export NODE_OPTIONS=\"--max_old_space_size=4096\"

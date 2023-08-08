@@ -320,10 +320,15 @@
   resolved "https://registry.npmjs.org/@emurgo/cardano-message-signing-nodejs/-/cardano-message-signing-nodejs-1.0.1.tgz"
   integrity sha512-PoKh1tQnJX18f8iEr8Jk1KXxKCn9eqaSslMI1pyOJvYRJhQVDLCh0+9YReufjp0oFJIY1ShcrR+4/WnECVZUKQ==
 
-"@emurgo/cardano-serialization-lib-asmjs@^11.2.1":
-  version "11.3.0"
-  resolved "https://registry.npmjs.org/@emurgo/cardano-serialization-lib-asmjs/-/cardano-serialization-lib-asmjs-11.3.0.tgz"
-  integrity sha512-81KVs/LitQF7WVeCe9FdFDaUSynZtyK7iqXToTpgiHOi/VVyEn9OkvU5WOzTehl6DfOwU1dx1xGopZsVqslZWw==
+"@emurgo/cardano-serialization-lib-asmjs@^11.1.0":
+  version "11.1.0"
+  resolved "https://registry.npmjs.org/@emurgo/cardano-serialization-lib-asmjs/-/cardano-serialization-lib-asmjs-11.1.0.tgz"
+  integrity sha512-wxF/Yle0HBCs19bDue+zpG8pRTP0iZk90TTNX3VfsAUmIRbP2GqheEN6Uwsd0kfCdwkRbOZCSEb7+QLJ6MOCPg==
+
+"@emurgo/cardano-serialization-lib-browser@^11.4.0":
+  version "11.4.0"
+  resolved "https://registry.npmjs.org/@emurgo/cardano-serialization-lib-browser/-/cardano-serialization-lib-browser-11.4.0.tgz"
+  integrity sha512-VWMvLRBFo7MAYh42zledURFs5BpMTWvkP4DzsLNbyJxZlwjDS+bPyehJVyGc116d2gq8NHFmANbfdeuK8ffJ7A==
 
 "@emurgo/cardano-serialization-lib-browser@11.1.0":
   version "11.1.0"
