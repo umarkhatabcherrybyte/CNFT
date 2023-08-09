@@ -18,7 +18,7 @@ import {
   TransactionWitnessSet,
   Value,
   Vkeywitnesses,
-} from "@emurgo/cardano-serialization-lib-browser";
+} from '@emurgo/cardano-serialization-lib-asmjs';
 
 // declare global {
 //     interface Window {

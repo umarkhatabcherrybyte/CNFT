@@ -3,19 +3,22 @@ import { useAssets, useWallet } from "@meshsdk/react";
 import React, { useEffect, useState } from "react";
 import { BlockfrostProvider } from "@meshsdk/core";
 import { network_key } from "../../base_network";
-
+import { market } from "../../config";
+import Listing from "/components/testing/Listing.jsx"
 import {
   calculatePolicyHash,
   decodeAssetName,
   listProviders,
   walletValue,
+  callKuberAndSubmit,
+  transformNftImageUrl,
 } from "../../scripts/wallet.js";
 // import {
 //   Address,
 //   BaseAddress,
 //   ScriptPubkey,
 // } from "@emurgo/cardano-serialization-lib-browser";
-import { Address } from "@emurgo/cardano-serialization-lib-asmjs";
+import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
 const Testing = () => {
   const [nfts, setNfts] = useState([]);
 
@@ -24,14 +27,14 @@ const Testing = () => {
   useEffect(() => {
     getAssets();
   }, [assets]);
-
+  // console.log(nfts, "assets");
   const getAssets = async () => {
     if (assets && assets.length > 0) {
       const assetMetadataPromises = assets.map(async (item) => {
         const main = await blockfrostProvider.fetchAssetMetadata(item.unit);
         const url = new URL(main.image);
         const hash = url.pathname.slice(1);
-        return { ...main, image: hash, isSelling: false, price: "" }; // Replace the i
+        return { ...main, image: hash, isSelling: false, price: "", ...item }; // Replace the i
       });
 
       const data = await Promise.all(assetMetadataPromises);
@@ -48,18 +51,19 @@ const Testing = () => {
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
   const [instance, setInstance] = useState(null);
-  useEffect(() => {
-    if (wallet) {
-      setInstance(wallet);
-    }
-  }, [wallet]);
-  console.log(instance, "wallet");
+  // useEffect(() => {
+  //   if (wallet) {
+  //     setInstance(wallet);
+  //   }
+  // }, [wallet]);
+  // console.log(instance, "wallet");
   const connectWallet = async () => {
-    // const res = await connect("Nami");
     const api = await window.cardano.nami.enable();
-    const addresses = await api.getUsedAddresses();
-    console.log(addresses, "addressesaddressesaddresses");
-    console.log(api, "sellNftsellNftsellNft");
+    const res = await connect("Nami");
+    setInstance(api);
+    // const addresses = await api.getUsedAddresses();
+    // console.log(addresses, "addressesaddressesaddresses");
+    // console.log(api, "sellNftsellNftsellNft");
   };
   const sellNft = async (providerInstance, asset) => {
     console.log(providerInstance, "providerInstance");
@@ -75,6 +79,49 @@ const Testing = () => {
       Address.from_bytes(Uint8Array.from(Buffer.from(addresses[0], "hex")))
     );
     console.log("sellerAddr", sellerAddr);
+    const sellerPkh = Buffer.from(
+      sellerAddr.payment_cred().to_keyhash().to_bytes()
+    ).toString("hex");
+    const sellerStakeKey = Buffer.from(
+      sellerAddr.stake_cred().to_keyhash().to_bytes()
+    ).toString("hex");
+    const body = {
+      selections: await providerInstance.getUtxos(),
+      outputs: [
+        {
+          address: market.address,
+          value: `${asset.policyId}.${asset.name}`,
+          datum: {
+            fields: [
+              {
+                fields: [
+                  { fields: [{ bytes: `${sellerPkh}` }], constructor: 0 }, // pubkeyhash
+                  {
+                    fields: [
+                      {
+                        fields: [
+                          {
+                            fields: [{ bytes: `${sellerStakeKey}` }],
+                            constructor: 0,
+                          },
+                        ],
+                        constructor: 0,
+                      },
+                    ],
+                    constructor: 0,
+                  }, // stakekeyHash
+                ],
+                constructor: 0,
+              },
+              // sellAmount: "",
+              { int: Math.round(parseFloat(40) * 1e6) },
+            ],
+            constructor: 0,
+          },
+        },
+      ],
+    };
+    callKuberAndSubmit(providerInstance, JSON.stringify(body));
   };
   const handleAddButtonClick = (index, price) => {
     // Save the price and set isSelling back to false
@@ -84,9 +131,10 @@ const Testing = () => {
     setNfts(updatedNfts);
   };
 
-  console.log(nfts, "assetsassetsassetsassets");
+  // console.log(nfts, "assetsassetsassetsassets");
 
   return (
+    <>
     <Box
       sx={{
         height: "40vh",
@@ -123,6 +171,9 @@ const Testing = () => {
         </div>
       ))}
     </Box>
+    <p>hello</p>
+    <Listing instance={instance}/>
+    </>
   );
 };
 
