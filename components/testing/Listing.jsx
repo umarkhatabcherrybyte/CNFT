@@ -16,9 +16,9 @@ import {
   Ed25519KeyHash,
   StakeCredential,
 } from "@emurgo/cardano-serialization-lib-asmjs";
-import { useWalletState, useWalletAction  } from "../../scripts/sotre";
+import { useWalletState, useWalletAction } from "../../scripts/sotre";
 
-const YourReactComponent = ({instance}) => {
+const YourReactComponent = ({ instance }) => {
   const [walletState, setWalletState] = useWalletState();
   const walletAction = useWalletAction();
 
@@ -90,7 +90,7 @@ const YourReactComponent = ({instance}) => {
             setTimeout(() => {
               database.saveUtxos(db, [nftDetail]);
             });
-console.log(nftDetail , "nftDetailnftDetailnftDetail")
+            console.log(nftDetail, "nftDetailnftDetailnftDetail");
             return nftDetail;
           }
         });
@@ -147,33 +147,33 @@ console.log(nftDetail , "nftDetailnftDetailnftDetail")
     // Create constraints for buying
     // walletAction.callback
     // const by2 = async (provider) => {
-      const request = {
-        selections: await instance.getUtxos(),
-        inputs: [
-          {
-            address: market.address,
-            utxo: {
-              hash: utxo.tx_hash,
-              index: utxo.tx_index,
-            },
-            script: market.script,
-            redeemer: { fields: [], constructor: 0 },
+    const request = {
+      selections: await instance.getUtxos(),
+      inputs: [
+        {
+          address: market.address,
+          utxo: {
+            hash: utxo.tx_hash,
+            index: utxo.tx_index,
           },
-        ],
-        outputs: [
-          {
-            address: sellerAddr
-              .to_address()
-              .to_bech32(
-                market.address.startsWith("addr_test") ? "addr_test" : "addr"
-              ),
-            value: cost,
-            insuffientUtxoAda: "increase",
-          },
-        ],
-      };
+          script: market.script,
+          redeemer: { fields: [], constructor: 0 },
+        },
+      ],
+      outputs: [
+        {
+          address: sellerAddr
+            .to_address()
+            .to_bech32(
+              market.address.startsWith("addr_test") ? "addr_test" : "addr"
+            ),
+          value: cost,
+          insuffientUtxoAda: "increase",
+        },
+      ],
+    };
 
-      return callKuberAndSubmit(instance, JSON.stringify(request));
+    return callKuberAndSubmit(instance, JSON.stringify(request));
     // };
 
     // walletAction.enable = true;
@@ -186,59 +186,78 @@ console.log(nftDetail , "nftDetailnftDetailnftDetail")
   return (
     <div>
       buy NFT
-    <div className="ml-2">
-      {utxos.length === 0 ? (
-        <div className="text-gray-400 font-semibold text-center my-5">{message}</div>
-      ) : (
-        utxos.map(utxo => (
-          <div key={utxo.id} className="p-2 flex">
-            <img
-              alt={utxo.assetName + '_img'}
-              className="inline-block h-32 w-32 mr-4 border-red-300 border-2"
-              src={utxo.detail._imageUrl}
-            />
-            <div className="flex flex-col justify-between pb-2">
-              <div>
-                {utxo.detail._name ? (
-                  <React.Fragment>
-                    <a href={'https://testnet.cardanoscan.io/token/' + utxo.nft}> &#x29c9; </a>
-                    <span className="text-blue-900 text-xl font-extrabol">{utxo.detail._name}</span>
-                    {utxo.detail?.onchain_metadata?.artist && (
-                      <span className="text-gray-400 text-xs">&nbsp; by {utxo.detail.onchain_metadata.artist}</span>
-                    )}
-                  </React.Fragment>
-                ) : (
-                  <span className="text-blue-700 font-extrabold">
-                    {utxo.policy.substring(0, 8)}...{utxo.assetName}
-                  </span>
-                )}
-                {utxo.detail?.onchain_metadata && (
-                  <div>
-                    {utxo.detail.onchain_metadata.description && (
-                      <div className="text-gray-500">
-                        {mapDescription(utxo.detail.onchain_metadata.description)}
-                      </div>
-                    )}
-                    {utxo.detail.onchain_metadata.copyright && (
-                      <div className="text-gray-500">Copyright: {utxo.detail.onchain_metadata.copyright}</div>
-                    )}
-                  </div>
-                )}
-              </div>
-              <div>
-                <button
-                  onClick={() => buy(utxo)}
-                  className="bg-transparent hover:bg-blue-300 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-blue-200 rounded"
-                >
-                  {renderLovelace(utxo.detail?.datum?.fields[1]?.int)} Ada (Buy)
-                </button>
+      <div className="ml-2">
+        {utxos.length === 0 ? (
+          <div className="text-gray-400 font-semibold text-center my-5">
+            {message}
+          </div>
+        ) : (
+          utxos.map((utxo) => (
+            <div key={utxo.id} className="p-2 flex">
+              <img
+                alt={utxo.assetName + "_img"}
+                className="inline-block h-32 w-32 mr-4 border-red-300 border-2"
+                style={{ width: "100px", height: "80px" }}
+                src={utxo.detail._imageUrl}
+              />
+              <div className="flex flex-col justify-between pb-2">
+                <div>
+                  {utxo.detail._name ? (
+                    <React.Fragment>
+                      <a
+                        href={
+                          "https://testnet.cardanoscan.io/token/" + utxo.nft
+                        }
+                      >
+                        {" "}
+                        &#x29c9;{" "}
+                      </a>
+                      <span className="text-blue-900 text-xl font-extrabol">
+                        {utxo.detail._name}
+                      </span>
+                      {utxo.detail?.onchain_metadata?.artist && (
+                        <span className="text-gray-400 text-xs">
+                          &nbsp; by {utxo.detail.onchain_metadata.artist}
+                        </span>
+                      )}
+                    </React.Fragment>
+                  ) : (
+                    <span className="text-blue-700 font-extrabold">
+                      {utxo.policy.substring(0, 8)}...{utxo.assetName}
+                    </span>
+                  )}
+                  {utxo.detail?.onchain_metadata && (
+                    <div>
+                      {utxo.detail.onchain_metadata.description && (
+                        <div className="text-gray-500">
+                          {mapDescription(
+                            utxo.detail.onchain_metadata.description
+                          )}
+                        </div>
+                      )}
+                      {utxo.detail.onchain_metadata.copyright && (
+                        <div className="text-gray-500">
+                          Copyright: {utxo.detail.onchain_metadata.copyright}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <button
+                    onClick={() => buy(utxo)}
+                    className="bg-transparent hover:bg-blue-300 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-blue-200 rounded"
+                  >
+                    {renderLovelace(utxo.detail?.datum?.fields[1]?.int)} Ada
+                    (Buy)
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))
-      )}
+          ))
+        )}
+      </div>
     </div>
-  </div>
   );
 };
 

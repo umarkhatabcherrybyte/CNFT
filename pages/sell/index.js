@@ -157,7 +157,7 @@ const Sell = () => {
               {type === "add-listing" ? (
                 <>
                   {listing.step === "step1" && <MylistTabs />}
-                  {listing.step === "step2" && <SellMethod />}
+                  {listing.step === "step1" && <SellMethod />}
                 </>
               ) : (
                 <MyListCard />

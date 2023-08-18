@@ -147,7 +147,7 @@ const Testing = () => {
       {nfts.map((nft, index) => (
         <div key={index}>
           <h2>{nft.name}</h2>
-          <img src={`https://ipfs.io/ipfs${nft.image}`} alt={nft.name} />
+          <img src={`https://ipfs.io/ipfs${nft.image}`} alt={nft.name} style={{width:"100px" , height:"100px"}} />
           <p>{nft.description}</p>
           {nft.isSelling ? (
             <>

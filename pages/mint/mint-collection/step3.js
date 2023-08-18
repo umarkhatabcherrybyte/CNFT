@@ -60,9 +60,12 @@ const CollectionStep3 = () => {
       let connectedWallet = window.localStorage.getItem("connectedWallet");
 
       let img = window.localStorage.getItem("img");
+      console.log(img, "img");
+      console.log(connected, "connected");
+
       if (selectedValue == undefined || selectedValue == null) {
         Toast("error", "Please Select an Option for Minting");
-      } else if (img && connected) {
+      } else if (connected) {
         if (lovelace < 1000000) {
           Toast(
             "error",
@@ -89,11 +92,11 @@ const CollectionStep3 = () => {
             );
             const api = await window.cardano[String(connectedWallet)].enable();
             lucid.selectWallet(api);
-
+            console.log(api, "api");
             const { paymentCredential } = lucid.utils.getAddressDetails(
               await lucid.wallet.address()
             );
-
+            console.log(paymentCredential, "paymentCredential");
             const mintingPolicy = lucid.utils.nativeScriptFromJson({
               type: "all",
               scripts: [
@@ -104,13 +107,20 @@ const CollectionStep3 = () => {
                 },
               ],
             });
-
+            console.log(mintingPolicy, "mintingPolicy");
             const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
+
             let obj;
             let assetObj = {};
             let units = [];
             let metadataX = {};
             let prices = [];
+            console.log(policyId, "policyId");
+            console.log(obj, "obj");
+            console.log({ units }, "uits");
+            console.log({ metadataX }, "metadataX");
+            console.log({ prices }, "prices");
+            console.log({ metadata_objs }, "metadata_objs");
             for (let index = 0; index < metadata_objs.length; index++) {
               const element = metadata_objs[index];
               prices.push(element.price);
@@ -190,11 +200,12 @@ const CollectionStep3 = () => {
 
             const api = await window.cardano[String(connectedWallet)].enable();
             lucid.selectWallet(api);
+            console.log(api, "api");
 
             const { paymentCredential } = lucid.utils.getAddressDetails(
               await lucid.wallet.address()
             );
-
+            console.log(paymentCredential, "paymentCredential");
             const mintingPolicy = lucid.utils.nativeScriptFromJson({
               type: "all",
               scripts: [
@@ -205,6 +216,7 @@ const CollectionStep3 = () => {
                 },
               ],
             });
+            console.log(mintingPolicy, "mintingPolicy");
 
             const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
             let obj;
@@ -212,6 +224,12 @@ const CollectionStep3 = () => {
             let units = [];
             let metadataX = {};
             let prices = [];
+            console.log(policyId, "policyId");
+            console.log(obj, "obj");
+            console.log({ units }, "uits");
+            console.log({ metadataX }, "metadataX");
+            console.log({ prices }, "prices");
+            console.log({ metadata_objs }, "metadata_objs");
             for (let index = 0; index < metadata_objs.length; index++) {
               const element = metadata_objs[index];
               prices.push(element.price);
@@ -234,7 +252,7 @@ const CollectionStep3 = () => {
               .attachMetadata("721", obj)
               .payToAddress(bankWalletAddress, { lovelace: 10000n })
               .complete();
-
+            console.log({ txL }, "txL");
             const signedTxL = await txL.sign().complete();
             const txHashL = await signedTxL.submit();
             if (txHashL) {
