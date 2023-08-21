@@ -33,12 +33,23 @@ import {
   AppWallet,
   BlockfrostProvider,
 } from "@meshsdk/core";
-import { costLovelace, bankWalletAddress } from "../../../config/utils";
-import { Lucid, fromText, Blockfrost } from "lucid-cardano";
+import {
+  costLovelace,
+  bankWalletAddress,
+  seedPhrasePreprod,
+} from "../../../config/utils";
+import {
+  Lucid,
+  fromText,
+  Blockfrost,
+  Data,
+  applyParamsToScript,
+} from "lucid-cardano";
 import { INSTANCE } from "/config/axiosInstance";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
 import { transactionErrorHanlder } from "../../../helper/transactionError";
 import { getClientIp } from "../../../helper/clientIP";
+import { cborHex } from "../../../config";
 const payData = [
   // {
   //   title: "Mint for free and list with us ",
@@ -192,56 +203,76 @@ const SingleMintStep3 = () => {
           } else if (selectedValue == "b") {
             console.log("dasdasd");
             setIsLoading(true);
-            //-----------Lucid mainnet----------------
-            // const lucid = await Lucid.new(
-            //   new Blockfrost(
-            //      "https://cardano-mainnet.blockfrost.io/api/v0",
 
-            //      "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-
-            //   ),
-            //    "Mainnet"
-
-            // );
             const lucid = await Lucid.new(
               new Blockfrost(network_url, network_key),
               network_name
             );
-            //----------Lucid preprod----------------
-            // const lucid = await Lucid.new(
-            //   new Blockfrost(
-            //     "https://cardano-preprod.blockfrost.io/api/v0",
-            //     "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm"
-            //   ),
-            //   "Preprod"
-            // );
-            const api = await window.cardano[String(connectedWallet)].enable();
-            lucid.selectWallet(api);
+            lucid.selectWalletFromSeed(seedPhrasePreprod);
+            const addr = await lucid.wallet.address();
+            console.log("own address: " + addr);
+
+            const utxos = await lucid.utxosAt(addr);
+            const utxo = utxos[0];
+            const tn = fromText("Wali ahmed");
+            const image = fromText("sdfdsfdsfsdf");
+            const Params = Data.Tuple([
+              Data.String,
+              Data.BigInt,
+              Data.String,
+              Data.String,
+            ]);
+            console.log("utxo: ", utxo);
+            console.log("script params", cborHex, [
+              utxo.txHash,
+              BigInt(utxo.outputIndex),
+              tn,
+              image,
+            ]);
+
+            let policyId = "";
+            const nftPolicy = {
+              type: "PlutusV2",
+              script: applyParamsToScript(cborHex, [
+                utxo.txHash,
+                BigInt(utxo.outputIndex),
+                tn,
+                image,
+              ]),
+            };
+            console.log("policyScript", nftPolicy);
+            policyId = lucid.utils.mintingPolicyToId(nftPolicy);
+
+            // policyId = lucid.utils.mintingPolicyToId(nftPolicy);
+            // policyId="0c70f82d8d4c7737ea75e05e356e9e4a0751c5105faf7f4d2a59e7fc"
+            console.log("minting policy: " + policyId);
+            // const api = await window.cardano[String(connectedWallet)].enable();
+            // lucid.selectWallet(api);
 
             // debugger
-            let network = await lucid.network;
-            let addDeet = await lucid.utils.getAddressDetails(
-              await lucid.wallet.address()
-            );
+            // let network = await lucid.network;
+            // let addDeet = await lucid.utils.getAddressDetails(
+            //   await lucid.wallet.address()
+            // );
 
-            console.log(network, addDeet);
+            // console.log(network, addDeet);
 
-            const { paymentCredential } = lucid.utils.getAddressDetails(
-              await lucid.wallet.address()
-            );
+            // const { paymentCredential } = lucid.utils.getAddressDetails(
+            //   await lucid.wallet.address()
+            // );
 
-            const mintingPolicy = lucid.utils.nativeScriptFromJson({
-              type: "all",
-              scripts: [
-                { type: "sig", keyHash: paymentCredential?.hash },
-                {
-                  type: "before",
-                  slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
-                },
-              ],
-            });
+            // const mintingPolicy = lucid.utils.nativeScriptFromJson({
+            //   type: "all",
+            //   scripts: [
+            //     { type: "sig", keyHash: paymentCredential?.hash },
+            //     {
+            //       type: "before",
+            //       slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
+            //     },
+            //   ],
+            // });
 
-            const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
+            // const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
             let metadataX = {};
             let metadata = JSON.parse(window.localStorage.getItem("metadata"));
             metadataX[metadata.name] = metadata;
@@ -252,13 +283,22 @@ const SingleMintStep3 = () => {
 
             console.log(obj, "objd");
 
+            // const tx = await lucid
+            //   .newTx()
+            //   .attachMetadata("721", obj)
+            //   .mintAssets({ [unit]: 1n })
+            //   .validTo(Date.now() + 100000)
+            //   .payToAddress(bankWalletAddress, { lovelace: 1000n })
+            //   .attachMintingPolicy(nftPolicy)
+            //   .collectFrom([utxo])
+            //   .complete();
             const tx = await lucid
               .newTx()
+              .mintAssets({ [unit]: 1n }, Data.void())
               .attachMetadata("721", obj)
-              .mintAssets({ [unit]: 1n })
-              .validTo(Date.now() + 100000)
+              .attachMintingPolicy(nftPolicy)
+              .collectFrom([utxo])
               .payToAddress(bankWalletAddress, { lovelace: 1000n })
-              .attachMintingPolicy(mintingPolicy)
               .complete();
 
             const signedTx = await tx.sign().complete();
@@ -274,17 +314,17 @@ const SingleMintStep3 = () => {
                   recipient_address: await lucid.wallet.address(),
                   policy_id: policyId,
                   type: "single",
-                  minting_policy: JSON.stringify(mintingPolicy),
+                  minting_policy: JSON.stringify(nftPolicy),
                   // asset_hex_name: unit,
                 };
                 const res = await INSTANCE.post("/collection/create", data);
                 if (res) {
                   Toast("success", "Minted Successfully");
-                  window.localStorage.setItem("policy", mintingPolicy.script);
+                  window.localStorage.setItem("policy", nftPolicy.script);
                   window.localStorage.setItem("policy-id", policyId);
                   window.localStorage.setItem(
                     "minting-script",
-                    JSON.stringify(mintingPolicy)
+                    JSON.stringify(nftPolicy)
                   );
                   router.push("/mint");
                   setIsLoading(false);

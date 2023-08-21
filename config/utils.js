@@ -12,10 +12,13 @@ const costLovelace = "10000000";
 //new admin wallet address and seed phrase
 // const bankWalletAddress =
 //   "addr1q8nhtelxukx458x8h06d67l63yqs548h8guqxrdy525k428naxdfpf5a6evfaz78rdmu4d66fmvgzvmawl99y6wk0rjq9el5vh"; //new admin mainnet addres
+export const seedPhrasePreprod =
+  "load obtain bachelor bid steak royal retreat gossip width method august boat plunge library mail pulse raw six smart news buddy party engine ride";
+
 const bankWalletAddress =
   "addr_test1qz2f59rk5mrss5xrjtwqa8kh269fvu9gzgswk6jt29axe9gpuhlkntj7m9yl2eflx3thj7lt3lvyzysh4202vvgxgahseljsmd"; //new admin preprod address
-const seedPhrasePreprod =
-  "invloved sudden plug library sunny lunar tragic pride chapter flee sight side mechanic choose sure early hunt develop symbol physical core bulb flag chimney";
+// const seedPhrasePreprod =
+//   "invloved sudden plug library sunny lunar tragic pride chapter flee sight side mechanic choose sure early hunt develop symbol physical core bulb flag chimney";
 
 const seedPhraseMainnet =
   "invloved sudden plug library sunny lunar tragic pride chapter flee sight side mechanic choose sure early hunt develop symbol physical core bulb flag chimney";
