@@ -208,7 +208,11 @@ const SingleMintStep3 = () => {
               new Blockfrost(network_url, network_key),
               network_name
             );
-            lucid.selectWalletFromSeed(seedPhrasePreprod);
+
+            const api = await window.cardano[String(connectedWallet)].enable();
+            lucid.selectWallet(api);
+
+            // lucid.selectWalletFromSeed(seedPhrasePreprod);
             const addr = await lucid.wallet.address();
             console.log("own address: " + addr);
 
@@ -216,12 +220,7 @@ const SingleMintStep3 = () => {
             const utxo = utxos[0];
             const tn = fromText("Wali ahmed");
             const image = fromText("sdfdsfdsfsdf");
-            const Params = Data.Tuple([
-              Data.String,
-              Data.BigInt,
-              Data.String,
-              Data.String,
-            ]);
+
             console.log("utxo: ", utxo);
             console.log("script params", cborHex, [
               utxo.txHash,
