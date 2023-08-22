@@ -23,7 +23,7 @@ import { transactionErrorHanlder } from "../../helper/transactionError";
 import { seedPhraseMainnet } from "../../config/utils";
 import { seedPhrasePreprod } from "../../config/utils";
 import { getClientIp } from "../../helper/clientIP";
-import { network_name, network_url, network_key } from "../../../base_network";
+import { network_name, network_url, network_key } from "../../base_network";
 const ListCollectionStep2 = () => {
   const lovelace = useLovelace();
 
