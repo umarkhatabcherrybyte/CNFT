@@ -14,7 +14,7 @@ import { useRouter } from "next/router";
 import { transactionErrorHanlder } from "../../helper/transactionError";
 import { seedPhraseMainnet } from "../../config/utils";
 import { seedPhrasePreprod } from "../../config/utils";
-import { network_name, network_url, network_key } from "../../../base_network";
+import { network_name, network_url, network_key } from "../../base_network";
 import { getClientIp } from "../../helper/clientIP";
 
 const style = {
@@ -42,15 +42,8 @@ const AuctionModal = ({
   const lovelace = useLovelace();
   const [total, setTotal] = useState("");
   const [inputVal, setInputVal] = useState("");
-  const {
-    wallet,
-    connected,
-    name,
-    connecting,
-    connect,
-    disconnect,
-    error,
-  } = useWallet();
+  const { wallet, connected, name, connecting, connect, disconnect, error } =
+    useWallet();
   const formik = useFormik({
     initialValues: {
       price: "",
