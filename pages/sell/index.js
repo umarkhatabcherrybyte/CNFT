@@ -96,7 +96,7 @@ const Sell = () => {
       <ContainerLayout>
         <Ballon />
         <Strips />
-        <BreadCrumHeader heading="Sell your token" />
+        {/* <BreadCrumHeader heading="Sell your token" /> */}
 
         <Box sx={{ py: 5 }}>
           <TabContext value={tabValue}>
@@ -157,7 +157,7 @@ const Sell = () => {
               {type === "add-listing" ? (
                 <>
                   {listing.step === "step1" && <MylistTabs />}
-                  {listing.step === "step2" && <SellMethod />}
+                  {listing.step === "step1" && <SellMethod />}
                 </>
               ) : (
                 <MyListCard />

@@ -27,6 +27,7 @@ import {
 } from "/components/Routes/constants";
 import { useRouter } from "next/router";
 import { create } from "ipfs-http-client";
+import { LoadingButton } from "@mui/lab";
 
 const CollectionStep1 = () => {
   const router = useRouter();
@@ -126,6 +127,7 @@ const CollectionStep1 = () => {
 
   const uploadFilesIPFS = async () => {
     if (selectedFiles.length > 0) {
+      setIsUploading(true);
       setImagePaths([]);
       try {
         const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
@@ -154,6 +156,7 @@ const CollectionStep1 = () => {
         }
         setImagePaths(arr);
         setMetadataFileUploaded(true);
+        setIsUploading(false);
         Toast("success", "Files Uploaded Successfully");
       } catch (error) {
         console.log(error, "err");
@@ -167,7 +170,6 @@ const CollectionStep1 = () => {
   };
 
   function onNextStep() {
-    debugger
     if (!isWebform && metaFile && metadataObjectsFromFile.length > 0) {
       router.push(mintCollectionStep3);
       return;
@@ -460,13 +462,24 @@ const CollectionStep1 = () => {
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={3}>
-                  <Button
-                    className="btn w_100"
-                    // disabled={!selectedFiles}
-                    onClick={() => uploadFilesIPFS()}
-                  >
-                    Upload
-                  </Button>
+                  {isUploading ? (
+                    <LoadingButton
+                      className="btn w_100"
+                      loading
+                      sx={{
+                        height: "100%",
+                        "& .MuiCircularProgress-svg": { color: "white" },
+                      }}
+                    />
+                  ) : (
+                    <Button
+                      className="btn w_100"
+                      // disabled={!selectedFiles}
+                      onClick={() => uploadFilesIPFS()}
+                    >
+                      Upload
+                    </Button>
+                  )}
                 </Grid>
                 <Grid xs={12} item>
                   <Box

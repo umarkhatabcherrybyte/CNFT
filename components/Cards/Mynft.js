@@ -13,15 +13,18 @@ import { INSTANCE } from "/config/axiosInstance";
 import FullScreenLoader from "../shared/FullScreenLoader";
 import { BlockfrostProvider } from "@meshsdk/core";
 import { useDispatch } from "react-redux";
+import { network_key } from "../../base_network";
 const Mynft = ({ card }) => {
   console.log(card);
+  console.log("Policy if of nft is: ", card.policyId);
   const dispatch = useDispatch();
   const [metadata, setMetadata] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const user_id = window.localStorage.getItem("user_id");
   const recipientAddress = window.localStorage.getItem("user_address");
   const blockfrostProvider = new BlockfrostProvider(
-    "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+    // "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj" //this was the mainnet key
+    network_key // I added the key declared globally but importing in this file
   );
   React.useEffect(() => {
     getMetaData();
@@ -38,7 +41,14 @@ const Mynft = ({ card }) => {
 
   const navigationHanlder = async () => {
     setIsLoading(true);
+    console.log(
+      "The policy id of this nft is------------------: ",
+      card.policyId
+    );
+    window.localStorage.setItem("policyId", JSON.stringify(card.policyId));
+    window.localStorage.setItem("assetName", JSON.stringify(card.assetName));
     try {
+      console.log("The policy id of this nft is: ", card.policyId);
       const ipfsHash = metadata?.image.replace("ipfs://", "");
       const data = {
         metadata: [
@@ -158,8 +168,9 @@ const Mynft = ({ card }) => {
                 className="bold"
                 sx={{ textTransform: "uppercase" }}
               >
-                {metadata?.name}
+                {metadata?.policyId}
               </Typography>
+
               {/* <Typography
               gutterBottom
               variant="body"
