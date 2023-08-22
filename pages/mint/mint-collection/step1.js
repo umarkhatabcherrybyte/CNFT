@@ -167,7 +167,6 @@ const CollectionStep1 = () => {
   };
 
   function onNextStep() {
-    debugger
     if (!isWebform && metaFile && metadataObjectsFromFile.length > 0) {
       router.push(mintCollectionStep3);
       return;

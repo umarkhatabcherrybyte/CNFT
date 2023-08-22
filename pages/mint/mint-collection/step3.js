@@ -20,12 +20,19 @@ import Strips from "/components/Design/Strips";
 import Baloon from "/components/Design/Ballon";
 import { useLovelace, useWallet } from "@meshsdk/react";
 import { useRouter } from "next/router";
-import { Lucid, fromText, Blockfrost } from "lucid-cardano";
+import {
+  Lucid,
+  fromText,
+  Blockfrost,
+  Data,
+  applyParamsToScript,
+} from "lucid-cardano";
 import { INSTANCE } from "/config/axiosInstance";
 import { costLovelace, bankWalletAddress } from "../../../config/utils";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
 import { transactionErrorHanlder } from "../../../helper/transactionError";
 import { getClientIp } from "../../../helper/clientIP";
+import { cborHex } from "../../../config";
 
 const payData = [
   // {
@@ -200,93 +207,122 @@ const CollectionStep3 = () => {
 
             const api = await window.cardano[String(connectedWallet)].enable();
             lucid.selectWallet(api);
-            console.log(api, "api");
-
-            const { paymentCredential } = lucid.utils.getAddressDetails(
-              await lucid.wallet.address()
+            const addr = await lucid.wallet.address();
+            const utxos = await lucid.utxosAt(addr);
+            const utxo = utxos[0]; // assign utxo having x amount
+            const tn = fromText("Wali ahmed");
+            const image = fromText(
+              "https://encrypted-tbn3.gstatic.com/licensed-image?q=tbn:ANd9GcSKYIHyX3HzbdR0OuKqMdQcMlt7LdXYFK_AJx5LpyljgTwgB_4SSvKmY0wFoCyn8U4EdDNf_mfEdfEJVHc"
             );
-            console.log(paymentCredential, "paymentCredential");
-            const mintingPolicy = lucid.utils.nativeScriptFromJson({
-              type: "all",
-              scripts: [
-                { type: "sig", keyHash: paymentCredential?.hash },
-                {
-                  type: "before",
-                  slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
-                },
-              ],
-            });
-            console.log(mintingPolicy, "mintingPolicy");
 
-            const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
+            let policyId = "";
+            const nftPolicy = {
+              type: "PlutusV2",
+              script: applyParamsToScript(cborHex, [
+                utxo.txHash,
+                BigInt(utxo.outputIndex),
+                tn,
+                image,
+              ]),
+            };
+
+            policyId = lucid.utils.mintingPolicyToId(nftPolicy);
+
+            // -----------------------------------------------------------
+            // const { paymentCredential } = lucid.utils.getAddressDetails(
+            //   await lucid.wallet.address()
+            // );
+            // const mintingPolicy = lucid.utils.nativeScriptFromJson({
+            //   type: "all",
+            //   scripts: [
+            //     { type: "sig", keyHash: paymentCredential?.hash },
+            //     {
+            //       type: "before",
+            //       slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
+            //     },
+            //   ],
+            // });
+            // const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
             let obj;
             let assetObj = {};
             let units = [];
             let metadataX = {};
             let prices = [];
+            let unit = "";
             console.log(policyId, "policyId");
             console.log(obj, "obj");
             console.log({ units }, "uits");
             console.log({ metadataX }, "metadataX");
             console.log({ prices }, "prices");
             console.log({ metadata_objs }, "metadata_objs");
+            // for (let index = 0; index < metadata_objs.length; index++) {
+            //   const element = metadata_objs[index];
+            //   prices.push(element.price);
+            //   let metadata = element;
+            //   metadataX[metadata.name] = metadata;
+            //   assetObj[String(policyId + fromText(metadata.name))] = 1n;
+            //   units.push(policyId + fromText(metadata.name));
+            //   obj = { [policyId]: metadataX };
+            //   delete element["price"];
+            // }
             for (let index = 0; index < metadata_objs.length; index++) {
               const element = metadata_objs[index];
-              prices.push(element.price);
-              // console.log(element, "elem");
               let metadata = element;
               metadataX[metadata.name] = metadata;
-              // console.log(metadataX, "dsadasd");
-              assetObj[String(policyId + fromText(metadata.name))] = 1n;
-              units.push(policyId + fromText(metadata.name));
+              assetObj[policyId + fromText(metadata.name)] = 1n;
               obj = { [policyId]: metadataX };
-              delete element["price"];
             }
-            // console.log(assetObj, "onjf");
-
+            // const txL = await lucid
+            //   .newTx()
+            //   .validTo(Date.now() + 100000)
+            //   .attachMintingPolicy(mintingPolicy)
+            //   .mintAssets(assetObj)
+            //   .attachMetadata("721", obj)
+            //   .payToAddress(bankWalletAddress, { lovelace: 10000n })
+            //   .complete();
             const txL = await lucid
               .newTx()
-              .validTo(Date.now() + 100000)
-              .attachMintingPolicy(mintingPolicy)
-              .mintAssets(assetObj)
+              .mintAssets(assetObj, Data.void())
+              .attachMintingPolicy(nftPolicy)
               .attachMetadata("721", obj)
-              .payToAddress(bankWalletAddress, { lovelace: 10000n })
+              // .payToAddress(addr, assetObj)
+              .payToAddress(bankWalletAddress, { lovelace: 1000000 })
+              .collectFrom([utxo])
               .complete();
-            console.log({ txL }, "txL");
             const signedTxL = await txL.sign().complete();
             const txHashL = await signedTxL.submit();
-            if (txHashL) {
-              let arr = [];
-              const user_id = window.localStorage.getItem("user_id");
-              for (let index = 0; index < metadata_objs.length; index++) {
-                const element = metadata_objs[index];
-                element["unit"] = String(policyId + fromText(element.name));
-                element["price"] = Number(prices[index]);
-                element["ipfs"] = element.image;
-                arr.push(element);
-              }
-              const data = {
-                metadata: arr,
-                prices,
-                user_id: user_id,
-                recipient_address: await lucid.wallet.address(),
-                policy_id: policyId,
-                type: "collection",
-                minting_policy: JSON.stringify(mintingPolicy),
-                // asset_hex_name: unit,
-              };
-              const res = await INSTANCE.post("/collection/create", data);
-              if (res) {
-                Toast("success", "Minted Successfully");
-                window.localStorage.setItem("policy", mintingPolicy.script);
-                window.localStorage.setItem("policy-id", policyId);
-                window.localStorage.setItem(
-                  "minting-script",
-                  JSON.stringify(mintingPolicy)
-                );
-                router.push("/mint");
-              }
-            }
+            // if (txHashL) {
+            //   let arr = [];
+            //   const user_id = window.localStorage.getItem("user_id");
+            //   for (let index = 0; index < metadata_objs.length; index++) {
+            //     const element = metadata_objs[index];
+            //     element["unit"] = String(policyId + fromText(element.name));
+            //     element["price"] = Number(prices[index]);
+            //     element["ipfs"] = element.image;
+            //     arr.push(element);
+            //   }
+            //   const data = {
+            //     metadata: arr,
+            //     prices,
+            //     user_id: user_id,
+            //     recipient_address: await lucid.wallet.address(),
+            //     policy_id: policyId,
+            //     type: "collection",
+            //     minting_policy: JSON.stringify(mintingPolicy),
+            //     // asset_hex_name: unit,
+            //   };
+            //   const res = await INSTANCE.post("/collection/create", data);
+            //   if (res) {
+            //     Toast("success", "Minted Successfully");
+            //     window.localStorage.setItem("policy", mintingPolicy.script);
+            //     window.localStorage.setItem("policy-id", policyId);
+            //     window.localStorage.setItem(
+            //       "minting-script",
+            //       JSON.stringify(mintingPolicy)
+            //     );
+            //     router.push("/mint");
+            //   }
+            // }
             setIsLoading(false);
           } else if (selectedValue == "c") {
             setIsLoading(true);

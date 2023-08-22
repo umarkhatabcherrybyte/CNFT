@@ -23,16 +23,6 @@ import QRCode from "react-qr-code";
 import Strips from "/components/Design/Strips";
 import Baloon from "/components/Design/Ballon";
 import { useRouter } from "next/router";
-import { singleMintStep1 } from "../../../components/Routes/constants";
-import {
-  Transaction,
-  ForgeScript,
-  resolveSlotNo,
-  resolvePaymentKeyHash,
-  largestFirst,
-  AppWallet,
-  BlockfrostProvider,
-} from "@meshsdk/core";
 import {
   costLovelace,
   bankWalletAddress,
