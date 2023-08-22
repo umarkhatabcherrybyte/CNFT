@@ -191,34 +191,18 @@ const SingleMintStep3 = () => {
               }
             }
           } else if (selectedValue == "b") {
-            console.log("dasdasd");
             setIsLoading(true);
-
             const lucid = await Lucid.new(
               new Blockfrost(network_url, network_key),
               network_name
             );
-
             const api = await window.cardano[String(connectedWallet)].enable();
             lucid.selectWallet(api);
-
-            // lucid.selectWalletFromSeed(seedPhrasePreprod);
             const addr = await lucid.wallet.address();
-            console.log("own address: " + addr);
-
             const utxos = await lucid.utxosAt(addr);
             const utxo = utxos[0];
             const tn = fromText("nft");
             const image = fromText("nft");
-
-            console.log("utxo: ", utxo);
-            console.log("script params", cborHex, [
-              utxo.txHash,
-              BigInt(utxo.outputIndex),
-              tn,
-              image,
-            ]);
-
             let policyId = "";
             const nftPolicy = {
               type: "PlutusV2",
@@ -229,58 +213,12 @@ const SingleMintStep3 = () => {
                 image,
               ]),
             };
-            console.log("policyScript", nftPolicy);
             policyId = lucid.utils.mintingPolicyToId(nftPolicy);
-
-            // policyId = lucid.utils.mintingPolicyToId(nftPolicy);
-            // policyId="0c70f82d8d4c7737ea75e05e356e9e4a0751c5105faf7f4d2a59e7fc"
-            console.log("minting policy: " + policyId);
-            // const api = await window.cardano[String(connectedWallet)].enable();
-            // lucid.selectWallet(api);
-
-            // debugger
-            // let network = await lucid.network;
-            // let addDeet = await lucid.utils.getAddressDetails(
-            //   await lucid.wallet.address()
-            // );
-
-            // console.log(network, addDeet);
-
-            // const { paymentCredential } = lucid.utils.getAddressDetails(
-            //   await lucid.wallet.address()
-            // );
-
-            // const mintingPolicy = lucid.utils.nativeScriptFromJson({
-            //   type: "all",
-            //   scripts: [
-            //     { type: "sig", keyHash: paymentCredential?.hash },
-            //     {
-            //       type: "before",
-            //       slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
-            //     },
-            //   ],
-            // });
-
-            // const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
             let metadataX = {};
             let metadata = JSON.parse(window.localStorage.getItem("metadata"));
             metadataX[metadata.name] = metadata;
-            // console.log(metadataX, "dsadasd");
-
             const unit = policyId + fromText(metadata.name);
             let obj = { [policyId]: metadataX };
-
-            console.log(obj, "objd");
-
-            // const tx = await lucid
-            //   .newTx()
-            //   .attachMetadata("721", obj)
-            //   .mintAssets({ [unit]: 1n })
-            //   .validTo(Date.now() + 100000)
-            //   .payToAddress(bankWalletAddress, { lovelace: 1000n })
-            //   .attachMintingPolicy(nftPolicy)
-            //   .collectFrom([utxo])
-            //   .complete();
             const tx = await lucid
               .newTx()
               .mintAssets({ [unit]: 1n }, Data.void())
@@ -294,66 +232,49 @@ const SingleMintStep3 = () => {
             const txHash = await signedTx.submit();
             if (txHash) {
               try {
-                const user_id = window.localStorage.getItem("userid");
-                metadata["unit"] = unit;
-                metadata["ipfs"] = img;
-                const data = {
-                  metadata: [metadata],
-                  user_id: user_id,
-                  recipient_address: await lucid.wallet.address(),
-                  policy_id: policyId,
-                  type: "single",
-                  minting_policy: JSON.stringify(nftPolicy),
-                  // asset_hex_name: unit,
-                };
-                const res = await INSTANCE.post("/collection/create", data);
-                if (res) {
-                  Toast("success", "Minted Successfully");
-                  window.localStorage.setItem("policy", nftPolicy.script);
-                  window.localStorage.setItem("policy-id", policyId);
-                  window.localStorage.setItem(
-                    "minting-script",
-                    JSON.stringify(nftPolicy)
-                  );
-                  router.push("/mint");
-                  setIsLoading(false);
-                }
+                // const user_id = window.localStorage.getItem("userid");
+                // metadata["unit"] = unit;
+                // metadata["ipfs"] = img;
+                // const data = {
+                //   metadata: [metadata],
+                //   user_id: user_id,
+                //   recipient_address: await lucid.wallet.address(),
+                //   policy_id: policyId,
+                //   type: "single",
+                //   minting_policy: JSON.stringify(nftPolicy),
+                //   // asset_hex_name: unit,
+                // };
+                // const res = await INSTANCE.post("/collection/create", data);
+                // if (res) {
+                Toast("success", "Minted Successfully");
+                // window.localStorage.setItem("policy", nftPolicy.script);
+                // window.localStorage.setItem("policy-id", policyId);
+                // window.localStorage.setItem(
+                //   "minting-script",
+                //   JSON.stringify(nftPolicy)
+                // );
+                router.push("/mint");
+                setIsLoading(false);
+                // }
               } catch (e) {
                 setIsLoading(false);
-
                 console.log(e);
               }
             }
             setIsLoading(false);
           } else if (selectedValue == "c") {
-            console.log("in step3 c");
             setIsLoading(true);
-
             const lucid = await Lucid.new(
               new Blockfrost(network_url, network_key),
               network_name
             );
-
             const api = await window.cardano[String(connectedWallet)].enable();
             lucid.selectWallet(api);
-
-            // lucid.selectWalletFromSeed(seedPhrasePreprod);
             const addr = await lucid.wallet.address();
-            console.log("own address: " + addr);
-
             const utxos = await lucid.utxosAt(addr);
             const utxo = utxos[0];
             const tn = fromText("nft");
             const image = fromText("nft");
-
-            console.log("utxo: ", utxo);
-            console.log("script params", cborHex, [
-              utxo.txHash,
-              BigInt(utxo.outputIndex),
-              tn,
-              image,
-            ]);
-
             let policyId = "";
             const nftPolicy = {
               type: "PlutusV2",
@@ -365,7 +286,6 @@ const SingleMintStep3 = () => {
               ]),
             };
             policyId = lucid.utils.mintingPolicyToId(nftPolicy);
-            console.log("minting policy: " + policyId);
             let metadataX = {};
             let metadata = JSON.parse(window.localStorage.getItem("metadata"));
             metadataX[metadata.name] = metadata;
@@ -380,41 +300,38 @@ const SingleMintStep3 = () => {
               .payToAddress(currentAddr, { [unit]: 1n })
               .payToAddress(bankWalletAddress, { lovelace: 1000000n })
               .complete();
-
             const signedTx = await tx.sign().complete();
             const txHash = await signedTx.submit();
             if (txHash) {
-              // try {
-              //   const user_id = window.localStorage.getItem("userid");
-              //   metadata["unit"] = unit;
-              //   metadata["ipfs"] = img;
-              //   const data = {
-              //     metadata: [metadata],
-              //     user_id: user_id,
-              //     recipient_address: await lucid.wallet.address(),
-              //     policy_id: policyId,
-              //     type: "single",
-              //     minting_policy: JSON.stringify(nftPolicy),
-              //     // asset_hex_name: unit,
-              //   };
-              //   const res = await INSTANCE.post("/collection/create", data);
-              //   if (res) {
-              //     Toast("success", "Minted Successfully");
-              //     window.localStorage.setItem("policy", nftPolicy.script);
-              //     window.localStorage.setItem("policy-id", policyId);
-              //     window.localStorage.setItem(
-              //       "minting-script",
-              //       JSON.stringify(nftPolicy)
-              //     );
-              //     router.push("/mint");
-              //     setIsLoading(false);
-              //   }
-              // } catch (e) {
-              //   setIsLoading(false);
-
-              //   console.log(e);
-              // }
-
+              try {
+                // const user_id = window.localStorage.getItem("userid");
+                // metadata["unit"] = unit;
+                // metadata["ipfs"] = img;
+                // const data = {
+                //   metadata: [metadata],
+                //   user_id: user_id,
+                //   recipient_address: await lucid.wallet.address(),
+                //   policy_id: policyId,
+                //   type: "single",
+                //   minting_policy: JSON.stringify(nftPolicy),
+                //   // asset_hex_name: unit,
+                // };
+                // const res = await INSTANCE.post("/collection/create", data);
+                // if (res) {
+                Toast("success", "Minted Successfully");
+                // window.localStorage.setItem("policy", nftPolicy.script);
+                // window.localStorage.setItem("policy-id", policyId);
+                // window.localStorage.setItem(
+                //   "minting-script",
+                //   JSON.stringify(nftPolicy)
+                // );
+                router.push("/mint");
+                setIsLoading(false);
+                // }
+              } catch (e) {
+                setIsLoading(false);
+                console.log(e);
+              }
               setIsLoading(false);
             }
           }
@@ -425,7 +342,6 @@ const SingleMintStep3 = () => {
     } catch (error) {
       transactionErrorHanlder(error, "mint");
       setIsLoading(false);
-
       const errorString = JSON.stringify(Object.values(error));
       const clientIp = await getClientIp();
       if (clientIp) {
