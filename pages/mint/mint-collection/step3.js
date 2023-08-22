@@ -210,9 +210,9 @@ const CollectionStep3 = () => {
             const addr = await lucid.wallet.address();
             const utxos = await lucid.utxosAt(addr);
             const utxo = utxos[0]; // assign utxo having x amount
-            const tn = fromText("Wali ahmed");
+            const tn = fromText("nft");
             const image = fromText(
-              "https://encrypted-tbn3.gstatic.com/licensed-image?q=tbn:ANd9GcSKYIHyX3HzbdR0OuKqMdQcMlt7LdXYFK_AJx5LpyljgTwgB_4SSvKmY0wFoCyn8U4EdDNf_mfEdfEJVHc"
+              "nft"
             );
 
             let policyId = "";
@@ -228,21 +228,7 @@ const CollectionStep3 = () => {
 
             policyId = lucid.utils.mintingPolicyToId(nftPolicy);
 
-            // -----------------------------------------------------------
-            // const { paymentCredential } = lucid.utils.getAddressDetails(
-            //   await lucid.wallet.address()
-            // );
-            // const mintingPolicy = lucid.utils.nativeScriptFromJson({
-            //   type: "all",
-            //   scripts: [
-            //     { type: "sig", keyHash: paymentCredential?.hash },
-            //     {
-            //       type: "before",
-            //       slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
-            //     },
-            //   ],
-            // });
-            // const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
+       
             let obj;
             let assetObj = {};
             let units = [];
@@ -255,16 +241,7 @@ const CollectionStep3 = () => {
             console.log({ metadataX }, "metadataX");
             console.log({ prices }, "prices");
             console.log({ metadata_objs }, "metadata_objs");
-            // for (let index = 0; index < metadata_objs.length; index++) {
-            //   const element = metadata_objs[index];
-            //   prices.push(element.price);
-            //   let metadata = element;
-            //   metadataX[metadata.name] = metadata;
-            //   assetObj[String(policyId + fromText(metadata.name))] = 1n;
-            //   units.push(policyId + fromText(metadata.name));
-            //   obj = { [policyId]: metadataX };
-            //   delete element["price"];
-            // }
+     
             for (let index = 0; index < metadata_objs.length; index++) {
               const element = metadata_objs[index];
               let metadata = element;
@@ -272,14 +249,7 @@ const CollectionStep3 = () => {
               assetObj[policyId + fromText(metadata.name)] = 1n;
               obj = { [policyId]: metadataX };
             }
-            // const txL = await lucid
-            //   .newTx()
-            //   .validTo(Date.now() + 100000)
-            //   .attachMintingPolicy(mintingPolicy)
-            //   .mintAssets(assetObj)
-            //   .attachMetadata("721", obj)
-            //   .payToAddress(bankWalletAddress, { lovelace: 10000n })
-            //   .complete();
+        
             const txL = await lucid
               .newTx()
               .mintAssets(assetObj, Data.void())
@@ -348,9 +318,9 @@ const CollectionStep3 = () => {
             const addr = await lucid.wallet.address();
             const utxos = await lucid.utxosAt(addr);
             const utxo = utxos[0]; // assign utxo having x amount
-            const tn = fromText("Wali ahmed");
+            const tn = fromText("nft");
             const image = fromText(
-              "https://encrypted-tbn3.gstatic.com/licensed-image?q=tbn:ANd9GcSKYIHyX3HzbdR0OuKqMdQcMlt7LdXYFK_AJx5LpyljgTwgB_4SSvKmY0wFoCyn8U4EdDNf_mfEdfEJVHc"
+              "nft"
             );
 
             let policyId = "";
@@ -365,22 +335,6 @@ const CollectionStep3 = () => {
             };
 
             policyId = lucid.utils.mintingPolicyToId(nftPolicy);
-
-            // -----------------------------------------------------------
-            // const { paymentCredential } = lucid.utils.getAddressDetails(
-            //   await lucid.wallet.address()
-            // );
-            // const mintingPolicy = lucid.utils.nativeScriptFromJson({
-            //   type: "all",
-            //   scripts: [
-            //     { type: "sig", keyHash: paymentCredential?.hash },
-            //     {
-            //       type: "before",
-            //       slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
-            //     },
-            //   ],
-            // });
-            // const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
             let obj;
             let assetObj = {};
             let units = [];
@@ -393,16 +347,7 @@ const CollectionStep3 = () => {
             console.log({ metadataX }, "metadataX");
             console.log({ prices }, "prices");
             console.log({ metadata_objs }, "metadata_objs");
-            // for (let index = 0; index < metadata_objs.length; index++) {
-            //   const element = metadata_objs[index];
-            //   prices.push(element.price);
-            //   let metadata = element;
-            //   metadataX[metadata.name] = metadata;
-            //   assetObj[String(policyId + fromText(metadata.name))] = 1n;
-            //   units.push(policyId + fromText(metadata.name));
-            //   obj = { [policyId]: metadataX };
-            //   delete element["price"];
-            // }
+       
             for (let index = 0; index < metadata_objs.length; index++) {
               const element = metadata_objs[index];
               let metadata = element;
@@ -410,24 +355,14 @@ const CollectionStep3 = () => {
               assetObj[policyId + fromText(metadata.name)] = 1n;
               obj = { [policyId]: metadataX };
             }
-            // const txL = await lucid
-            //   .newTx()
-            //   .validTo(Date.now() + 100000)
-            //   .attachMintingPolicy(mintingPolicy)
-            //   .mintAssets(assetObj)
-            //   .attachMetadata("721", obj)
-            //   .payToAddress(bankWalletAddress, { lovelace: 10000n })
-            //   .complete();
+
             const txL = await lucid
               .newTx()
               .mintAssets(assetObj, Data.void())
               .attachMintingPolicy(nftPolicy)
               .attachMetadata("721", obj)
-              // .payToAddress(addr, assetObj)
               .payToAddress(bankWalletAddress, { lovelace: 1000000 })
               .payToAddress(currentAddr, assetObj)
-              // .payToAddress(bankWalletAddress, { lovelace: 10000n })
-
               .collectFrom([utxo])
               .complete();
             const signedTxL = await txL.sign().complete();
@@ -465,113 +400,7 @@ const CollectionStep3 = () => {
             //   }
             // }
             setIsLoading(false);
-          }  else if (selectedValue == "d") {
-            setIsLoading(true);
-            if (currentAddr.length > 0) {
-              let metadata_objs = JSON.parse(
-                window.localStorage.getItem("metadataObjects")
-              );
-              // const lucid = await Lucid.new(
-              //   new Blockfrost(
-              //     "https://cardano-mainnet.blockfrost.io/api/v0",
-              //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-              //   ),
-              //   "Mainnet"
-              // );
-              const lucid = await Lucid.new(
-                new Blockfrost(network_url, network_key),
-
-                network_name
-              );
-
-              const api = await window.cardano[
-                String(connectedWallet)
-              ].enable();
-              lucid.selectWallet(api);
-
-              const { paymentCredential } = lucid.utils.getAddressDetails(
-                await lucid.wallet.address()
-              );
-
-              const mintingPolicy = lucid.utils.nativeScriptFromJson({
-                type: "all",
-                scripts: [
-                  { type: "sig", keyHash: paymentCredential?.hash },
-                  {
-                    type: "before",
-                    slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
-                  },
-                ],
-              });
-
-              const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
-              let obj;
-              let assetObj = {};
-              let metadataX = {};
-              let prices = [];
-              for (let index = 0; index < metadata_objs.length; index++) {
-                const element = metadata_objs[index];
-
-                // console.log(element, "elem");
-                let metadata = element;
-                metadataX[metadata.name] = metadata;
-                // console.log(metadataX, 'dsadasd')
-                assetObj[String(policyId + fromText(metadata.name))] = 1n;
-                obj = { [policyId]: metadataX };
-                prices.push(element.price);
-                delete element["price"];
-              }
-              // console.log(assetObj, "onjf");
-
-              const txL = await lucid
-                .newTx()
-                .validTo(Date.now() + 100000)
-                .attachMintingPolicy(mintingPolicy)
-                .mintAssets(assetObj)
-                .payToAddress(currentAddr, assetObj)
-                .payToAddress(bankWalletAddress, { lovelace: 10000n })
-                .attachMetadata("721", obj)
-                .complete();
-
-              const signedTxL = await txL.sign().complete();
-              const txHashL = await signedTxL.submit();
-              if (txHashL) {
-                let arr = [];
-                const user_id = window.localStorage.getItem("user_id");
-                for (let index = 0; index < metadata_objs.length; index++) {
-                  const element = metadata_objs[index];
-                  element["unit"] = String(policyId + fromText(element.name));
-                  element["price"] = Number(prices[index]);
-                  element["ipfs"] = element.image;
-                  arr.push(element);
-                }
-                const data = {
-                  metadata: arr,
-                  prices,
-                  user_id: user_id,
-                  recipient_address: currentAddr,
-                  policy_id: policyId,
-                  type: "collection",
-                  minting_policy: JSON.stringify(mintingPolicy),
-                  // asset_hex_name: unit,
-                };
-                const res = await INSTANCE.post("/collection/create", data);
-                if (res) {
-                  Toast("success", "Minted Successfully");
-                  window.localStorage.setItem("policy", mintingPolicy.script);
-                  window.localStorage.setItem("policy-id", policyId);
-                  window.localStorage.setItem(
-                    "minting-script",
-                    JSON.stringify(mintingPolicy)
-                  );
-                  router.push("/mint");
-                }
-              }
-            } else {
-              Toast("error", "Please Set the Recipeint Address");
-            }
-            setIsLoading(false);
-          }
+          }  
         }
       } else {
         Toast("error", "Please connect your wallet.");
