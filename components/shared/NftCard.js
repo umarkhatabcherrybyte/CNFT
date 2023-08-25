@@ -9,16 +9,21 @@ import {
   auctionDetailRoute,
 } from "../Routes/constants";
 import { isVideoOrIsAudio } from "../../utils/utils";
+import { renderLovelace } from "../../scripts/wallet";
+import { fromText } from "lucid-cardano";
 const NftCard = ({ card }) => {
+  console.log(card, "card1");
   const asset_detail = card?.collection_id?.assets[0];
   const type = card.mint_type === "collection";
   const sell_model = card.sell_model;
   const router = useRouter();
   const navigationHanlder = () => {
-    const route = type
-      ? `${MycollectionRoute}/${sell_model}`
-      : `${buyDetailRoute}/0`;
-    router.push(`${route}/${card._id}`);
+    // const route = type
+    //   ? `${MycollectionRoute}/${sell_model}`
+    //   : `${buyDetailRoute}/0`;
+    // router.push(`${route}/${card._id}`);
+    let name = fromText(card.assetName);
+    router.push(`/buy/${name}/${card?.policy}`);
   };
   return (
     <NftCardStyled>
@@ -44,13 +49,15 @@ const NftCard = ({ card }) => {
           <CardMedia
             component="img"
             height="290"
-            image={`${
-              type
-                ? card.feature_image
-                : isVideoOrIsAudio(asset_detail)
-                ? asset_detail?.feature_image
-                : `https://ipfs.io/ipfs/${asset_detail?.ipfs}`
-            }`}
+            // image={`${
+            //   type
+            //     ? card.feature_image
+            //     : isVideoOrIsAudio(asset_detail)
+            //     ? asset_detail?.feature_image
+            //     : `https://ipfs.io/ipfs/${asset_detail?.ipfs}`
+            // }`}
+
+            image={`${card.detail._imageUrl}`}
             alt="green iguana"
           />
           {/* <Box
@@ -94,7 +101,8 @@ const NftCard = ({ card }) => {
               className="bold"
               sx={{ textTransform: "uppercase" }}
             >
-              {type ? card.name : asset_detail?.asset_name}
+              {/* {type ? card.name : asset_detail?.asset_name} */}
+              {card?.detail?._name}
             </Typography>
             <Typography
               gutterBottom
@@ -103,8 +111,8 @@ const NftCard = ({ card }) => {
               sx={{ color: "var(--secondary-color)" }}
               className="bold"
             >
-              {card?.sell_type_id?.price}
-
+              {/* {card?.sell_type_id?.price} */}
+              {renderLovelace(card.detail?.datum?.fields[1]?.int)}
               <Typography
                 variant="caption"
                 component="div"

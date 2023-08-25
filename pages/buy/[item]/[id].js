@@ -32,6 +32,7 @@ import { isVideoOrIsAudio } from "../../../utils/utils";
 import { transactionErrorHanlder } from "../../../helper/transactionError";
 import { getClientIp } from "../../../helper/clientIP";
 import { network_name, network_url, network_key } from "../../../base_network";
+import { getAssetDetail } from "../../../scripts/blockfrost";
 // import { BigInt } from "lucid-cardano/types/src/core/wasm_modules/cardano_multiplatform_lib_web/cardano_multiplatform_lib";
 const List = [{}, {}, {}, {}];
 
@@ -55,20 +56,12 @@ const BuyDetail = () => {
   const lovelace = useLovelace();
   const { id, item } = router.query;
   const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
-  const [open, setOpen] = useState(false);
   const [tabValue, setTabValue] = useState("ada");
   const [detail, setDetail] = useState({});
 
   const [isLoading, setIsLoading] = useState(true);
-  const {
-    wallet,
-    connected,
-    name,
-    connecting,
-    connect,
-    disconnect,
-    error,
-  } = useWallet();
+  const { wallet, connected, name, connecting, connect, disconnect, error } =
+    useWallet();
   console.log(detail);
   useEffect(() => {
     const getData = async () => {
@@ -83,99 +76,119 @@ const BuyDetail = () => {
       }
     };
     if (id) {
-      getData();
+      // getData();
     }
   }, [id]);
+  const onBuy = async (e) => {};
+  // const onBuy = async (e) => {
+  //   if (connected) {
+  //     const price =
+  //       detail.list?.mint_type === "single"
+  //         ? detail.list?.sell_type_id?.price
+  //         : detail.list?.collection_id?.assets[item]?.price;
+  //     if (lovelace < price * 1000000) {
+  //       Toast(
+  //         "error",
+  //         "You do not have enough Ada to complete this transaction"
+  //       );
+  //       return;
+  //     } else {
+  //       try {
+  //         const user_address = getKeyData("user_address");
+  //         const connectedWallet = getKeyData("connectedWallet");
+  //         const address = detail.list?.collection_id?.recipient_address;
+  //         const lovelace = detail.list?.sell_type_id?.price * 1000000;
+  //         const user_value = Number(lovelace * 0.975);
+  //         const owner_value = Number(lovelace * 0.025);
+  //         const owner_address =
+  //           "addr_test1qpm6srkw5vndavk72khy58cht0f0u796xdmwq9kfu2j63064cwwrleufnnz36s8v0pk0l54kvfn3m7et69xxsvh4ajus55y7tq";
+  //         // const lucid = await Lucid.new(
+  //         //   new Blockfrost(
+  //         //     "https://cardano-mainnet.blockfrost.io/api/v0",
+  //         //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
+  //         //   ),
+  //         //   "Mainnet"
+  //         // );
+  //         const lucid = await Lucid.new(
+  //           new Blockfrost(network_url, network_key),
 
-  const onBuy = async (e) => {
-    if (connected) {
-      const price =
-        detail.list?.mint_type === "single"
-          ? detail.list?.sell_type_id?.price
-          : detail.list?.collection_id?.assets[item]?.price;
-      if (lovelace < price * 1000000) {
-        Toast(
-          "error",
-          "You do not have enough Ada to complete this transaction"
-        );
-        return;
-      } else {
-        try {
-          const user_address = getKeyData("user_address");
-          const connectedWallet = getKeyData("connectedWallet");
-          const address = detail.list?.collection_id?.recipient_address;
-          const lovelace = detail.list?.sell_type_id?.price * 1000000;
-          const user_value = Number(lovelace * 0.975);
-          const owner_value = Number(lovelace * 0.025);
-          const owner_address =
-            "addr_test1qpm6srkw5vndavk72khy58cht0f0u796xdmwq9kfu2j63064cwwrleufnnz36s8v0pk0l54kvfn3m7et69xxsvh4ajus55y7tq";
-          // const lucid = await Lucid.new(
-          //   new Blockfrost(
-          //     "https://cardano-mainnet.blockfrost.io/api/v0",
-          //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-          //   ),
-          //   "Mainnet"
-          // );
-          const lucid = await Lucid.new(
-            new Blockfrost(network_url, network_key),
+  //           network_name
+  //         );
 
-            network_name
-          );
+  //         const api = await window.cardano[String(connectedWallet)].enable();
+  //         lucid.selectWallet(api);
+  //         // console.log(await lucid.wallet.address());
 
-          const api = await window.cardano[String(connectedWallet)].enable();
-          lucid.selectWallet(api);
-          // console.log(await lucid.wallet.address());
+  //         const tx = await lucid
+  //           .newTx()
+  //           .payToAddress(address, { lovelace: BigInt(user_value) })
+  //           .payToAddress(owner_address, {
+  //             lovelace: BigInt(owner_value),
+  //           })
+  //           .validTo(Date.now() + 100000)
+  //           .complete();
+  //         // console.log(tx);
+  //         const signedTx = await tx.sign().complete();
+  //         const txHash = await signedTx.submit();
+  //         if (txHash) {
+  //           try {
+  //             const res = await INSTANCE.post("/list/approve", {
+  //               list_id: id,
+  //               index: item,
+  //               recipient_address: user_address,
+  //             });
+  //             if (res) {
+  //               Toast("success", "NFT Transfered to Your Wallet");
+  //               router.push("/buy");
+  //             }
+  //           } catch (e) {
+  //             Toast("error", "Try again later.");
+  //           }
+  //           // window.localStorage.setItem('policy', mintingPolicy.script)
+  //           // window.localStorage.setItem('policy-id', policyId)
+  //           // window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
+  //           // router.push('/mint')
+  //         }
+  //       } catch (e) {
+  //         transactionErrorHanlder(e, "buy");
+  //         const clientIp = await getClientIp();
+  //         if (clientIp) {
+  //           try {
+  //             const response = await INSTANCE.post(`/log/create`, {
+  //               error: JSON.stringify(error),
+  //               ip: clientIp,
+  //               type: "single buy item",
+  //             });
+  //             console.log(response.data);
+  //           } catch (error) {
+  //             console.error(error);
+  //           }
+  //         }
+  //         console.log(e, "errro");
+  //       }
+  //     }
+  //   } else {
+  //     Toast("error", "Please connect your wallet.");
+  //   }
+  // };
 
-          const tx = await lucid
-            .newTx()
-            .payToAddress(address, { lovelace: BigInt(user_value) })
-            .payToAddress(owner_address, {
-              lovelace: BigInt(owner_value),
-            })
-            .validTo(Date.now() + 100000)
-            .complete();
-          // console.log(tx);
-          const signedTx = await tx.sign().complete();
-          const txHash = await signedTx.submit();
-          if (txHash) {
-            try {
-              const res = await INSTANCE.post("/list/approve", {
-                list_id: id,
-                index: item,
-                recipient_address: user_address,
-              });
-              if (res) {
-                Toast("success", "NFT Transfered to Your Wallet");
-                router.push("/buy");
-              }
-            } catch (e) {
-              Toast("error", "Try again later.");
-            }
-            // window.localStorage.setItem('policy', mintingPolicy.script)
-            // window.localStorage.setItem('policy-id', policyId)
-            // window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
-            // router.push('/mint')
-          }
-        } catch (e) {
-          transactionErrorHanlder(e, "buy");
-          const clientIp = await getClientIp();
-          if (clientIp) {
-            try {
-              const response = await INSTANCE.post(`/log/create`, {
-                error: JSON.stringify(error),
-                ip: clientIp,
-                type: "single buy item",
-              });
-              console.log(response.data);
-            } catch (error) {
-              console.error(error);
-            }
-          }
-          console.log(e, "errro");
-        }
+  const [asset, setAsset] = useState({});
+  console.log(asset, "assetassetassetassetasset");
+  useEffect(() => {
+    setIsLoading(true);
+    getNFTDetial();
+  }, [id]);
+
+  const getNFTDetial = async () => {
+    if (id) {
+      try {
+        let asset = await getAssetDetail(id + item);
+        setIsLoading(false);
+        setAsset(asset);
+      } catch (e) {
+        console.log(e);
+        setAsset({});
       }
-    } else {
-      Toast("error", "Please connect your wallet.");
     }
   };
   return (
@@ -208,18 +221,11 @@ const BuyDetail = () => {
           <TabPanel value="ada" sx={{ p: 0 }}>
             <Box sx={{ py: 10 }}>
               <Box sx={{ minHeight: "7rem" }}>
-                {Object.keys(detail).length > 0 && (
+                {Object.keys(asset).length > 0 && (
                   <Grid container spacing={3}>
                     <Grid xs={12} md={6} item>
                       <img
-                        src={
-                          !isVideoOrIsAudio(
-                            detail?.list?.collection_id?.assets[item]
-                          )
-                            ? `https://ipfs.io/ipfs/${detail?.list?.collection_id?.assets[item]?.ipfs}`
-                            : detail?.list?.collection_id?.assets[item]
-                                ?.feature_image
-                        }
+                        src={`https://ipfs.io/ipfs/${asset?.onchain_metadata?.ipfs}`}
                         // src={
                         //   !isVideoOrIsAudio(
                         //     detail?.list?.collection_id?.assets[item]
@@ -228,6 +234,7 @@ const BuyDetail = () => {
                         //     : detail?.list?.collection_id?.assets[item]
                         //         ?.feature_image
                         // }
+
                         alt=""
                         className="w_100 br_15 item_img"
                       />
@@ -237,7 +244,8 @@ const BuyDetail = () => {
                         variant="h3"
                         className="uppercase text_white bold oswald"
                       >
-                        {detail.list?.collection_id?.assets[item]?.asset_name}
+                        {asset?.onchain_metadata?.name}
+                        {/* {detail.list?.collection_id?.assets[item]?.asset_name} */}
                       </Typography>
                       {/* <Box
                           sx={{
@@ -304,10 +312,10 @@ const BuyDetail = () => {
                           >
                             <Typography className="bold montserrat">
                               Price:{" "}
-                              {detail.list?.mint_type === "single"
+                              {/* {detail.list?.mint_type === "single"
                                 ? detail.list?.sell_type_id?.price
                                 : detail.list?.collection_id?.assets[item]
-                                    ?.price}
+                                    ?.price} */}
                               ADA
                             </Typography>
                           </Box>
@@ -391,11 +399,8 @@ const BuyDetail = () => {
                               sx={{ pb: 1.5, px: 2 }}
                               variant="caption"
                             >
-                              {detail?.asset_details.fingerprint
-                                ? detail?.asset_details?.fingerprint.slice(
-                                    0,
-                                    35
-                                  ) + "...."
+                              {asset?.fingerprint
+                                ? asset?.fingerprint.slice(0, 35) + "...."
                                 : "......"}
                             </Typography>
                           </Box>
@@ -412,7 +417,7 @@ const BuyDetail = () => {
                               sx={{ pb: 1.5, px: 2 }}
                               variant="caption"
                             >
-                              {detail.list?.collection_id?.policy_id}
+                              {asset?.policy_id}
                             </Typography>
                           </Box>
                         </Grid>
@@ -473,7 +478,7 @@ const BuyDetail = () => {
                   </Grid>
                 )}
               </Box>
-              {!isLoading && detail?.lists_by_user.length > 0 && (
+              {/* {!isLoading && detail?.lists_by_user.length > 0 && (
                 <Box>
                   <BarHeading heading="Explore more from this artist" />
                   <Box sx={{ py: 5 }}>
@@ -486,7 +491,7 @@ const BuyDetail = () => {
                     </Grid>
                   </Box>
                 </Box>
-              )}
+              )} */}
             </Box>
           </TabPanel>
           <TabPanel value="credit">
