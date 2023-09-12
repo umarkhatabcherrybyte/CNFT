@@ -6,6 +6,7 @@ import filterReducer from "./filters";
 import blogPostsReducer from "./blogs";
 import { listingreducer } from "../listing/ListingReducer";
 import { userReducer } from "../user/userReducer";
+import { walletreducer } from "../wallet/WalletReducer";
 export const rootReducer = combineReducers({
   NFT: nftReducer,
   hotCollection: hotCollectionsReducer,
@@ -14,6 +15,7 @@ export const rootReducer = combineReducers({
   blogs: blogPostsReducer,
   listing: listingreducer,
   user: userReducer,
+  wallet: walletreducer,
 });
 
 const reducers = (state, action) => rootReducer(state, action);

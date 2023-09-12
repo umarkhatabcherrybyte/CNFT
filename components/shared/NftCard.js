@@ -12,7 +12,7 @@ import { isVideoOrIsAudio } from "../../utils/utils";
 import { renderLovelace } from "../../scripts/wallet";
 import { fromText } from "lucid-cardano";
 const NftCard = ({ card }) => {
-  console.log(card, "card1");
+  // console.log(card, "card1");
   const asset_detail = card?.collection_id?.assets[0];
   const type = card.mint_type === "collection";
   const sell_model = card.sell_model;
@@ -24,6 +24,12 @@ const NftCard = ({ card }) => {
     // router.push(`${route}/${card._id}`);
     let name = fromText(card.assetName);
     router.push(`/buy/${name}/${card?.policy}`);
+    // router.push({
+    //   pathname: `/buy/${name}/${card?.policy}`,
+    //   query: {
+    //     datum: card.detail.,
+    //   },
+    // });
   };
   return (
     <NftCardStyled>

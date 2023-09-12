@@ -114,7 +114,7 @@ const MylistTabs = () => {
   const router = useRouter();
   const lovelace = useLovelace();
   const assets = useAssets();
-  const { wallet, connected } = useWallet();
+  const { wallet, connected, connecting } = useWallet();
   const [recipientAddress, setRecipientAddress] = useState("");
   const [lists, setLists] = useState([]);
   const [tabValue, setTabValue] = useState("add");
@@ -149,7 +149,10 @@ const MylistTabs = () => {
   // }, [recipientAddress, connected]);
   useEffect(() => {
     if (connected) {
+      setIsLoading(true);
       if (assets && assets.length > 0) {
+        setIsLoading(false);
+      } else {
         setIsLoading(false);
       }
     }
@@ -157,7 +160,6 @@ const MylistTabs = () => {
   const onTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
-  const [imageDataUrl, setImageDataUrl] = useState(null);
 
   const formik = useFormik({
     initialValues: {
@@ -479,7 +481,7 @@ const MylistTabs = () => {
                 <Heading heading="Please connect your wallet first." />
               </Box>
             </Layout>
-          ) : isLoading ? (
+          ) : connecting || isLoading ? (
             <FullScreenLoader />
           ) : assets && assets.length > 0 ? (
             <Grid container spacing={2}>

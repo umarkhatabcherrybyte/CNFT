@@ -8,6 +8,7 @@ import { Box, Select, MenuItem, Button, Typography } from "@mui/material";
 import { Toast } from "../shared/Toast";
 import { setUser } from "../../redux/user/userActions";
 import { formatAmount } from "/helper/formatAmount";
+import { setInstance } from "../../redux/wallet/WalletActions";
 const wallets = [
   {
     img: "/images/wallet/nami_small.png",
@@ -104,7 +105,9 @@ const WalletDropdown = () => {
         setWalletName("default");
         disconnect();
       } else {
-        connect(walletV.value);
+        await connect(walletV.value);
+        const api = await window.cardano[walletV.extension].enable();
+        dispatch(setInstance(api));
         window.localStorage.setItem("connectedWallet", walletV.extension);
       }
     } else {
