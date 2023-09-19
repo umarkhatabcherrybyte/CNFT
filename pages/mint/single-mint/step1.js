@@ -74,9 +74,11 @@ const SingleMint = () => {
             setIsUploading(false);
             window.localStorage.setItem("img", uploaded_image.path);
             window.localStorage.setItem("file_mimeType", mintFile.type);
+            window.localStorage.setItem("featured_img", null);
+            window.localStorage.setItem("featured_type", null);
           }
 
-          // router.push(mintSingleStep2);
+          router.push(mintSingleStep2);
         } else if (mintFileFormat === "video" || mintFileFormat === "audio") {
           // console.log("audio ya video ha ");
 
@@ -91,14 +93,23 @@ const SingleMint = () => {
             //   client.add(featureImage),
             //   client.add(mintFile),
             // ]);
-            const uploadedFeatureFile = await client.add(featureImage);
             const uploadedMintFile = await client.add(mintFile);
+            const uploadedFeatureFile = await client.add(featureImage);
             console.log(uploadedFeatureFile, "uploadedFeatureFile");
             console.log(uploadedMintFile, "uploadedMintFile");
             if (uploadedFeatureFile && uploadedMintFile) {
+              window.localStorage.setItem("img", uploadedMintFile.path);
+              window.localStorage.setItem("file_mimeType", mintFile.type);
+              window.localStorage.setItem(
+                "featured_img",
+                uploadedFeatureFile.path
+              );
+              window.localStorage.setItem("featured_type", featureImage.type);
               Toast("success", "Files Uploaded Successfully");
               setIsUploading(false);
-              // window.localStorage.setItem("img", uploaded_image.path);
+              router.push(mintSingleStep2);
+
+              // window.localStorage.setItem("img", uploadedMintFile.path);
               // window.localStorage.setItem("file_mimeType", mintFile.type);
               // Save file paths or other necessary information
             } else {
