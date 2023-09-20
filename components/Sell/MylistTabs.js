@@ -226,7 +226,6 @@ const MylistTabs = () => {
                 // );
                 const lucidBrowser = await Lucid.new(
                   new Blockfrost(network_url, network_key),
-
                   network_name
                 );
 

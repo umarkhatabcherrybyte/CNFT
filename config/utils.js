@@ -12,97 +12,16 @@ const costLovelace = "10000000";
 //new admin wallet address and seed phrase
 // const bankWalletAddress =
 //   "addr1q8nhtelxukx458x8h06d67l63yqs548h8guqxrdy525k428naxdfpf5a6evfaz78rdmu4d66fmvgzvmawl99y6wk0rjq9el5vh"; //new admin mainnet addres
-export const seedPhrasePreprod =
-  "load obtain bachelor bid steak royal retreat gossip width method august boat plunge library mail pulse raw six smart news buddy party engine ride";
 
+// wali dev seed
+export const seedPhrasePreprod =
+  "zebra scheme remember grape panther utility mobile ostrich luxury oven matrix waste chase please way belt quit jealous small hair world end casual wagon";
+// wali  dev address
 const bankWalletAddress =
-  "addr_test1qz2f59rk5mrss5xrjtwqa8kh269fvu9gzgswk6jt29axe9gpuhlkntj7m9yl2eflx3thj7lt3lvyzysh4202vvgxgahseljsmd"; //new admin preprod address
-// const seedPhrasePreprod =
-//   "invloved sudden plug library sunny lunar tragic pride chapter flee sight side mechanic choose sure early hunt develop symbol physical core bulb flag chimney";
+  "addr_test1qz9kafjtlqtnn7qpjuyqyen7c46wtnlsstzqtuykxuwkrsaa5kc6s4rgd82vj2val5yq2vchymdm24xakdd3w3wqsvws2hhemc";
 
 const seedPhraseMainnet =
   "invloved sudden plug library sunny lunar tragic pride chapter flee sight side mechanic choose sure early hunt develop symbol physical core bulb flag chimney";
-
-const metadata = {
-  MeshToken01: {
-    name: "Mesh Token 1",
-    image: "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-    mediaType: "image/jpg",
-    description: "Just a purple coin.",
-    artist: "This NFT is minted by Mesh (https://meshjs.dev/).",
-  },
-  MeshToken02: {
-    name: "Mesh Token 2",
-    image: "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-    mediaType: "image/jpg",
-    description: "This is suppose to be a gold coin.",
-    artist: "This NFT is minted by Mesh (https://meshjs.dev/).",
-  },
-  MeshToken03: {
-    name: "Mesh Token 3",
-    image: "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-    mediaType: "image/jpg",
-    description: "A coin with a M on it.",
-    artist: "This NFT is minted by Mesh (https://meshjs.dev/).",
-  },
-};
-
-const assetsMetadataFake = {
-  1: {
-    name: "Mesh Token 01",
-    image: "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-    mediaType: "image/jpg",
-    description: "This NFT is minted by Mesh (https://mesh.martify.io/).",
-  },
-  2: {
-    name: "Mesh Token 02",
-    image: "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-    mediaType: "image/jpg",
-    description: "This NFT is minted by Mesh (https://mesh.martify.io/).",
-  },
-  3: {
-    name: "Mesh Token 03",
-    image: "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-    mediaType: "image/jpg",
-    description: "This NFT is minted by Mesh (https://mesh.martify.io/).",
-  },
-  4: {
-    name: "Mesh Token 04",
-    image: "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-    mediaType: "image/jpg",
-    description: "This NFT is minted by Mesh (https://mesh.martify.io/).",
-  },
-  5: {
-    name: "Mesh Token 05",
-    image: "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-    mediaType: "image/jpg",
-    description: "This NFT is minted by Mesh (https://mesh.martify.io/).",
-  },
-  6: {
-    name: "Mesh Token 06",
-    image: "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-    mediaType: "image/jpg",
-    description: "This NFT is minted by Mesh (https://mesh.martify.io/).",
-  },
-  7: {
-    name: "Mesh Token 07",
-    image: "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-    mediaType: "image/jpg",
-    description: "This NFT is minted by Mesh (https://mesh.martify.io/).",
-  },
-  8: {
-    name: "Mesh Token 08",
-    image: "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-    mediaType: "image/jpg",
-    description: "This NFT is minted by Mesh (https://mesh.martify.io/).",
-  },
-  9: {
-    name: "Mesh Token 09",
-    image: "ipfs://QmRzicpReutwCkM6aotuKjErFCUD213DpwPq6ByuzMJaua",
-    mediaType: "image/jpg",
-    description: "This NFT is minted by Mesh (https://mesh.martify.io/).",
-  },
-};
 
 const assetsMetadata = {
   MeshToken01: {
@@ -131,7 +50,6 @@ const assetsMetadata = {
 module.exports = {
   costLovelace,
   bankWalletAddress,
-  assetsMetadataFake,
   assetsMetadata,
   seedPhraseMainnet,
   seedPhrasePreprod,

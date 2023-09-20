@@ -87,7 +87,6 @@ const SingleMintStep3 = () => {
           console.log("dasdasd2");
           Toast("error", "Please Select an Option for Minting");
         } else if (img && connected) {
-          console.log("dasdasd3");
           if (selectedValue == "a") {
             setIsLoading(true);
             //------------------Lucid mainnet---------------
