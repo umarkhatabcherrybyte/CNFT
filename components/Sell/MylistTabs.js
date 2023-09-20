@@ -17,7 +17,6 @@ import ListCollection from "./ListCollection";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { create } from "ipfs-http-client";
 import { setListing } from "../../redux/listing/ListingActions";
 import { setStep } from "../../redux/listing/ListingActions";
 import { useAssets, useLovelace, useWallet } from "@meshsdk/react";
@@ -29,7 +28,11 @@ import { seedPhrasePreprod } from "../../config/utils";
 import Heading from "../shared/headings/Heading";
 import Layout from "../Mint/Layout";
 import Mynft from "../Cards/Mynft";
-import { network_name, network_url, network_key } from "../../base_network";
+import {
+  blockfrostUrl,
+  blockfrostApiKey,
+  blockfrostNetworkName,
+} from "../../config/blockfrostConfig";
 import { handleFileUpload } from "../../utils/utils";
 const inputFileStyle = {
   my: 2,
@@ -113,15 +116,15 @@ const MylistTabs = () => {
               const uploaded_image = await handleFileUpload(values.file);
               if (uploaded_image) {
                 const transferLucid = await Lucid.new(
-                  new Blockfrost(network_url, network_key),
+                  new Blockfrost(blockfrostUrl, blockfrostApiKey),
 
-                  network_name
+                  blockfrostNetworkName
                 );
 
                 transferLucid.selectWalletFromSeed(seedPhrasePreprod);
                 const lucidBrowser = await Lucid.new(
-                  new Blockfrost(network_url, network_key),
-                  network_name
+                  new Blockfrost(blockfrostUrl, blockfrostApiKey),
+                  blockfrostNetworkName
                 );
 
                 const api = await window.cardano[
