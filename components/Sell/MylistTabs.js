@@ -173,7 +173,6 @@ const MylistTabs = () => {
     validationSchema: addSingleListingSchema,
     onSubmit: async (values) => {
       try {
-        // console.log(values, "values");
         if (connected) {
           if (lovelace < 1000000) {
             Toast(
@@ -216,7 +215,7 @@ const MylistTabs = () => {
                   network_name
                 );
 
-                transferLucid.selectWalletFromSeed(seedPhraseMainnet);
+                transferLucid.selectWalletFromSeed(seedPhrasePreprod);
 
                 // const lucidBrowser = await Lucid.new(
                 //   new Blockfrost(
@@ -311,7 +310,7 @@ const MylistTabs = () => {
                         );
                         if (res) {
                           setIsLoading(false);
-                          dispatch(setStep("step2"));
+                          // dispatch(setStep("step2"));
                           // dispatch(setListing())
                           window.localStorage.setItem(
                             "listing",
@@ -344,7 +343,7 @@ const MylistTabs = () => {
                       );
                       if (res) {
                         setIsLoading(false);
-                        dispatch(setStep("step2"));
+                        // dispatch(setStep("step2"));
                         // dispatch(setListing())
                         window.localStorage.setItem(
                           "listing",
@@ -377,19 +376,6 @@ const MylistTabs = () => {
         console.log(error, "err");
         setIsLoading(false);
         transactionErrorHanlder(error, "mint");
-        const clientIp = await getClientIp();
-        if (clientIp) {
-          try {
-            const response = await INSTANCE.post(`/log/create`, {
-              error: JSON.stringify(error),
-              ip: clientIp,
-              type: "list item by user, MyListTabs",
-            });
-            console.log(response.data);
-          } catch (error) {
-            console.error(error);
-          }
-        }
       }
     },
   });

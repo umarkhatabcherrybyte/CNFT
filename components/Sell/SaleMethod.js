@@ -81,103 +81,108 @@ const SaleMethod = () => {
           : getObjData("list-item-auction");
       console.log(price_data, "price_data");
       if (listing_data && price_data) {
-        // const data =
-        //   listing_data.type === "single"
-        //     ? {
-        //         user_id: listing_data?.user_id,
-        //         collection_id: listing_data._id,
-        //         mint_type: listing_data?.type,
-        //       }
-        //     : {
-        //         collection_id: listing_data?._id,
-        //         user_id: listing_data?.user_id,
-        //         logo_image: listing_data?.logo_image,
-        //         feature_image: listing_data?.feature_image,
-        //         mint_type: listing_data?.type,
-        //         name: listing_data?.name,
-        //         // sell_type: price_data?.sell_type,
-        //       };
         try {
-          // const res = await INSTANCE.post("/list/create", {
-          //   ...price_data,
-          //   ...data,
-          // });
-          // if (res) {
-          //   setIsLoading(false);
-          //   const route =
-          //     paymentValue === "fixed" ? buyDetailRoute : auctionRoute;
-          //   // window.localStorage.removeItem("listing")
-          //   Toast("success", "Listed Successfully");
-          //   dispatch(setStep("step1"));
-          //   router.push(route);
-          // }
+          if (paymentValue === "fixed") {
+            const addresses = await instance.getUsedAddresses();
+            console.log(addresses, "addressesaddressesaddresses");
 
-          const addresses = await instance.getUsedAddresses();
-          console.log(addresses, "addressesaddressesaddresses");
+            console.log(
+              Address.from_bytes(
+                Uint8Array.from(Buffer.from(addresses[0], "hex"))
+              )
+            );
 
-          console.log(
-            Address.from_bytes(
-              Uint8Array.from(Buffer.from(addresses[0], "hex"))
-            )
-          );
+            const sellerAddr = BaseAddress.from_address(
+              Address.from_bytes(
+                Uint8Array.from(Buffer.from(addresses[0], "hex"))
+              )
+            );
+            console.log("sellerAddr", sellerAddr);
+            const sellerPkh = Buffer.from(
+              sellerAddr.payment_cred().to_keyhash().to_bytes()
+            ).toString("hex");
+            const sellerStakeKey = Buffer.from(
+              sellerAddr.stake_cred().to_keyhash().to_bytes()
+            ).toString("hex");
 
-          const sellerAddr = BaseAddress.from_address(
-            Address.from_bytes(
-              Uint8Array.from(Buffer.from(addresses[0], "hex"))
-            )
-          );
-          console.log("sellerAddr", sellerAddr);
-          const sellerPkh = Buffer.from(
-            sellerAddr.payment_cred().to_keyhash().to_bytes()
-          ).toString("hex");
-          const sellerStakeKey = Buffer.from(
-            sellerAddr.stake_cred().to_keyhash().to_bytes()
-          ).toString("hex");
-
-          console.log(price_data.price, "price");
-          console.log(
-            `${listing_data.policy_id}.${listing_data.metadata[0].name}`,
-            "`${listing_data.policy_id}.${listing_data.name}`"
-          );
-          console.log(listing_data, "listing_data");
-          const body = {
-            selections: await instance.getUtxos(),
-            outputs: [
-              {
-                address: market.address,
-                value: `${listing_data.policy_id}.${listing_data.metadata[0].name}`,
-                datum: {
-                  fields: [
-                    {
-                      fields: [
-                        { fields: [{ bytes: `${sellerPkh}` }], constructor: 0 }, // pubkeyhash
-                        {
-                          fields: [
-                            {
-                              fields: [
-                                {
-                                  fields: [{ bytes: `${sellerStakeKey}` }],
-                                  constructor: 0,
-                                },
-                              ],
-                              constructor: 0,
-                            },
-                          ],
-                          constructor: 0,
-                        }, // stakekeyHash
-                      ],
-                      constructor: 0,
-                    },
-                    // sellAmount: "",
-                    { int: Math.round(parseFloat(price_data.price) * 1e6) },
-                  ],
-                  constructor: 0,
+            console.log(price_data.price, "price");
+            console.log(
+              `${listing_data.policy_id}.${listing_data.metadata[0].name}`,
+              "`${listing_data.policy_id}.${listing_data.name}`"
+            );
+            console.log(listing_data, "listing_data");
+            const body = {
+              selections: await instance.getUtxos(),
+              outputs: [
+                {
+                  address: market.address,
+                  value: `${listing_data.policy_id}.${listing_data.metadata[0].name}`,
+                  datum: {
+                    fields: [
+                      {
+                        fields: [
+                          {
+                            fields: [{ bytes: `${sellerPkh}` }],
+                            constructor: 0,
+                          }, // pubkeyhash
+                          {
+                            fields: [
+                              {
+                                fields: [
+                                  {
+                                    fields: [{ bytes: `${sellerStakeKey}` }],
+                                    constructor: 0,
+                                  },
+                                ],
+                                constructor: 0,
+                              },
+                            ],
+                            constructor: 0,
+                          }, // stakekeyHash
+                        ],
+                        constructor: 0,
+                      },
+                      // sellAmount: "",
+                      { int: Math.round(parseFloat(price_data.price) * 1e6) },
+                    ],
+                    constructor: 0,
+                  },
                 },
-              },
-            ],
-          };
-          callKuberAndSubmit(instance, JSON.stringify(body));
-          setIsLoading(false);
+              ],
+            };
+            callKuberAndSubmit(instance, JSON.stringify(body));
+            setIsLoading(false);
+          } else {
+            const data =
+              listing_data.type === "single"
+                ? {
+                    user_id: listing_data?.user_id,
+                    collection_id: listing_data._id,
+                    mint_type: listing_data?.type,
+                  }
+                : {
+                    collection_id: listing_data?._id,
+                    user_id: listing_data?.user_id,
+                    logo_image: listing_data?.logo_image,
+                    feature_image: listing_data?.feature_image,
+                    mint_type: listing_data?.type,
+                    name: listing_data?.name,
+                    // sell_type: price_data?.sell_type,
+                  };
+            const res = await INSTANCE.post("/list/create", {
+              ...price_data,
+              ...data,
+            });
+            if (res) {
+              setIsLoading(false);
+              const route =
+                paymentValue === "fixed" ? buyDetailRoute : auctionRoute;
+              // window.localStorage.removeItem("listing")
+              Toast("success", "Listed Successfully");
+              // dispatch(setStep("step1"));
+              router.push(route);
+            }
+          }
         } catch (e) {
           setIsLoading(false);
           console.log(e);
@@ -344,7 +349,8 @@ const SaleMethod = () => {
                 value={
                   listing_data.type === "collection"
                     ? listing_data.name
-                    : listing_data?.metadata.length > 0
+                    : listing_data?.metadata &&
+                      listing_data?.metadata.length > 0
                     ? listing_data?.metadata[0]?.name
                     : ""
                 }
