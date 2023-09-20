@@ -3,7 +3,6 @@ import ContainerLayout from "/components/shared/ContainerLayout";
 import Header from "/components/Mint/shared/Header";
 import Layout from "/components/Mint/Layout";
 import styled from "styled-components";
-import VerifyMetaFileService from "/services/verify-metafile.service";
 import UploadService from "/services/upload-files.service";
 import MintService from "/services/mint.service";
 import { Toast } from "/components/shared/Toast";
