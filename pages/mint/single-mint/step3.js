@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Layout from "../../../components/Mint/Layout";
-import { CardanoWallet, useLovelace, useWallet } from "@meshsdk/react";
+import { useLovelace, useWallet } from "@meshsdk/react";
 import { Toast } from "../../../components/shared/Toast";
-import { createTransaction, signTransaction } from "../../../backend";
-import CircularJSON from "circular-json";
-//import { Lucid } from "lucid-cardano";
-import { network_name, network_url, network_key } from "../../../base_network";
 import { mintNFT } from "../../../utils/nftMinter";
 import {
   Box,
@@ -72,8 +68,6 @@ const SingleMintStep3 = () => {
 
   const onMint = async () => {
     try {
-      console.log("dasdasd1");
-
       if (!connected) {
         Toast("error", "Please Connect Your Wallet First");
       } else if (lovelace < 1000000) {
@@ -82,92 +76,47 @@ const SingleMintStep3 = () => {
           "You do not have enough Ada to complete this transaction"
         );
       } else {
-        let img = window.localStorage.getItem("img");
         let connectedWallet = window.localStorage.getItem("connectedWallet");
         if (selectedValue == undefined || selectedValue == null) {
           Toast("error", "Please Select an Option for Minting");
-        } else if (img && connected) {
+        } else {
           setIsLoading(true);
           if (selectedValue == "a") {
-          } else if (selectedValue == "b") {
+          } else if (selectedValue == "b" || selectedValue == "c") {
             const txHash = await mintNFT(
               selectedValue,
               connectedWallet,
               currentAddr
             );
             if (txHash) {
-              try {
-                // const user_id = window.localStorage.getItem("userid");
-                // metadata["unit"] = unit;
-                // metadata["ipfs"] = img;
-                // const data = {
-                //   metadata: [metadata],
-                //   user_id: user_id,
-                //   recipient_address: await lucid.wallet.address(),
-                //   policy_id: policyId,
-                //   type: "single",
-                //   minting_policy: JSON.stringify(nftPolicy),
-                //   // asset_hex_name: unit,
-                // };
-                // const res = await INSTANCE.post("/collection/create", data);
-                // if (res) {
-                Toast("success", "Minted Successfully");
-                // window.localStorage.setItem("policy", nftPolicy.script);
-                // window.localStorage.setItem("policy-id", policyId);
-                // window.localStorage.setItem(
-                //   "minting-script",
-                //   JSON.stringify(nftPolicy)
-                // );
-                router.push("/mint");
-                setIsLoading(false);
-                // }
-              } catch (e) {
-                setIsLoading(false);
-                console.log(e);
-              }
-            }
-            setIsLoading(false);
-          } else if (selectedValue == "c") {
-            const txHash = await mintNFT(
-              selectedValue,
-              connectedWallet,
-              currentAddr
-            );
-            if (txHash) {
-              try {
-                // const user_id = window.localStorage.getItem("userid");
-                // metadata["unit"] = unit;
-                // metadata["ipfs"] = img;
-                // const data = {
-                //   metadata: [metadata],
-                //   user_id: user_id,
-                //   recipient_address: await lucid.wallet.address(),
-                //   policy_id: policyId,
-                //   type: "single",
-                //   minting_policy: JSON.stringify(nftPolicy),
-                //   // asset_hex_name: unit,
-                // };
-                // const res = await INSTANCE.post("/collection/create", data);
-                // if (res) {
-                Toast("success", "Minted Successfully");
-                // window.localStorage.setItem("policy", nftPolicy.script);
-                // window.localStorage.setItem("policy-id", policyId);
-                // window.localStorage.setItem(
-                //   "minting-script",
-                //   JSON.stringify(nftPolicy)
-                // );
-                router.push("/mint");
-                // }
-              } catch (e) {
-                setIsLoading(false);
-                console.log(e);
-              }
+              Toast("success", "Minted Successfully");
+              router.push("/mint");
               setIsLoading(false);
+              // const user_id = window.localStorage.getItem("userid");
+              // metadata["unit"] = unit;
+              // metadata["ipfs"] = img;
+              // const data = {
+              //   metadata: [metadata],
+              //   user_id: user_id,
+              //   recipient_address: await lucid.wallet.address(),
+              //   policy_id: policyId,
+              //   type: "single",
+              //   minting_policy: JSON.stringify(nftPolicy),
+              //   // asset_hex_name: unit,
+              // };
+              // const res = await INSTANCE.post("/collection/create", data);
+              // if (res) {
+              // window.localStorage.setItem("policy", nftPolicy.script);
+              // window.localStorage.setItem("policy-id", policyId);
+              // window.localStorage.setItem(
+              //   "minting-script",
+              //   JSON.stringify(nftPolicy)
+              // );
+
+              // }
             }
-            setIsLoading(false);
           }
-        } else {
-          Toast("error", "You are Not Connected");
+          setIsLoading(false);
         }
       }
     } catch (error) {

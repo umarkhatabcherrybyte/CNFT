@@ -14,8 +14,6 @@ import { bankWalletAddress } from "../config/utils";
 import { cborHex } from "../config";
 
 export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
-  console.log(selectedValue, "selectedValue mint");
-  console.log(currentAddr, "currentAddr mint");
   const lucid = await Lucid.new(
     new Blockfrost(blockfrostUrl, blockfrostApiKey),
     blockfrostNetworkName
@@ -80,9 +78,3 @@ export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
   const txHash = await signedTx.submit();
   return txHash;
 };
-
-// if (con) {
-//   console.log("ss");
-// } else if (selectedValue === "b" || selectedValue === "c") {
-//   mintNFT(selectedValue, bankWalletAddress, currentAddr);
-// }
