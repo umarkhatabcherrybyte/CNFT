@@ -196,8 +196,8 @@ const SaleMethod = () => {
   useEffect(async () => {
     setIsLoading(true);
     const response = await getAssetDetail(listing_data?.policy_id);
-    console.log(response, "datadatadatadata");
-    setAsset(response.data);
+    console.log(response, "datadatadatadata");   
+    setAsset(response?.data);
     setIsLoading(false);
   }, []);
 

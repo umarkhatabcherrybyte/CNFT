@@ -55,7 +55,10 @@ const ListCollectionStep2 = () => {
   const { wallet, connected } = useWallet();
   const [currentAddr, setCurrentAddr] = useState("");
   const [selectedValue, setSelectedValue] = React.useState();
-
+  // console.log(
+  //   "collection metadata ",
+  //   (window.localStorage)
+  // );
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.localStorage.getItem("connectedWallet", imagePaths);
@@ -386,6 +389,19 @@ const ListCollectionStep2 = () => {
 
   const mintCollection = async (metadataObjects) => {
     const listing_previous = getObjData("listing");
+    console.log(listing_previous);
+    let banner_image=undefined, feature_image=undefined, logo_image=undefined;
+    if (
+      listing_previous &&
+      listing_previous.banner_image &&
+      listing_previous.logo_image &&
+      listing_previous.feature_image
+    ) {
+      banner_image = listing_previous.banner_image.path;
+      feature_image = listing_previous.feature_image.path;
+      logo_image = listing_previous.logo_image.path;
+    }
+
     try {
       let connectedWallet = window.localStorage.getItem("connectedWallet");
       if (connected) {
@@ -408,7 +424,7 @@ const ListCollectionStep2 = () => {
 
             network_name
           );
-          transferLucid.selectWalletFromSeed(seedPhraseMainnet);
+          transferLucid.selectWalletFromSeed(seedPhrasePreprod);
 
           // const lucid = await Lucid.new(
           //   new Blockfrost(
@@ -453,7 +469,14 @@ const ListCollectionStep2 = () => {
           let lovelace = [];
 
           for (let index = 0; index < metadataObjects.length; index++) {
-            const element = metadataObjects[index];
+            let element = metadataObjects[index];
+            if (banner_image && feature_image && logo_image) {
+              element.banner_image = banner_image;
+              element.feature_image = feature_image;
+              element.logo_image = logo_image;
+            }
+
+            // element = { ...element, prev };
             metadataX[element.name] = element;
             // console.log(metadataX, 'dsadasd')
             assetObj[String(policyId + fromText(element.name))] = 1n;
@@ -467,7 +490,7 @@ const ListCollectionStep2 = () => {
           }
           // console.log(assetObj, 'onjf')
           // debugger
-
+          console.log("with features , ", obj);
           const txL = await lucid
             .newTx()
             .validTo(Date.now() + 100000)
