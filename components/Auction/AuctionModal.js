@@ -16,7 +16,11 @@ import { seedPhraseMainnet } from "../../config/utils";
 import { seedPhrasePreprod } from "../../config/utils";
 import { network_name, network_url, network_key } from "../../base_network";
 import { getClientIp } from "../../helper/clientIP";
-
+import {
+  blockfrostUrl,
+  blockfrostApiKey,
+  blockfrostNetworkName,
+} from "../../config/constants";
 const style = {
   fieldset: {
     border: "none",
@@ -90,9 +94,9 @@ const AuctionModal = ({
                 //   "Mainnet"
                 // );
                 const transferLucid = await Lucid.new(
-                  new Blockfrost(network_url, network_key),
+                  new Blockfrost(blockfrostUrl, blockfrostApiKey),
 
-                  network_name
+                  blockfrostNetworkName
                 );
                 transferLucid.selectWalletFromSeed(seedPhraseMainnet);
                 // const lucidBrowser = await Lucid.new(
@@ -103,9 +107,8 @@ const AuctionModal = ({
                 //   "Mainnet"
                 // );
                 const lucidBrowser = await Lucid.new(
-                  new Blockfrost(network_url, network_key),
-
-                  network_name
+                  new Blockfrost(blockfrostUrl, blockfrostApiKey),
+                  blockfrostNetworkName
                 );
                 // console.log(values.price, "dasd");
                 const api = await window.cardano[
