@@ -92,7 +92,7 @@ const AuctionCard = ({ data, index }) => {
             component="div"
             className="bold uppercase poppin"
           >
-            Base Price
+            Price
           </Typography>
           <Box className="space_between">
             <Typography

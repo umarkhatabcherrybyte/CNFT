@@ -55,8 +55,7 @@ const MylistTabs = () => {
   const [lists, setLists] = useState([]);
   const [tabValue, setTabValue] = useState("add");
   const [isLoading, setIsLoading] = useState(false);
-  // console.log(assets, "assetsassetsassetsassetsassetsassetsassetsassetsassets");
-  React.useEffect(() => {
+  useEffect(() => {
     async function getAddress() {
       if (connected) {
         const user_id = window.localStorage.getItem("user_id");
@@ -117,7 +116,6 @@ const MylistTabs = () => {
               if (uploaded_image) {
                 const transferLucid = await Lucid.new(
                   new Blockfrost(blockfrostUrl, blockfrostApiKey),
-
                   blockfrostNetworkName
                 );
 
@@ -275,7 +273,6 @@ const MylistTabs = () => {
       }
     },
   });
-  // console.log(formik.values);
   const onMintFileChange = (e) => {
     if (e.currentTarget.files[0]) {
       formik.setFieldValue("file", e.currentTarget.files[0]);
@@ -294,51 +291,7 @@ const MylistTabs = () => {
       // formik.setFieldValue("imageFile", null);
     }
   };
-  // async function getCardanoWalletNFTs(walletAddress) {
-  //   console.log("add", walletAddress);
-  //   let AssetsArray = [];
-  //   try {
-  //     const endpoint = `https://cardano-mainnet.blockfrost.io/api/v0/addresses/${walletAddress}/utxos`;
-  //     // `https://cardano-mainnet.blockfrost.io/api/v0/accounts/${walletAddress}/addresses/assets`;
-  //     const response = await axios.get(endpoint, {
-  //       headers: {
-  //         project_id: "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj",
-  //       },
-  //     });
-  //     let assets = response.data[0].amount;
 
-  //     // console.log({assets});
-  //     let index = 0;
-  //     for (let i = 0; i < assets.length; i++) {
-  //       const asset = assets[i];
-
-  //       try {
-  //         let assetEndPoint = `https://cardano-mainnet.blockfrost.io/api/v0/assets/${asset.unit}`;
-  //         let asset_info = await axios.get(assetEndPoint, {
-  //           headers: {
-  //             project_id: "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj",
-  //           },
-  //         });
-  //         let { data } = asset_info;
-  //         AssetsArray.push(data);
-  //         console.log(AssetsArray);
-  //         setAssets([...AssetsArray]);
-  //         setIsLoading(false);
-  //       } catch (e) {
-  //         console.log(e);
-  //         setIsLoading(false);
-  //         setAssets([]);
-  //       }
-  //       // console.log({asset_info});
-  //     }
-  //     console.log("Assets are ", AssetsArray);
-  //     return AssetsArray;
-  //   } catch (error) {
-  //     setIsLoading(false);
-  //     // setaAssets([]);
-  //     console.error(error);
-  //   }
-  // }
   return (
     <>
       {isLoading && <FullScreenLoader />}

@@ -180,7 +180,7 @@ const SaleMethod = () => {
               // window.localStorage.removeItem("listing")
               Toast("success", "Listed Successfully");
               // dispatch(setStep("step1"));
-              router.push(route);
+              // router.push(route);
             }
           }
         } catch (e) {
