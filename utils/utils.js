@@ -1,63 +1,28 @@
-export const initEntityState = (initialValue, loading = true) => ({
-  loading,
-  data: initialValue,
-  loadFailed: false,
-  canceler: null,
+import { create } from "ipfs-http-client";
+import { ipfsConfig } from "../config/ipfsConfig";
+const { projectId, projectSecret } = ipfsConfig; // Use the configuration
+const auth = `Basic ${Buffer.from(`${projectId}:${projectSecret}`).toString(
+  "base64"
+)}`;
+
+const ipfsClient = create({
+  host: "ipfs.infura.io",
+  port: 5001,
+  protocol: "https",
+  headers: {
+    authorization: auth,
+  },
 });
-
-export const entityLoadingStarted = (state, canceler) => ({
-  ...state,
-  canceler,
-  loading: true,
-  loadFailed: false,
-});
-
-export const entityLoadingSucceeded = (state, data) => ({
-  ...state,
-  data,
-  loading: false,
-  loadFailed: false,
-  canceler: null,
-});
-
-export const entityLoadingFailed = (state) => ({
-  ...state,
-  loading: false,
-  loadFailed: true,
-  canceler: null,
-});
-
-export const handleSelection = (
-  selectedIds,
-  selectId,
-  singleSelect = false
-) => {
-  const selected = new Set(selectedIds || []);
-
-  if (singleSelect) return new Set([selectId]);
-
-  if (selected.has(selectId)) {
-    selected.delete(selectId);
-  } else {
-    selected.add(selectId);
+export const handleFileUpload = async (file) => {
+  try {
+    const uploaded_file = await ipfsClient.add(file);
+    return uploaded_file;
+  } catch (error) {
+    console.log(error);
+    // throw new Error("Failed to upload image to IPFS");
   }
-
-  return selected;
 };
-
-export const shuffleArray = (array) => {
-  let shuffeled = array;
-
-  for (let i = shuffeled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffeled[i], shuffeled[j]] = [shuffeled[j], shuffeled[i]];
-  }
-
-  return shuffeled;
-};
-
 export const isVideoOrIsAudio = (file) => {
-  // console.log(file.media_type, "fdfds");
   return (
     file.media_type == "audio/mpeg" ||
     file.media_type == "audio/mp4" ||

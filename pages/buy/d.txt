@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { Box, Tab, Grid } from "@mui/material";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
+import Strips from "../../components/Design/Strips";
 import BreadCrumHeader from "../../components/shared/BreadCrumHeader";
 import ContainerLayout from "../../components/shared/ContainerLayout";
 import Filter from "../../components/shared/Filter";
-import { Box, Tab, Grid } from "@mui/material";
-import { TabContext, TabList, TabPanel } from "@mui/lab";
-import AuctionTokens from "../../components/Auction/AuctionTokens";
+import BuyCards from "../../components/Buy/BuyCards";
+import { useRouter } from "next/router";
+import FullScreenLoader from "../../components/shared/FullScreenLoader";
 import { INSTANCE } from "../../config/axiosInstance";
-import FullScreenLoader from "/components/shared/FullScreenLoader";
-const Auction = () => {
+import NftCard from "../../components/shared/NftCard";
+
+const Buy = () => {
+  const router = useRouter();
   const [tabValue, setTabValue] = useState("single");
   const [isLoading, setIsLoading] = useState(true);
+
   const [filter, setFilter] = useState({
     price_range: {
       min: "0",
@@ -19,22 +25,24 @@ const Auction = () => {
     sort: "",
     type: "",
   });
-  const [auction, setAuction] = useState([]);
-  console.log(auction, "auction");
+  const [buy, setBuy] = useState([]);
   useEffect(() => {
     const getData = async () => {
       setIsLoading(true);
+
       try {
-        const res = await INSTANCE.post("/list/find/single/auction", {
+        const res = await INSTANCE.post("/list/find/single/fixed", {
           mint_type: tabValue,
           ...filter,
         });
-        setAuction([...res.data.data]);
+        // console.log("filter");
+
+        setBuy([...res?.data?.data]);
         setIsLoading(false);
       } catch (e) {
+        setBuy([]);
         setIsLoading(false);
 
-        setAuction([]);
         // console.log("filter error");
       }
     };
@@ -42,20 +50,25 @@ const Auction = () => {
   }, [tabValue, filter]);
   const onTabChange = (event, newValue) => {
     setTabValue(newValue);
+    // if (newValue === "collections") {
+    //   router.push(MycollectionRoute);
+    // }
   };
   return (
-    <AuctionStyled>
+    <BuyStyled>
       {isLoading && <FullScreenLoader />}
 
       <Box>
         <img
           src="/images/balloon-right-1.png"
           alt="no img"
-          className="auction_ballon"
+          className="buy_ballon"
         />
       </Box>
+      <Strips />
       <ContainerLayout>
-        <BreadCrumHeader heading="Live Auction" />
+        <BreadCrumHeader heading=" Buy our tokens" />
+        {/* Tabs and filter  */}
         <TabContext value={tabValue}>
           <Box sx={{ pb: 4, pt: 10 }}>
             <Grid container spacing={2} alignItems="center ">
@@ -72,7 +85,7 @@ const Auction = () => {
                       fontWeight: "bold",
                     },
                     "& 	.MuiTabs-flexContainer": {
-                      flexWrap: "wrap",
+                      flexWrap: { xs: "wrap", lg: "nowrap" },
                     },
                     "& .tab_btn": {
                       color: "#ffff",
@@ -88,17 +101,17 @@ const Auction = () => {
                   <Tab
                     label="Items"
                     value="single"
-                    className="tab_btn initialcase poppin"
+                    className="tab_btn initialcase"
                   />
                   <Tab
                     label="Collections "
                     value="collection"
-                    className="tab_btn initialcase poppin"
+                    className="tab_btn initialcase"
                   />
                   {/* <Tab
                     label="Trending"
                     value="trending"
-                    className="tab_btn initialcase poppin"
+                    className="tab_btn initialcase"
                   /> */}
                 </TabList>
               </Grid>
@@ -108,24 +121,27 @@ const Auction = () => {
             </Grid>
           </Box>
           <TabPanel value="single">
-            {!isLoading && <AuctionTokens auction={auction} />}
+            <BuyCards tabValue={tabValue} buy={buy} />
           </TabPanel>
           <TabPanel value="collection">
-            {/* {!isLoading && <AuctionTokens auction={auction} />} */}
+            <BuyCards tabValue={tabValue} buy={buy} />
           </TabPanel>
+          {/* <TabPanel value="trending">
+            <BuyCards tabValue={tabValue} />
+          </TabPanel> */}
         </TabContext>
       </ContainerLayout>
-    </AuctionStyled>
+    </BuyStyled>
   );
 };
 
-export default Auction;
+export default Buy;
 
-const AuctionStyled = styled.section`
-  .auction_ballon {
+const BuyStyled = styled.section`
+  .buy_ballon {
     position: absolute;
     z-index: -1;
-    top: 4%;
-    right: -7%;
+    top: 7%;
+    right: -2%;
   }
 `;

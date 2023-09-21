@@ -18,8 +18,8 @@ import {
   TransactionWitnessSet,
   Value,
   Vkeywitnesses,
-} from '@emurgo/cardano-serialization-lib-asmjs';
-
+} from "@emurgo/cardano-serialization-lib-asmjs";
+import { transactionErrorHanlder } from "../helper/transactionError";
 // declare global {
 //     interface Window {
 //       cardano: any;
@@ -136,7 +136,8 @@ export async function callKuberAndSubmit(provider, data) {
   )
     .catch((e) => {
       console.error(`${kuberUrlByNetwork}/api/v1/tx`, e);
-      throw Error(`Kubær API call : ` + e.message);
+      // throw Error(`Kubær API call : ` + e.message);
+      transactionErrorHanlder(e)
     })
     .then((res) => {
       if (res.status === 200) {

@@ -39,53 +39,39 @@ import moment from "moment";
 import { Toast } from "../shared/Toast";
 import { useRouter } from "next/router";
 import { buyDetailRoute, auctionRoute } from "../Routes/constants";
+import { getAssetDetail } from "../../scripts/koios";
+import { formatDateFromTimestamp } from "../../helper/formatDate";
+import {
+  calculatePolicyHash,
+  decodeAssetName,
+  listProviders,
+  walletValue,
+  callKuberAndSubmit,
+  transformNftImageUrl,
+} from "../../scripts/wallet";
+import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
+import { market } from "../../config";
 const SaleMethod = () => {
   const router = useRouter();
   // const dispatch = useDispatch();
   // const [listing, setListing] = useState();
-  // const { auction } = useSelector((state) => state.listing);
   // console.log(auction);
   // console.log(listing);
-
   const dispatch = useDispatch();
-
+  const { instance } = useSelector((state) => state.wallet);
   const listing_data = getObjData("listing");
   const [paymentValue, setPaymentValue] = useState("fixed");
   const [isLoading, setIsLoading] = useState(false);
   const [totalAmount, setTotalAmount] = useState("");
   const [isForm, setIsForm] = useState(false);
+  const [asset, setAsset] = useState([]);
+
+  // console.log(asset, "assetassetassetassetasset");
   // console.log(toalAmount);
   const onPaymentChange = (event, newValue) => {
     setPaymentValue(newValue);
   };
-  // const getMintingTime = async() => {
-  //   const {time} = await axios.get("https://api.koios.rest/api/v0/asset_info?_asset_policy=750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501&_asset_name=424f4f4b" \
-  //   -H "accept: application/json")
 
-  // }
-  async function getAssetInfo(assetPolicy, assetName) {
-    try {
-      const baseURL = "https://api.koios.rest/api/v0/asset_info";
-      const queryParams = `_asset_policy=${assetPolicy}&_asset_name=${assetName}`;
-
-      const response = await axios.get(
-        `https://api.koios.rest/api/v0/asset_info?_asset_policy=e8a578c7ac07051bd5879f02de00ff12d7e88e0bf85d2f49e0a552f9&_asset_name=e8a578c7ac07051bd5879f02de00ff12d7e88e0bf85d2f49e0a552f974657374206d696e74`,
-        {
-          headers: {
-            accept: "application/json",
-          },
-        }
-      );
-
-      // Handle the response data here (e.g., print it)
-      console.log("Asset Info:---------------------", response.data);
-
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching asset info:", error.message);
-      return null;
-    }
-  }
   const submitData = async () => {
     if (isForm) {
       setIsLoading(true);
@@ -93,36 +79,109 @@ const SaleMethod = () => {
         paymentValue === "fixed"
           ? getObjData("list-item-fixed")
           : getObjData("list-item-auction");
+      console.log(price_data, "price_data");
       if (listing_data && price_data) {
-        const data =
-          listing_data.type === "single"
-            ? {
-                user_id: listing_data?.user_id,
-                collection_id: listing_data._id,
-                mint_type: listing_data?.type,
-              }
-            : {
-                collection_id: listing_data?._id,
-                user_id: listing_data?.user_id,
-                logo_image: listing_data?.logo_image,
-                feature_image: listing_data?.feature_image,
-                mint_type: listing_data?.type,
-                name: listing_data?.name,
-                // sell_type: price_data?.sell_type,
-              };
         try {
-          const res = await INSTANCE.post("/list/create", {
-            ...price_data,
-            ...data,
-          });
-          if (res) {
+          if (paymentValue === "fixed") {
+            const addresses = await instance.getUsedAddresses();
+            console.log(addresses, "addressesaddressesaddresses");
+
+            console.log(
+              Address.from_bytes(
+                Uint8Array.from(Buffer.from(addresses[0], "hex"))
+              )
+            );
+
+            const sellerAddr = BaseAddress.from_address(
+              Address.from_bytes(
+                Uint8Array.from(Buffer.from(addresses[0], "hex"))
+              )
+            );
+            console.log("sellerAddr", sellerAddr);
+            const sellerPkh = Buffer.from(
+              sellerAddr.payment_cred().to_keyhash().to_bytes()
+            ).toString("hex");
+            const sellerStakeKey = Buffer.from(
+              sellerAddr.stake_cred().to_keyhash().to_bytes()
+            ).toString("hex");
+
+            console.log(price_data.price, "price");
+            console.log(
+              `${listing_data.policy_id}.${listing_data.metadata[0].name}`,
+              "`${listing_data.policy_id}.${listing_data.name}`"
+            );
+            console.log(listing_data, "listing_data");
+            const body = {
+              selections: await instance.getUtxos(),
+              outputs: [
+                {
+                  address: market.address,
+                  value: `${listing_data.policy_id}.${listing_data.metadata[0].name}`,
+                  datum: {
+                    fields: [
+                      {
+                        fields: [
+                          {
+                            fields: [{ bytes: `${sellerPkh}` }],
+                            constructor: 0,
+                          }, // pubkeyhash
+                          {
+                            fields: [
+                              {
+                                fields: [
+                                  {
+                                    fields: [{ bytes: `${sellerStakeKey}` }],
+                                    constructor: 0,
+                                  },
+                                ],
+                                constructor: 0,
+                              },
+                            ],
+                            constructor: 0,
+                          }, // stakekeyHash
+                        ],
+                        constructor: 0,
+                      },
+                      // sellAmount: "",
+                      { int: Math.round(parseFloat(price_data.price) * 1e6) },
+                    ],
+                    constructor: 0,
+                  },
+                },
+              ],
+            };
+            callKuberAndSubmit(instance, JSON.stringify(body));
             setIsLoading(false);
-            const route =
-              paymentValue === "fixed" ? buyDetailRoute : auctionRoute;
-            // window.localStorage.removeItem("listing")
-            Toast("success", "Listed Successfully");
-            dispatch(setStep("step1"));
-            router.push(route);
+          } else {
+            const data =
+              listing_data.type === "single"
+                ? {
+                    user_id: listing_data?.user_id,
+                    collection_id: listing_data._id,
+                    mint_type: listing_data?.type,
+                  }
+                : {
+                    collection_id: listing_data?._id,
+                    user_id: listing_data?.user_id,
+                    logo_image: listing_data?.logo_image,
+                    feature_image: listing_data?.feature_image,
+                    mint_type: listing_data?.type,
+                    name: listing_data?.name,
+                    // sell_type: price_data?.sell_type,
+                  };
+            const res = await INSTANCE.post("/list/create", {
+              ...price_data,
+              ...data,
+            });
+            if (res) {
+              setIsLoading(false);
+              const route =
+                paymentValue === "fixed" ? buyDetailRoute : auctionRoute;
+              // window.localStorage.removeItem("listing")
+              Toast("success", "Listed Successfully");
+              // dispatch(setStep("step1"));
+              router.push(route);
+            }
           }
         } catch (e) {
           setIsLoading(false);
@@ -133,17 +192,17 @@ const SaleMethod = () => {
       Toast("error", "Please set your price.");
     }
   };
-  useEffect(() => {
-    getAssetInfo(
-      "e8a578c7ac07051bd5879f02de00ff12d7e88e0bf85d2f49e0a552f9",
-      "test mint"
-    );
+
+  useEffect(async () => {
+    setIsLoading(true);
+    const response = await getAssetDetail(listing_data?.policy_id);
+    console.log(response, "datadatadatadata");
+    setAsset(response.data);
+    setIsLoading(false);
   }, []);
+
   return (
     <>
-      <p onClick={() => getAssetInfo()}>
-        sdfffffffffffffffffffffffffffffffffff
-      </p>
       {isLoading && <FullScreenLoader />}
       {/* <Button
         className="btn2"
@@ -279,11 +338,24 @@ const SaleMethod = () => {
             <Box>
               <CaptionHeading
                 font="montserrat"
-                heading={`${
-                  listing_data.type === "collection" ? "Collection" : "Asset"
-                } Name`}
+                heading="Asset Name"
+                // heading={`${
+                //   listing_data.type === "collection" ? "Collection" : "Asset"
+                // } Name`}
               />
               <AssetInputField
+                placeholder={`Enter Asset Name`}
+                name="asset_name"
+                value={
+                  listing_data.type === "collection"
+                    ? listing_data.name
+                    : listing_data?.metadata &&
+                      listing_data?.metadata.length > 0
+                    ? listing_data?.metadata[0]?.name
+                    : ""
+                }
+              />
+              {/* <AssetInputField
                 placeholder={`Enter ${
                   listing_data.type === "collection"
                     ? "Collection Name"
@@ -297,7 +369,7 @@ const SaleMethod = () => {
                     ? listing_data?.assets[0]?.asset_name
                     : listing_data?.onchain_metadata?.name
                 }
-              />
+              /> */}
             </Box>
           </Grid>
           {/* <Grid item xs={12} md={6}>
@@ -321,35 +393,32 @@ const SaleMethod = () => {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <Box>
-              <CaptionHeading heading="Quantity" font="montserrat" />
-              <AssetInputField
-                placeholder="Enter Quantity"
-                name="quantity"
-                // value={listing_data?.assets?.length}
-                value={
-                  listing_data?.assets
-                    ? listing_data?.assets?.length
-                    : listing_data?.quantity
-                }
-              />
-            </Box>
-          </Grid>
-          {listing_data?.createdAt && (
-            <Grid item xs={12} md={6}>
-              <Box>
-                <CaptionHeading heading="Minted On" font="montserrat" />
-                <AssetInputField
-                  placeholder="Enter Minted Date"
-                  name="minted_on"
-                  // value={moment(new Date(listing_data?.createdAt)).format(
-                  //   "Do MMMM YYYY"
-                  // )}
-                  value={localStorage.getItem("policyId")}
-                />
-              </Box>
-            </Grid>
+
+          {asset?.length > 0 && (
+            <>
+              <Grid item xs={12} md={6}>
+                <Box>
+                  <CaptionHeading heading="Quantity" font="montserrat" />
+                  <AssetInputField
+                    placeholder="Enter Quantity"
+                    name="quantity"
+                    // value={listing_data?.assets?.length}
+                    value={asset[0]?.mint_cnt}
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Box>
+                  <CaptionHeading heading="Minted On" font="montserrat" />
+                  <AssetInputField
+                    placeholder="Enter Minted Date"
+                    name="minted_on"
+                    value={formatDateFromTimestamp(asset[0].creation_time)}
+                    // value={localStorage.getItem("policyId")}
+                  />
+                </Box>
+              </Grid>
+            </>
           )}
 
           <Grid item xs={12} className="flex">

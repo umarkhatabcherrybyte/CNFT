@@ -7,41 +7,33 @@ import {
   Grid,
   Tab,
   Typography,
-  Select,
-  MenuItem,
   FormHelperText,
 } from "@mui/material";
 import { Image } from "@mui/icons-material";
 import InputField from "./InputField";
-import LightText from "../shared/headings/LightText";
 import { addSingleListingSchema } from "../../schema/Index";
 import { useFormik } from "formik";
 import ListCollection from "./ListCollection";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { create } from "ipfs-http-client";
 import { setListing } from "../../redux/listing/ListingActions";
 import { setStep } from "../../redux/listing/ListingActions";
-import {
-  CardanoWallet,
-  useAssets,
-  useLovelace,
-  useWallet,
-} from "@meshsdk/react";
+import { useAssets, useLovelace, useWallet } from "@meshsdk/react";
 import { Toast } from "../shared/Toast";
 import { INSTANCE } from "../../config/axiosInstance";
 import FullScreenLoader from "../shared/FullScreenLoader";
 import { transactionErrorHanlder } from "../../helper/transactionError";
-import { seedPhraseMainnet } from "../../config/utils";
 import { seedPhrasePreprod } from "../../config/utils";
-import { getClientIp } from "../../helper/clientIP";
 import Heading from "../shared/headings/Heading";
-import axios from "axios";
 import Layout from "../Mint/Layout";
 import Mynft from "../Cards/Mynft";
-//import { network_name, network_url, network_key } from "../../../base_network";
-import { network_name, network_url, network_key } from "../../base_network";
+import {
+  blockfrostUrl,
+  blockfrostApiKey,
+  blockfrostNetworkName,
+} from "../../config/blockfrostConfig";
+import { handleFileUpload } from "../../utils/utils";
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",
@@ -53,74 +45,17 @@ const inputFileStyle = {
   justifyContent: "center",
 };
 
-// user id , type
-const f = [
-  {
-    user_id: "6412bbe5ab27d2c9ebaa7307",
-    asset:
-      "d88c75a4b316dbdd387789a6eaed235e265ff90b3ae67b808d55c90254657374206c697665206d696e74",
-    policy_id: "d88c75a4b316dbdd387789a6eaed235e265ff90b3ae67b808d55c902",
-    asset_name: "54657374206c697665206d696e74",
-    fingerprint: "asset19welxnfl0px73a6n5qr9ed25h3xlmva2xgarda",
-    quantity: "1",
-    type: "single",
-    initial_mint_tx_hash:
-      "48b7c67f3bd796621fc3becf1a18f7820501f86f0ee616e04a7d9f41ed57f7cf",
-    mint_or_burn_count: 1,
-    onchain_metadata: {
-      link: "Test",
-      name: "Test live mint",
-      image: "ipfs://QmamkL42Rz6wZGD8YZeEG58YJvCvKBFNc4EhrQsUnkzxrD",
-      creator: "Test",
-      mediaType: "image/jpg",
-      description: "Test",
-    },
-    onchain_metadata_standard: "CIP25v1",
-    metadata: null,
-  },
-];
-const hello = {
-  user_id: "6412bbe5ab27d2c9ebaa7307",
-  type: "single",
-  assets: [
-    {
-      price: null,
-      feature_image: "",
-      asset_name: "23 mar 3 ",
-      asset_quantity: 1,
-      image: "ipfs://QmVYJgLxzBmxZAc2pZTsCTjYj16GDoyF4gVEPGLn7rZC3X",
-      media_type: "image/jpeg",
-      description: "",
-      artist: "",
-      ipfs: "QmVYJgLxzBmxZAc2pZTsCTjYj16GDoyF4gVEPGLn7rZC3X",
-      is_sold: false,
-      _id: "641c2d329a4080ee3d9013d3",
-    },
-  ],
-  total_supply: 1,
-  minting_policy:
-    '{"type":"Native","script":"8201828200581c04074187b909c0754f026839a852dc380a47a944d599de22e16b6de282051a01745da8"}',
-  policy_id: "4ce42d1798e66f42dfbbca0c1b8c1d53edbc0fd14b152f9dec6ec97a",
-  recipient_address:
-    "addr_test1qqzqwsv8hyyuqa20qf5rn2zjmsuq53afgn2enh3zu94kmcsa80ahhs9psx7lfvyy2krh9kpfts58tdtkc33wv47u78usrxuqgn",
-  _id: "641c2d329a4080ee3d9013d2",
-  createdAt: "2023-03-23T10:42:58.385Z",
-  updatedAt: "2023-03-23T10:42:58.385Z",
-  __v: 0,
-};
-
 const MylistTabs = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const lovelace = useLovelace();
   const assets = useAssets();
-  const { wallet, connected } = useWallet();
+  const { wallet, connected, connecting } = useWallet();
   const [recipientAddress, setRecipientAddress] = useState("");
   const [lists, setLists] = useState([]);
   const [tabValue, setTabValue] = useState("add");
   const [isLoading, setIsLoading] = useState(false);
-  console.log(assets, "assetsassetsassetsassetsassetsassetsassetsassetsassets");
-  // const [assets, setAssets] = useState([]);
+  // console.log(assets, "assetsassetsassetsassetsassetsassetsassetsassetsassets");
   React.useEffect(() => {
     async function getAddress() {
       if (connected) {
@@ -139,17 +74,13 @@ const MylistTabs = () => {
     }
     getAddress();
   }, [wallet]);
-  // useEffect(() => {
-  //   if (connected && recipientAddress) {
-  //     setIsLoading(true);
-  //     getCardanoWalletNFTs(
-  //       "addr1qyzqwsv8hyyuqa20qf5rn2zjmsuq53afgn2enh3zu94kmcsa80ahhs9psx7lfvyy2krh9kpfts58tdtkc33wv47u78usqspqyv"
-  //     );
-  //   }
-  // }, [recipientAddress, connected]);
+
   useEffect(() => {
     if (connected) {
+      setIsLoading(true);
       if (assets && assets.length > 0) {
+        setIsLoading(false);
+      } else {
         setIsLoading(false);
       }
     }
@@ -157,7 +88,6 @@ const MylistTabs = () => {
   const onTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
-  const [imageDataUrl, setImageDataUrl] = useState(null);
 
   const formik = useFormik({
     initialValues: {
@@ -171,7 +101,6 @@ const MylistTabs = () => {
     validationSchema: addSingleListingSchema,
     onSubmit: async (values) => {
       try {
-        // console.log(values, "values");
         if (connected) {
           if (lovelace < 1000000) {
             Toast(
@@ -184,49 +113,18 @@ const MylistTabs = () => {
             let connectedWallet =
               window.localStorage.getItem("connectedWallet");
             if (values.file != null || values.file != undefined) {
-              const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
-              const projectSecret = "136393a5b7f4e47a9e153a88eb636003";
-              const auth = `Basic ${Buffer.from(
-                `${projectId}:${projectSecret}`
-              ).toString("base64")}`;
-              const client = create({
-                host: "ipfs.infura.io",
-                port: 5001,
-                protocol: "https",
-                headers: {
-                  authorization: auth,
-                },
-              });
-              const uploaded_image = await client.add(values.file);
+              const uploaded_image = await handleFileUpload(values.file);
               if (uploaded_image) {
-                // console.log(uploaded_image, "img");
-
-                // const transferLucid = await Lucid.new(
-                //   new Blockfrost(
-                //     "https://cardano-mainnet.blockfrost.io/api/v0",
-                //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-                //   ),
-                //   "Mainnet"
-                // );
                 const transferLucid = await Lucid.new(
-                  new Blockfrost(network_url, network_key),
+                  new Blockfrost(blockfrostUrl, blockfrostApiKey),
 
-                  network_name
+                  blockfrostNetworkName
                 );
 
-                transferLucid.selectWalletFromSeed(seedPhraseMainnet);
-
-                // const lucidBrowser = await Lucid.new(
-                //   new Blockfrost(
-                //     "https://cardano-mainnet.blockfrost.io/api/v0",
-                //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-                //   ),
-                //   "Mainnet"
-                // );
+                transferLucid.selectWalletFromSeed(seedPhrasePreprod);
                 const lucidBrowser = await Lucid.new(
-                  new Blockfrost(network_url, network_key),
-
-                  network_name
+                  new Blockfrost(blockfrostUrl, blockfrostApiKey),
+                  blockfrostNetworkName
                 );
 
                 const api = await window.cardano[
@@ -253,7 +151,6 @@ const MylistTabs = () => {
 
                 const policyId =
                   lucidBrowser.utils.mintingPolicyToId(mintingPolicy);
-                // console.log(mintingPolicy, policyId, "pm");
                 let metadataX = {};
                 let metadata = {
                   name: values.name,
@@ -309,7 +206,7 @@ const MylistTabs = () => {
                         );
                         if (res) {
                           setIsLoading(false);
-                          dispatch(setStep("step2"));
+                          // dispatch(setStep("step2"));
                           // dispatch(setListing())
                           window.localStorage.setItem(
                             "listing",
@@ -342,7 +239,7 @@ const MylistTabs = () => {
                       );
                       if (res) {
                         setIsLoading(false);
-                        dispatch(setStep("step2"));
+                        // dispatch(setStep("step2"));
                         // dispatch(setListing())
                         window.localStorage.setItem(
                           "listing",
@@ -375,19 +272,6 @@ const MylistTabs = () => {
         console.log(error, "err");
         setIsLoading(false);
         transactionErrorHanlder(error, "mint");
-        const clientIp = await getClientIp();
-        if (clientIp) {
-          try {
-            const response = await INSTANCE.post(`/log/create`, {
-              error: JSON.stringify(error),
-              ip: clientIp,
-              type: "list item by user, MyListTabs",
-            });
-            console.log(response.data);
-          } catch (error) {
-            console.error(error);
-          }
-        }
       }
     },
   });
@@ -479,7 +363,7 @@ const MylistTabs = () => {
                 <Heading heading="Please connect your wallet first." />
               </Box>
             </Layout>
-          ) : isLoading ? (
+          ) : connecting || isLoading ? (
             <FullScreenLoader />
           ) : assets && assets.length > 0 ? (
             <Grid container spacing={2}>

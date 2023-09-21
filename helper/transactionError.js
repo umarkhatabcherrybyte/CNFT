@@ -25,17 +25,21 @@ export const transactionErrorHanlder = (error, type) => {
       "Your previous transaction is being validated please try again later."
     );
   } else {
-    if (type === "mint") {
-      Toast("error", "Error Occured while Minting");
-    }
-    if (type === "buy") {
-      Toast(
-        "error",
-        "Sorry, there seems to be an issue with our server and we're unable to process your request at this time. Please try again later."
-      );
-    }
-    if (type === "auction") {
-      Toast("error", "Could Not Add Bid");
+    if (type) {
+      if (type === "mint") {
+        Toast("error", "Error Occured while Minting");
+      }
+      if (type === "buy") {
+        Toast(
+          "error",
+          "Sorry, there seems to be an issue with our server and we're unable to process your request at this time. Please try again later."
+        );
+      }
+      if (type === "auction") {
+        Toast("error", "Could Not Add Bid");
+      }
+    } else {
+      Toast("error", "Something went wrong please try again lator.");
     }
   }
 };
