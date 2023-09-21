@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 import { listCollectionRoute } from "/components/Routes/constants";
 import { setListing } from "../../redux/listing/ListingActions";
 import { useDispatch, useSelector } from "react-redux";
+import { handleFileUpload } from "../../utils/utils";
 const AddImage = ({ heading, desc, width, formik, name }) => {
   return (
     <>
@@ -83,6 +84,8 @@ const AddImage = ({ heading, desc, width, formik, name }) => {
   );
 };
 const ListCollection = () => {
+
+  console.log("hi");
   const router = useRouter();
   const dispatch = useDispatch();
   useEffect(() => {}, []);
@@ -119,15 +122,19 @@ const ListCollection = () => {
 
           // Read file3 as data URL
           reader.readAsDataURL(values.banner_image);
-          reader.onload = () => {
+          reader.onload = async() => {
             const file3DataURL = reader.result;
 
             // Create a new object with the form data and file data URLs
+            let file1DataURL_ipfs=await handleFileUpload(file1DataURL)
+            let file2DataURL_ipfs=await handleFileUpload(file2DataURL)
+            let file3DataURL_ipfs=await handleFileUpload(file3DataURL)
+            console.log("uploadeded to ipfs ",{file1DataURL_ipfs,file2DataURL_ipfs,file3DataURL_ipfs});
             const dataWithFiles = {
               ...values,
-              logo_image: file1DataURL,
-              feature_image: file2DataURL,
-              banner_image: file3DataURL,
+              logo_image: file1DataURL_ipfs,
+              feature_image: file2DataURL_ipfs,
+              banner_image: file3DataURL_ipfs,
             };
 
             // Store the object in local storage

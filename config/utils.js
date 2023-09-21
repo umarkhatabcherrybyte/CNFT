@@ -14,8 +14,7 @@ const costLovelace = "10000000";
 //   "addr1q8nhtelxukx458x8h06d67l63yqs548h8guqxrdy525k428naxdfpf5a6evfaz78rdmu4d66fmvgzvmawl99y6wk0rjq9el5vh"; //new admin mainnet addres
 
 // wali dev seed
-export const seedPhrasePreprod =
-  "zebra scheme remember grape panther utility mobile ostrich luxury oven matrix waste chase please way belt quit jealous small hair world end casual wagon";
+export const seedPhrasePreprod ="zebra scheme remember grape panther utility mobile ostrich luxury oven matrix waste chase please way belt quit jealous small hair world end casual wagon";
 // wali  dev address
 const bankWalletAddress =
   "addr_test1qz9kafjtlqtnn7qpjuyqyen7c46wtnlsstzqtuykxuwkrsaa5kc6s4rgd82vj2val5yq2vchymdm24xakdd3w3wqsvws2hhemc";
