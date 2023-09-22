@@ -17,13 +17,20 @@ import { INSTANCE } from "../../config/axiosInstance";
 import { setStep } from "../../redux/listing/ListingActions";
 import { useDispatch, useSelector } from "react-redux";
 import { useLovelace, useWallet } from "@meshsdk/react";
-import { Lucid, fromText, Blockfrost } from "lucid-cardano";
+import {
+  Lucid,
+  fromText,
+  Blockfrost,
+  applyParamsToScript,
+  Data,
+} from "lucid-cardano";
 import { getObjData } from "../../helper/localStorage";
 import { transactionErrorHanlder } from "../../helper/transactionError";
 import { seedPhraseMainnet } from "../../config/utils";
 import { seedPhrasePreprod } from "../../config/utils";
 import { getClientIp } from "../../helper/clientIP";
 import { network_name, network_url, network_key } from "../../base_network";
+import { cborHex } from "../../config";
 const ListCollectionStep2 = () => {
   const lovelace = useLovelace();
 
@@ -390,7 +397,9 @@ const ListCollectionStep2 = () => {
   const mintCollection = async (metadataObjects) => {
     const listing_previous = getObjData("listing");
     console.log(listing_previous);
-    let banner_image=undefined, feature_image=undefined, logo_image=undefined;
+    let banner_image = undefined,
+      feature_image = undefined,
+      logo_image = undefined;
     if (
       listing_previous &&
       listing_previous.banner_image &&
@@ -442,101 +451,119 @@ const ListCollectionStep2 = () => {
           const api = await window.cardano[String(connectedWallet)].enable();
           lucid.selectWallet(api);
 
-          const { paymentCredential } = lucid.utils.getAddressDetails(
-            await lucid.wallet.address()
-          );
+          // const { paymentCredential } = lucid.utils.getAddressDetails(
+          //   await lucid.wallet.address()
+          // );
 
-          const mintingPolicy = lucid.utils.nativeScriptFromJson({
-            type: "all",
-            scripts: [
-              { type: "sig", keyHash: paymentCredential?.hash },
-              {
-                type: "before",
-                slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
-              },
-            ],
-          });
+          // const mintingPolicy = lucid.utils.nativeScriptFromJson({
+          //   type: "all",
+          //   scripts: [
+          //     { type: "sig", keyHash: paymentCredential?.hash },
+          //     {
+          //       type: "before",
+          //       slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
+          //     },
+          //   ],
+          // });
 
-          const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
-          let obj,
-            assetObj = {},
-            metadataX = {};
+          // const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
+          const addr = await lucid.wallet.address();
+          const utxos = await lucid.utxosAt(addr);
+          const utxo = utxos[0]; // assign utxo having x amount
+          const tn = fromText("nft");
+          const image = fromText("nft");
 
-          // console.log(metadataObjects, "metadasd");
+          let policyId = "";
+          const nftPolicy = {
+            type: "PlutusV2",
+            script: applyParamsToScript(cborHex, [
+              utxo.txHash,
+              BigInt(utxo.outputIndex),
+              tn,
+              image,
+            ]),
+          };
 
-          let arr = [];
+          policyId = lucid.utils.mintingPolicyToId(nftPolicy);
+          let obj;
+          let assetObj = {};
+          let units = [];
+          let metadataX = {};
           let prices = [];
-          let lovelace = [];
+          let unit = "";
+          console.log(policyId, "policyId");
+          console.log(obj, "obj");
+          console.log({ units }, "uits");
+          console.log({ metadataX }, "metadataX");
+          console.log({ prices }, "prices");
 
           for (let index = 0; index < metadataObjects.length; index++) {
-            let element = metadataObjects[index];
+            const element = metadataObjects[index];
             if (banner_image && feature_image && logo_image) {
               element.banner_image = banner_image;
               element.feature_image = feature_image;
               element.logo_image = logo_image;
             }
-
-            // element = { ...element, prev };
-            metadataX[element.name] = element;
-            // console.log(metadataX, 'dsadasd')
-            assetObj[String(policyId + fromText(element.name))] = 1n;
+            // assetObj[String(policyId + fromText(element.name))] = 1n;
+            // obj = { [policyId]: metadataX };
+            let metadata = element;
+            metadataX[metadata.name] = metadata;
+            assetObj[policyId + fromText(metadata.name)] = 1n;
             obj = { [policyId]: metadataX };
             prices.push(element.price);
-            lovelace.push(element.price * 10000000);
-            // prices.push(element.price * 10000000);
+            // lovelace.push(element.price * 10000000);
             delete element["price"];
-            // element["unit"] = String(policyId + fromText(element.name))
-            // arr.push(element)
           }
-          // console.log(assetObj, 'onjf')
-          // debugger
-          console.log("with features , ", obj);
+
           const txL = await lucid
             .newTx()
-            .validTo(Date.now() + 100000)
-            .attachMintingPolicy(mintingPolicy)
-            .mintAssets(assetObj)
-            .payToAddress(await transferLucid.wallet.address(), assetObj)
+            .mintAssets(assetObj, Data.void())
+            .attachMintingPolicy(nftPolicy)
             .attachMetadata("721", obj)
+            // .payToAddress(addr, assetObj)
+            .payToAddress(await transferLucid.wallet.address(), assetObj)
+            .collectFrom([utxo])
             .complete();
-
           const signedTxL = await txL.sign().complete();
           const txHashL = await signedTxL.submit();
+          let arr=[]
           if (txHashL) {
-            const user_id = window.localStorage.getItem("user_id");
-            for (let index = 0; index < metadataObjects.length; index++) {
-              const element = metadataObjects[index];
-              element["unit"] = String(policyId + fromText(element.name));
-              element["price"] = Number(prices[index]);
+            // const user_id = window.localStorage.getItem("user_id");
+            // for (let index = 0; index < metadataObjects.length; index++) {
+            //   const element = metadataObjects[index];
+            //   element["unit"] = String(policyId + fromText(element.name));
+            //   element["price"] = Number(prices[index]);
 
-              arr.push(element);
-            }
-            // debugger
-            const data = {
-              metadata: arr,
-              prices,
-              user_id: user_id,
-              recipient_address: await lucid.wallet.address(),
-              policy_id: policyId,
-              type: "collection",
-              minting_policy: JSON.stringify(mintingPolicy),
-              // asset_hex_name: unit,
-            };
-            const res = await INSTANCE.post("/collection/create", data);
-            if (res) {
+            //   arr.push(element);
+            // }
+            // // debugger
+            // const data = {
+            //   metadata: arr,
+            //   prices,
+            //   user_id: user_id,
+            //   recipient_address: await lucid.wallet.address(),
+            //   policy_id: policyId,
+            //   type: "collection",
+            //   minting_policy: JSON.stringify(nftPolicy),
+            //   // asset_hex_name: unit,
+            // };
+            // const res = await INSTANCE.post("/collection/create", data);
+            // // if (res) {
               window.localStorage.setItem(
                 "listing",
                 JSON.stringify({ ...listing_previous, ...res?.data.data })
               );
-              dispatch(setStep("step2"));
-              router.push({
-                pathname: "/sell",
-                query: {
-                  type: "add-listing",
-                },
-              });
-            }
+
+              // dispatch(setStep("step2"));
+              // router.push({
+              //   pathname: "/sell",
+              //   query: {
+              //     type: "add-listing",
+              //   },
+              // });
+            // }
           }
+          
         }
       } else {
         Toast("error", "You are Not Connected");
