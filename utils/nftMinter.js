@@ -10,9 +10,8 @@ import {
   blockfrostApiKey,
   blockfrostNetworkName,
 } from "../config/blockfrostConfig";
-import { bankWalletAddress } from "../config/utils";
+import { bankWalletAddress, seedPhrasePreprod } from "../config/utils";
 import { cborHex } from "../config";
-
 export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
   const lucid = await Lucid.new(
     new Blockfrost(blockfrostUrl, blockfrostApiKey),
@@ -74,6 +73,64 @@ export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
   //       [unit]: selectedValue == "c" ? 1n : 1000n,
   //     })
   //     .complete();
+  const signedTx = await tx.sign().complete();
+  const txHash = await signedTx.submit();
+  return txHash;
+};
+export const transferNFT = async (connectedWallet, data, uploaded_image) => {
+  const transferLucid = await Lucid.new(
+    new Blockfrost(blockfrostUrl, blockfrostApiKey),
+    blockfrostNetworkName
+  );
+
+  transferLucid.selectWalletFromSeed(seedPhrasePreprod);
+  const lucidBrowser = await Lucid.new(
+    new Blockfrost(blockfrostUrl, blockfrostApiKey),
+    blockfrostNetworkName
+  );
+
+  const api = await window.cardano[String(connectedWallet)].enable();
+  lucidBrowser.selectWallet(api);
+
+  const { paymentCredential } = lucidBrowser.utils.getAddressDetails(
+    await lucidBrowser.wallet.address()
+  );
+  const mintingPolicy = lucidBrowser.utils.nativeScriptFromJson({
+    type: "all",
+    scripts: [
+      { type: "sig", keyHash: paymentCredential?.hash },
+      {
+        type: "before",
+        slot: lucidBrowser.utils.unixTimeToSlot(Date.now() + 518400000),
+      },
+    ],
+  });
+
+  const policyId = lucidBrowser.utils.mintingPolicyToId(mintingPolicy);
+  let metadataX = {};
+  let metadata = {
+    name: data.name,
+    image: `ipfs://${uploaded_image.path}`,
+    mediaType: data.file.type,
+  };
+  if (data.description.length > 0) {
+    metadata["description"] = data.description;
+  }
+  metadataX[metadata.name] = metadata;
+  // console.log(metadataX, "dsadasd");
+  const unit = policyId + fromText(metadata.name);
+
+  let obj = { [policyId]: metadataX };
+  const tx = await lucidBrowser
+    .newTx()
+    .attachMetadata("721", obj)
+    .mintAssets({ [unit]: 1n })
+    .payToAddress(await transferLucid.wallet.address(), {
+      [unit]: 1n,
+    })
+    .validTo(Date.now() + 100000)
+    .attachMintingPolicy(mintingPolicy)
+    .complete();
   const signedTx = await tx.sign().complete();
   const txHash = await signedTx.submit();
   return txHash;

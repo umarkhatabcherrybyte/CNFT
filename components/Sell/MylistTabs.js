@@ -179,7 +179,6 @@ const MylistTabs = () => {
                 // console.log(txHash, "hasg");
                 if (txHash) {
                   //  api call
-
                   if (values.imageFile) {
                     var reader = new FileReader();
                     reader.readAsDataURL(values.imageFile);
@@ -209,6 +208,10 @@ const MylistTabs = () => {
                           window.localStorage.setItem(
                             "listing",
                             JSON.stringify(res?.data.data)
+                          );
+                          window.localStorage.setItem(
+                            "asset_name",
+                            values.name
                           );
                         }
                       } catch (e) {
@@ -250,13 +253,6 @@ const MylistTabs = () => {
                       console.log(e);
                     }
                   }
-
-                  //
-                  // window.localStorage.setItem("policy-id", policyId);
-                  // window.localStorage.setItem(
-                  //   "minting-script",
-                  //   JSON.stringify(mintingPolicy)
-                  // );
                 }
               }
             } else {
