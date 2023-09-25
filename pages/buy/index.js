@@ -304,9 +304,9 @@ const Buy = () => {
                       <div>
                         {utxo.detail.onchain_metadata.description && (
                           <div className="text-gray-500">
-                            {mapDescription(
+                            {
                               utxo.detail.onchain_metadata.description
-                            )}
+                            }
                           </div>
                         )}
                         {utxo.detail.onchain_metadata.copyright && (
