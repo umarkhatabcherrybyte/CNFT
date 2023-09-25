@@ -38,6 +38,8 @@ const Mynft = ({ card }) => {
     // "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj" //this was the mainnet key
     network_key // I added the key declared globally but importing in this file
   );
+  console.log(metadata, "metadatametadata");
+
   React.useEffect(() => {
     getMetaData();
   }, []);
@@ -77,8 +79,9 @@ const Mynft = ({ card }) => {
         image_file: ``,
       };
       window.localStorage.setItem("listing", JSON.stringify(data));
+      window.localStorage.setItem("asset_name", card.assetName);
       setIsLoading(false);
-      dispatch(setStep("step2"));
+      // dispatch(setStep("step2"));
     }
     // setIsLoading(true);
     // console.log(
