@@ -35,11 +35,22 @@ export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
     ]),
   };
   policyId = lucid.utils.mintingPolicyToId(nftPolicy);
+  console.log(policyId, "policyId");
   let metadataX = {};
   let metadata = JSON.parse(window.localStorage.getItem("metadata"));
+  // let metadata = {
+  //   image: `ipfs://Qmc26if7L5k1Qy5bzGdNtuPBoTDJw3bDQbFuVqbuZ8ofqG`,
+  //   mediaType: "image/jpg",
+  //   description: "f",
+  //   name: "dfsdf",
+  //   description: "vsfsf",
+  //   creator: "fvfg",
+  //   link: "",
+  // };
   metadataX[metadata.name] = metadata;
   const unit = policyId + fromText(metadata.name);
   let obj = { [policyId]: metadataX };
+  console.log(obj, "obj");
   let tx;
   if (selectedValue == "b") {
     tx = await lucid

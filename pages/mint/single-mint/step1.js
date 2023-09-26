@@ -45,7 +45,12 @@ const SingleMint = () => {
   const onFeatureImageSelect = ({ currentTarget: input }) => {
     if (input.files && input.files[0]) {
       const files = input.files[0];
-      setFeatureImage(files);
+      const name = files?.name.toLowerCase();
+      if (name.match(/\.(jpg|jpeg|png|gif)$/)) {
+        setFeatureImage(files);
+      } else {
+        Toast("error", "Please select image file");
+      }
     }
   };
 
@@ -85,6 +90,7 @@ const SingleMint = () => {
           if (!featureImage) {
             console.log("feature image ni ha ");
             Toast("error", "Please Select a featured image and try again.");
+            setIsUploading(false);
             return;
           } else {
             // console.log(featureImage, "featureImage");
@@ -95,11 +101,11 @@ const SingleMint = () => {
             // ]);
             const uploadedMintFile = await client.add(mintFile);
             const uploadedFeatureFile = await client.add(featureImage);
-            console.log(uploadedFeatureFile, "uploadedFeatureFile");
-            console.log(uploadedMintFile, "uploadedMintFile");
             if (uploadedFeatureFile && uploadedMintFile) {
+              // mint asset
               window.localStorage.setItem("img", uploadedMintFile.path);
               window.localStorage.setItem("file_mimeType", mintFile.type);
+              // feature image
               window.localStorage.setItem(
                 "featured_img",
                 uploadedFeatureFile.path

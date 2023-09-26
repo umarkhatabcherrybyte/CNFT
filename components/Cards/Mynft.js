@@ -256,7 +256,7 @@ const Mynft = ({ card }) => {
                 className="bold"
                 sx={{ textTransform: "uppercase" }}
               >
-                {metadata?.policyId}
+                {metadata?.name}
               </Typography>
 
               {/* <Typography
