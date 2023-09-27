@@ -159,7 +159,7 @@ const MylistTabs = () => {
                   metadata["description"] = values.description;
                 }
                 metadataX[metadata.name] = metadata;
-                // console.log(metadataX, "dsadasd");
+                console.log(metadataX, "dsadasd");
                 const unit = policyId + fromText(metadata.name);
 
                 let obj = { [policyId]: metadataX };

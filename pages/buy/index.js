@@ -28,6 +28,7 @@ import {
   StakeCredential,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 import { market } from "../../config";
+import ShowNFT from "./ShowNFT";
 
 const Buy = () => {
   const { wallet, connected, name, connecting, connect, disconnect, error } =
@@ -51,6 +52,9 @@ const Buy = () => {
   const [hasIndexDb, setHasIndexDb] = useState(false);
   const [buy, setBuy] = useState([]);
   const [nfts, setNfts] = useState([]);
+  const [uniquePolicies, setUniquePolicies] = useState([]);
+  const [uniquePolicyGroups, setUniquePolicyGroups] = useState([]);
+
   const [filter, setFilter] = useState({
     price_range: {
       min: "0",
@@ -170,15 +174,17 @@ const Buy = () => {
         const policyGroups = {};
 
         // Categorize the data into policy groups
+        let unique_policies = [];
         validUtxos.forEach((item) => {
           const policy = item.policy;
           if (!policyGroups[policy]) {
             policyGroups[policy] = [];
-            
+            unique_policies.push(policy);
           }
           policyGroups[policy].push(item);
         });
-
+        setUniquePolicies(unique_policies);
+        setUniquePolicyGroups(policyGroups);
         // Convert the policyGroups object into an array of arrays
         // console.log(
         //   "policy groupds are ",
@@ -187,7 +193,6 @@ const Buy = () => {
         //   Object.values(policyGroups)
         // );
 
-        
         setNfts(Object.values(policyGroups));
         setUtxos(validUtxos);
         if (validUtxos.length > 0) {
@@ -266,20 +271,7 @@ const Buy = () => {
 
     // walletAction.enable = true;
   };
-// let individualNFTs=[]
-// let CollectionNFTs=[]
 
-//   nfts.map(item=>{
-//   nfts.map((item,index)=>{
-//     console.log({item});
-//     item.length==1 ? 
-//     individualNFTs.push(item[0])
-//   :
-//   CollectionNFTs.concat(item)
-//   })
-// })
-
-// console.log({individualNFTs,CollectionNFTs});
   return (
     <BuyStyled>
       {isLoading && <FullScreenLoader />}
@@ -354,6 +346,7 @@ const Buy = () => {
               <TabPanel value="collection">
                 <BuyCards buy={buy} nfts={nfts[1]} />
               </TabPanel>
+              {""}
             </>
           )}
 
@@ -362,7 +355,7 @@ const Buy = () => {
           </TabPanel> */}
         </TabContext>
 
-        <div className="ml-2">
+        {/* <div className="ml-2">
           {utxos.length === 0 ? (
             <div className="text-gray-400 font-semibold text-center my-5">
               {message}
@@ -430,44 +423,45 @@ const Buy = () => {
               </div>
             ))
           )}
-        </div>
+        </div> */}
 
         <div>
           <div>
-            <h2>Items with the Same Policy:</h2>
-            {nfts.map((item, index) => {
-              item.length > 1 ? (
-                <div key={item[0].assetName + "index"}>
-                  <p>{item[0].assetName}</p>
-                </div>
-              ) : (
-                <></>
-              );
+            <h1 style={{ fontSize: "24px" }}>Collections</h1>
+
+            {uniquePolicies.map((policy) => {
+              if (uniquePolicyGroups[policy].length > 1) {
+                console.log("same policy nfts ", uniquePolicyGroups[policy]);
+                return (
+                  <div>
+                    <h3 style={{ color: "white" }}>Policy : {policy}</h3>{" "}
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      {uniquePolicyGroups[policy].map((_nft) => {
+                        return <ShowNFT nft={_nft} />;
+                      })}
+                    </div>
+                    <hr />
+                  </div>
+                );
+              }
             })}
-            {/* {nfts.length != 0 &&
-              nfts.map((item) => (
-                <div key={item.id}>
-                  <p>{item.assetName}</p>
-                </div>
-              ))} */}
           </div>
           <div>
-            <h2>Items with Different Policies:</h2>
-            {nfts.map((item, index) => {
-              item.length == 1 ? (
-                <div key={item[0].assetName + "index"}>
-                  <p>{item[0].assetName}</p>
-                </div>
-              ) : (
-                <></>
-              );
-            })}
-            {/* {nftcollection.map((item) => (
-              <div key={item.id}>
-                <p>{item.assetName}</p>
-              </div>
-
-            ))} */}
+            <h1 style={{ fontSize: "24px" }}>Individual NFTs</h1>
+            <div style={{ display: "flex" }}>
+              {uniquePolicies.map((policy) => {
+                if (uniquePolicyGroups[policy].length == 1) {
+                  console.log("same policy nfts ", uniquePolicyGroups[policy]);
+                  return (
+                    <div>
+                      {uniquePolicyGroups[policy].map((_nft) => {
+                        return <ShowNFT nft={_nft} />;
+                      })}
+                    </div>
+                  );
+                }
+              })}
+            </div>
           </div>
         </div>
       </ContainerLayout>
