@@ -65,7 +65,8 @@ const SaleMethod = () => {
   const [totalAmount, setTotalAmount] = useState("");
   const [isForm, setIsForm] = useState(false);
   const [asset, setAsset] = useState([]);
-
+  const asset_name = localStorage.getItem("asset_name");
+  console.log(asset_name, "asset_nameasset_nameasset_nameasset_name");
   // console.log(asset, "assetassetassetassetasset");
   // console.log(toalAmount);
   const onPaymentChange = (event, newValue) => {
@@ -196,7 +197,7 @@ const SaleMethod = () => {
   useEffect(async () => {
     setIsLoading(true);
     const response = await getAssetDetail(listing_data?.policy_id);
-    console.log(response, "datadatadatadata");   
+    console.log(response, "datadatadatadata");
     setAsset(response?.data);
     setIsLoading(false);
   }, []);
@@ -346,6 +347,11 @@ const SaleMethod = () => {
               <AssetInputField
                 placeholder={`Enter Asset Name`}
                 name="asset_name"
+                value={asset_name && asset_name}
+              />
+              {/* <AssetInputField
+                placeholder={`Enter Asset Name`}
+                name="asset_name"
                 value={
                   listing_data.type === "collection"
                     ? listing_data.name
@@ -354,7 +360,7 @@ const SaleMethod = () => {
                     ? listing_data?.metadata[0]?.name
                     : ""
                 }
-              />
+              /> */}
               {/* <AssetInputField
                 placeholder={`Enter ${
                   listing_data.type === "collection"
