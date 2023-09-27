@@ -407,6 +407,7 @@ const ListCollectionStep2 = () => {
     const blockfrostProvider = new BlockfrostProvider(network_key);
     let selectedNFTs = [];
     let latestAssets = null;
+    /** Wait until the latest transaction is mined and we obtain the assets by latest policy id */
     while (!latestAssets || latestAssets.assets.length == 0) {
       console.log("fetching assets...");
       try {
@@ -417,6 +418,7 @@ const ListCollectionStep2 = () => {
       } catch (e) {}
 
       await delay(5000);
+      // Insert some notifier here
     }
     latestAssets = latestAssets.assets;
     console.log(latestAssets, "latest assets");
@@ -499,6 +501,8 @@ const ListCollectionStep2 = () => {
     console.log(body, "body");
 
     let res_ = await callKuberAndSubmit(providerInstance, JSON.stringify(body));
+    await delay(15000); // 15 seconds delay
+    // insert some notifier here 
     console.log(res_);
   };
 
