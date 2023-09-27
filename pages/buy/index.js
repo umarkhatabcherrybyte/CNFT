@@ -341,10 +341,33 @@ const Buy = () => {
           {message != "Loading" && (
             <>
               <TabPanel value="single">
-                <BuyCards buy={buy} nfts={nfts[0]} />
+              {uniquePolicies.map((policy) => {
+                  if (uniquePolicyGroups[policy].length == 1) {
+                    console.log(
+                      "same policy nfts ",
+                      uniquePolicyGroups[policy]
+                    );
+                    return (
+                      <BuyCards
+                        type={1}
+                        buy={buy}
+                        nfts={uniquePolicyGroups[policy]}
+                      />
+                    );
+                  }
+                })}
+
+                {/* <BuyCards buy={buy} nfts={nfts[0]} /> */}
               </TabPanel>
               <TabPanel value="collection">
-                <BuyCards buy={buy} nfts={nfts[1]} />
+             
+                  <BuyCards
+                  uniquePolicies={uniquePolicies}
+                  type={0}
+                  buy={buy}
+                  policyNFTs={uniquePolicyGroups}
+                />
+                {/* <BuyCards buy={buy} nfts={nfts[1]} /> */}
               </TabPanel>
               {""}
             </>
@@ -425,7 +448,7 @@ const Buy = () => {
           )}
         </div> */}
 
-        <div>
+        {/* <div>
           <div>
             <h1 style={{ fontSize: "24px" }}>Collections</h1>
 
@@ -463,7 +486,7 @@ const Buy = () => {
               })}
             </div>
           </div>
-        </div>
+        </div> */}
       </ContainerLayout>
     </BuyStyled>
   );

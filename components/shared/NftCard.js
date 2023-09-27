@@ -63,7 +63,12 @@ const NftCard = ({ card }) => {
             //     : `https://ipfs.io/ipfs/${asset_detail?.ipfs}`
             // }`}
 
-            image={`${card.detail._imageUrl}`}
+            image={`${
+              card.detail.onchain_metadata.feature_image
+                ? `https://ipfs.io/ipfs/` +
+                  card.detail.onchain_metadata.feature_image
+                : card.detail._imageUrl
+            }`}
             alt="green iguana"
           />
           {/* <Box

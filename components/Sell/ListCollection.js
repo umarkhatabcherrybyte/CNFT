@@ -101,8 +101,12 @@ const ListCollection = () => {
       description: "",
     },
     validationSchema: addCollectioneListingSchema,
-    onSubmit: (values) => {
+    onSubmit: async(values) => {
       console.log(values);
+      let file1DataURL_ipfs=await handleFileUpload(values.banner_image)
+      let file2DataURL_ipfs=await handleFileUpload(values.feature_image)
+      let file3DataURL_ipfs=await handleFileUpload(values.logo_image)
+
       // dispatch(setListing(values));
       // window.localStorage.setItem("listing", JSON.stringify(values));
 
@@ -126,15 +130,15 @@ const ListCollection = () => {
             const file3DataURL = reader.result;
 
             // Create a new object with the form data and file data URLs
-            let file1DataURL_ipfs=await handleFileUpload(file1DataURL)
-            let file2DataURL_ipfs=await handleFileUpload(file2DataURL)
-            let file3DataURL_ipfs=await handleFileUpload(file3DataURL)
+            // let file1DataURL_ipfs=await handleFileUpload(file1DataURL)
+            // let file2DataURL_ipfs=await handleFileUpload(file2DataURL)
+            // let file3DataURL_ipfs=await handleFileUpload(file3DataURL)
             console.log("uploadeded to ipfs ",{file1DataURL_ipfs,file2DataURL_ipfs,file3DataURL_ipfs});
             const dataWithFiles = {
               ...values,
-              logo_image: file1DataURL_ipfs,
+              logo_image: file3DataURL_ipfs,
               feature_image: file2DataURL_ipfs,
-              banner_image: file3DataURL_ipfs,
+              banner_image: file1DataURL_ipfs,
             };
 
             // Store the object in local storage
