@@ -498,7 +498,8 @@ const ListCollectionStep2 = () => {
     console.log("Selling NFTs ");
     console.log(body, "body");
 
-    await callKuberAndSubmit(providerInstance, JSON.stringify(body));
+    let res_ = await callKuberAndSubmit(providerInstance, JSON.stringify(body));
+    console.log(res_);
   };
 
   const mintCollection = async (metadataObjects) => {
@@ -619,12 +620,14 @@ const ListCollectionStep2 = () => {
              * artist,assetName,fingerprint ,image,isSelling,name,policyId,price,quantity:"1",unit
 
              */
-            const element = metadataObjects[index];
+            let element = metadataObjects[index];
+            console.log("metadata ",element);
             if (banner_image && feature_image && logo_image) {
               element.banner_image = banner_image;
               element.feature_image = feature_image;
               element.logo_image = logo_image;
             }
+            element.price=parseInt(element.price)*1000000
             // assetObj[String(policyId + fromText(element.name))] = 1n;
             // obj = { [policyId]: metadataX };
             let metadata = element;
@@ -634,7 +637,7 @@ const ListCollectionStep2 = () => {
             prices.push(element.price);
             // lovelace.push(element.price * 10000000);
             selectedNFTs.push(metadata.name);
-            delete element["price"];
+            // delete element["price"];
           }
           console.log("selectedNFTsNames are ", selectedNFTs);
 
