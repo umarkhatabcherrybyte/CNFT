@@ -21,8 +21,28 @@ import {
   renderLovelace,
 } from "../../scripts/wallet";
 import { Buffer } from "buffer";
+import { useWallet } from "@meshsdk/react";
+import {
+  BaseAddress,
+  Ed25519KeyHash,
+  StakeCredential,
+} from "@emurgo/cardano-serialization-lib-asmjs";
+import { market } from "../../config";
 
 const Buy = () => {
+  const { wallet, connected, name, connecting, connect, disconnect, error } =
+    useWallet();
+
+  console.log("wallet things ", {
+    wallet,
+    connected,
+    name,
+    // assets,_utxos,
+    connecting,
+    connect,
+    disconnect,
+    error,
+  });
   const router = useRouter();
   const [tabValue, setTabValue] = useState("single");
   const [isLoading, setIsLoading] = useState(true);
@@ -104,7 +124,7 @@ const Buy = () => {
             const v = await database.getUtxo(readHandle, utxo.id);
             return v;
           } catch (e) {
-            console.log("Error returned from db", e);
+            console.log("Error in UTXO ", e);
 
             const dataResponse = await getDatum(utxo.data_hash);
             utxo.datum = dataResponse.json_value;
@@ -154,11 +174,20 @@ const Buy = () => {
           const policy = item.policy;
           if (!policyGroups[policy]) {
             policyGroups[policy] = [];
+            
           }
           policyGroups[policy].push(item);
         });
 
         // Convert the policyGroups object into an array of arrays
+        // console.log(
+        //   "policy groupds are ",
+        //   policyGroups,
+        //   " in arrray form ",
+        //   Object.values(policyGroups)
+        // );
+
+        
         setNfts(Object.values(policyGroups));
         setUtxos(validUtxos);
         if (validUtxos.length > 0) {
@@ -178,6 +207,79 @@ const Buy = () => {
 
     fetchData();
   }, []);
+  async function buyUTXO(_utxo) {
+    if (!connected) {
+      alert("Please connect the wallet first !");
+      return 0;
+    }
+    alert("buying utxo!");
+    buy_utxo(_utxo);
+  }
+
+  const buy_utxo = async (utxo) => {
+    const datum = utxo.detail.datum;
+    const cost = datum.fields[1].int;
+    const sellerPubKeyHashHex = datum.fields[0].fields[0].fields[0].bytes;
+    const sellerStakeKeyHashHex =
+      datum.fields[0].fields[1].fields[0].fields[0].fields[0].bytes;
+    const vkey = StakeCredential.from_keyhash(
+      Ed25519KeyHash.from_bytes(Buffer.from(sellerPubKeyHashHex, "hex"))
+    );
+    const stakeKey = StakeCredential.from_keyhash(
+      Ed25519KeyHash.from_bytes(Buffer.from(sellerStakeKeyHashHex, "hex"))
+    );
+    const sellerAddr = BaseAddress.new(0, vkey, stakeKey);
+    let utxos__ = await wallet.getUtxos();
+    console.log({ utxos__ });
+    // Create constraints for buying
+    // walletAction.callback
+    // const by2 = async (provider) => {
+
+    const request = {
+      selections: utxos__,
+      inputs: [
+        {
+          address: market.address,
+          utxo: {
+            hash: utxo.tx_hash,
+            index: utxo.tx_index,
+          },
+          script: market.script,
+          redeemer: { fields: [], constructor: 0 },
+        },
+      ],
+      outputs: [
+        {
+          address: sellerAddr
+            .to_address()
+            .to_bech32(
+              market.address.startsWith("addr_test") ? "addr_test" : "addr"
+            ),
+          value: cost,
+          insuffientUtxoAda: "increase",
+        },
+      ],
+    };
+
+    return callKuberAndSubmit(wallet, JSON.stringify(request));
+    // };
+
+    // walletAction.enable = true;
+  };
+// let individualNFTs=[]
+// let CollectionNFTs=[]
+
+//   nfts.map(item=>{
+//   nfts.map((item,index)=>{
+//     console.log({item});
+//     item.length==1 ? 
+//     individualNFTs.push(item[0])
+//   :
+//   CollectionNFTs.concat(item)
+//   })
+// })
+
+// console.log({individualNFTs,CollectionNFTs});
   return (
     <BuyStyled>
       {isLoading && <FullScreenLoader />}
@@ -304,9 +406,7 @@ const Buy = () => {
                       <div>
                         {utxo.detail.onchain_metadata.description && (
                           <div className="text-gray-500">
-                            {
-                              utxo.detail.onchain_metadata.description
-                            }
+                            {utxo.detail.onchain_metadata.description}
                           </div>
                         )}
                         {utxo.detail.onchain_metadata.copyright && (
@@ -319,7 +419,7 @@ const Buy = () => {
                   </div>
                   <div>
                     <button
-                      onClick={() => buy(utxo)}
+                      onClick={() => buyUTXO(utxo)}
                       className="bg-transparent hover:bg-blue-300 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-blue-200 rounded"
                     >
                       {renderLovelace(utxo.detail?.datum?.fields[1]?.int)} Ada
@@ -335,6 +435,15 @@ const Buy = () => {
         <div>
           <div>
             <h2>Items with the Same Policy:</h2>
+            {nfts.map((item, index) => {
+              item.length > 1 ? (
+                <div key={item[0].assetName + "index"}>
+                  <p>{item[0].assetName}</p>
+                </div>
+              ) : (
+                <></>
+              );
+            })}
             {/* {nfts.length != 0 &&
               nfts.map((item) => (
                 <div key={item.id}>
@@ -344,10 +453,20 @@ const Buy = () => {
           </div>
           <div>
             <h2>Items with Different Policies:</h2>
+            {nfts.map((item, index) => {
+              item.length == 1 ? (
+                <div key={item[0].assetName + "index"}>
+                  <p>{item[0].assetName}</p>
+                </div>
+              ) : (
+                <></>
+              );
+            })}
             {/* {nftcollection.map((item) => (
               <div key={item.id}>
                 <p>{item.assetName}</p>
               </div>
+
             ))} */}
           </div>
         </div>

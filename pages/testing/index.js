@@ -40,6 +40,7 @@ const Testing = () => {
 
       const data = await Promise.all(assetMetadataPromises);
       // You can now use the data array containing all the resolved results.
+      console.log("assets are ",data);
       setNfts(data); // Update the state with the final array
     }
   };

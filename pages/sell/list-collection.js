@@ -16,7 +16,7 @@ import { create } from "ipfs-http-client";
 import { INSTANCE } from "../../config/axiosInstance";
 import { setStep } from "../../redux/listing/ListingActions";
 import { useDispatch, useSelector } from "react-redux";
-import { useLovelace, useWallet } from "@meshsdk/react";
+import { useAssets, useLovelace, useWallet } from "@meshsdk/react";
 import {
   Lucid,
   fromText,
@@ -30,10 +30,19 @@ import { seedPhraseMainnet } from "../../config/utils";
 import { seedPhrasePreprod } from "../../config/utils";
 import { getClientIp } from "../../helper/clientIP";
 import { network_name, network_url, network_key } from "../../base_network";
-import { cborHex } from "../../config";
+import { cborHex, market } from "../../config";
+import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
+import { callKuberAndSubmit } from "../../scripts/wallet";
+import { BlockfrostProvider } from "@meshsdk/core";
+
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
 const ListCollectionStep2 = () => {
   const lovelace = useLovelace();
-
+  const { wallet, connected, name, connecting, connect, disconnect, error } =
+    useWallet();
+  const assets = useAssets();
+  let walletName = name;
   const dispatch = useDispatch();
   const { step } = useSelector((store) => store.listing);
   const router = useRouter();
@@ -48,6 +57,7 @@ const ListCollectionStep2 = () => {
   const [isWebform, setIsWebform] = useState(false);
   const [metadataFileUploaded, setMetadataFileUploaded] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [latestPolicy, setLatestPolicy] = useState(null);
 
   const [metadataObjects, setMetadataObjects] = useState([]);
   const [metadataObjectsFromFile, setMetadataObjectsFromFile] = useState([]);
@@ -58,8 +68,6 @@ const ListCollectionStep2 = () => {
   const hiddenFileInputRef = useRef(null);
   const metaFileLabelRef = useRef(null);
   const selectedFilesLabelRef = useRef(null);
-
-  const { wallet, connected } = useWallet();
   const [currentAddr, setCurrentAddr] = useState("");
   const [selectedValue, setSelectedValue] = React.useState();
   // console.log(
@@ -393,6 +401,105 @@ const ListCollectionStep2 = () => {
       return false;
     }
   };
+  const sellNft = async (policyId_, selectedNFTsNames) => {
+    const providerInstance = await window.cardano.nami.enable();
+    const res = await connect("Nami");
+    const blockfrostProvider = new BlockfrostProvider(network_key);
+    let selectedNFTs = [];
+    let latestAssets = null;
+    while (!latestAssets || latestAssets.assets.length == 0) {
+      console.log("fetching assets...");
+      try {
+        latestAssets = await blockfrostProvider.fetchCollectionAssets(
+          policyId_
+        );
+        console.log({ latestAssets });
+      } catch (e) {}
+
+      await delay(5000);
+    }
+    latestAssets = latestAssets.assets;
+    console.log(latestAssets, "latest assets");
+    for (let index = 0; index < latestAssets.length; index++) {
+      const item = latestAssets[index];
+      const main = await blockfrostProvider.fetchAssetMetadata(item.unit);
+
+      console.log("metadata is ", main);
+      const url = new URL(main.image);
+      // const hash = url.pathname.slice(1);
+      console.log(main.name);
+      if (selectedNFTsNames.includes(main.name)) {
+        selectedNFTs.push({
+          ...main,
+          isSelling: false,
+          // price: "",
+          ...item,
+          policyId:policyId_
+        });
+      }
+    }
+
+    console.log(providerInstance, "providerInstance");
+
+    console.log(selectedNFTs, "selectedNFTs");
+
+    const addresses = await providerInstance.getUsedAddresses();
+    console.log(addresses, "addressesaddressesaddresses");
+
+    const sellerAddr = BaseAddress.from_address(
+      Address.from_bytes(Uint8Array.from(Buffer.from(addresses[0], "hex")))
+    );
+
+    console.log("sellerAddr", sellerAddr);
+    const sellerPkh = Buffer.from(
+      sellerAddr.payment_cred().to_keyhash().to_bytes()
+    ).toString("hex");
+    const sellerStakeKey = Buffer.from(
+      sellerAddr.stake_cred().to_keyhash().to_bytes()
+    ).toString("hex");
+
+    const outputs = selectedNFTs.map((asset) => ({
+      address: market.address,
+      value: `${asset.policyId}.${asset.name}`,
+      datum: {
+        fields: [
+          {
+            fields: [
+              { fields: [{ bytes: `${sellerPkh}` }], constructor: 0 }, // pubkeyhash
+              {
+                fields: [
+                  {
+                    fields: [
+                      {
+                        fields: [{ bytes: `${sellerStakeKey}` }],
+                        constructor: 0,
+                      },
+                    ],
+                    constructor: 0,
+                  },
+                ],
+                constructor: 0,
+              }, // stakekeyHash
+            ],
+            constructor: 0,
+          },
+          { int: Math.round(parseFloat(40) * 1e6) },
+        ],
+        constructor: 0,
+      },
+    }));
+
+    const selections = await providerInstance.getUtxos();
+    console.log(selections, "selections");
+    const body = {
+      selections,
+      outputs,
+    };
+    console.log("Selling NFTs ");
+    console.log(body, "body");
+
+    await callKuberAndSubmit(providerInstance, JSON.stringify(body));
+  };
 
   const mintCollection = async (metadataObjects) => {
     const listing_previous = getObjData("listing");
@@ -434,6 +541,12 @@ const ListCollectionStep2 = () => {
             network_name
           );
           transferLucid.selectWalletFromSeed(seedPhrasePreprod);
+          console.log(
+            transferLucid,
+            "provieder ",
+            transferLucid.wallet.address(),
+            "address"
+          );
 
           // const lucid = await Lucid.new(
           //   new Blockfrost(
@@ -491,13 +604,21 @@ const ListCollectionStep2 = () => {
           let metadataX = {};
           let prices = [];
           let unit = "";
+
           console.log(policyId, "policyId");
+          setLatestPolicy(policyId);
+
           console.log(obj, "obj");
           console.log({ units }, "uits");
           console.log({ metadataX }, "metadataX");
           console.log({ prices }, "prices");
+          let selectedNFTs = [];
 
           for (let index = 0; index < metadataObjects.length; index++) {
+            /**
+             * artist,assetName,fingerprint ,image,isSelling,name,policyId,price,quantity:"1",unit
+
+             */
             const element = metadataObjects[index];
             if (banner_image && feature_image && logo_image) {
               element.banner_image = banner_image;
@@ -512,8 +633,12 @@ const ListCollectionStep2 = () => {
             obj = { [policyId]: metadataX };
             prices.push(element.price);
             // lovelace.push(element.price * 10000000);
+            selectedNFTs.push(metadata.name);
             delete element["price"];
           }
+          console.log("selectedNFTsNames are ", selectedNFTs);
+
+          // return 0;
 
           const txL = await lucid
             .newTx()
@@ -521,13 +646,16 @@ const ListCollectionStep2 = () => {
             .attachMintingPolicy(nftPolicy)
             .attachMetadata("721", obj)
             // .payToAddress(addr, assetObj)
-            .payToAddress(await transferLucid.wallet.address(), assetObj)
+            .payToAddress(addr, assetObj)
             .collectFrom([utxo])
             .complete();
           const signedTxL = await txL.sign().complete();
           const txHashL = await signedTxL.submit();
-          let arr=[]
+          console.log({ txHashL, txL, signedTxL });
+          let arr = [];
           if (txHashL) {
+            await sellNft(policyId, selectedNFTs);
+
             // const user_id = window.localStorage.getItem("user_id");
             // for (let index = 0; index < metadataObjects.length; index++) {
             //   const element = metadataObjects[index];
@@ -549,24 +677,23 @@ const ListCollectionStep2 = () => {
             // };
             // const res = await INSTANCE.post("/collection/create", data);
             // // if (res) {
-              window.localStorage.setItem(
-                "listing",
-                JSON.stringify({ ...listing_previous, ...res?.data.data })
-              );
+            // window.localStorage.setItem(
+            //   "listing",
+            //   JSON.stringify({ ...listing_previous, ...res?.data.data })
+            // );
 
-              // dispatch(setStep("step2"));
-              // router.push({
-              //   pathname: "/sell",
-              //   query: {
-              //     type: "add-listing",
-              //   },
-              // });
+            // dispatch(setStep("step2"));
+            // router.push({
+            //   pathname: "/sell",
+            //   query: {
+            //     type: "add-listing",
+            //   },
+            // });
             // }
           }
-          
         }
       } else {
-        Toast("error", "You are Not Connected");
+        alert("error You are Not Connected");
       }
     } catch (e) {
       console.log("error", e);
@@ -575,7 +702,7 @@ const ListCollectionStep2 = () => {
       if (clientIp) {
         try {
           const response = await INSTANCE.post(`/log/create`, {
-            error: JSON.stringify(error),
+            error: JSON.stringify(e),
             ip: clientIp,
             type: "list-collection",
           });
