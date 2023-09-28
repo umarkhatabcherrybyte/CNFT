@@ -1,11 +1,16 @@
-import { Lucid, fromText, Blockfrost } from "lucid-cardano";
+import {
+  Lucid,
+  fromText,
+  Blockfrost,
+  applyParamsToScript,
+} from "lucid-cardano";
 import {
   blockfrostUrl,
   blockfrostApiKey,
   blockfrostNetworkName,
 } from "../config/blockfrost";
 import { seedPhrase } from "../config/walletConstants";
-
+import { cborHex } from "../config/constants";
 // Initialize a Lucid instance
 export async function initializeLucid(fromSeed) {
   let lucid;
@@ -27,15 +32,19 @@ export async function initializeLucid(fromSeed) {
 export async function connectWallet(connectedWallet) {
   return await window.cardano[String(connectedWallet)].enable();
 }
-//  Function to get the address from a Lucid instance
 
 // Function to get UTXOs for a given address from a Lucid instance
 export async function getUtxosForAddress(lucid, address) {
   return await lucid.utxosAt(address);
 }
 
+// Function to create a text value
+export function createTextValue(text) {
+  return fromText(text);
+}
+
 //  Function to generate NFT Policy and calculate PolicyId from smart Contract
-export function generatePolicyFromSmartContract(utxo, tn, image) {
+export function generatePolicyFromSmartContract(lucid, utxo, tn, image) {
   const nftPolicy = {
     type: "PlutusV2",
     script: applyParamsToScript(cborHex, [
@@ -153,4 +162,11 @@ export async function getPaymentCredential(lucidBrowser) {
 //  function to generate a unit value
 export function generateUnit(policyId, metadataName) {
   return policyId + fromText(metadataName);
+}
+
+//  Function to sign and submit a transaction
+export async function signAndSubmitTransaction(tx) {
+  const signedTx = await tx.sign().complete();
+  const txHash = await signedTx.submit();
+  return txHash;
 }

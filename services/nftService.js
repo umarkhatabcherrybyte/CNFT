@@ -1,56 +1,43 @@
-import {
-  Lucid,
-  fromText,
-  Blockfrost,
-  Data,
-  applyParamsToScript,
-} from "lucid-cardano";
+import { Lucid, fromText, Blockfrost, Data } from "lucid-cardano";
 import {
   blockfrostUrl,
   blockfrostApiKey,
   blockfrostNetworkName,
 } from "../config/blockfrost";
 import { bankWalletAddress, seedPhrase } from "../config/walletConstants";
-import { cborHex } from "../config/constants";
+import {
+  connectWallet,
+  createTextValue,
+  generatePolicyFromSmartContract,
+  generateUnit,
+  getAddressFromLucid,
+  getUtxosForAddress,
+  initializeLucid,
+  signAndSubmitTransaction,
+} from "../utils/lucidUtils";
 export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
-  const lucid = await Lucid.new(
-    new Blockfrost(blockfrostUrl, blockfrostApiKey),
-    blockfrostNetworkName
-  );
-  const api = await window.cardano[String(connectedWallet)].enable();
+  const lucid = await initializeLucid(true);
+
+  const api = await connectWallet(connectedWallet);
   lucid.selectWallet(api);
-  const addr = await lucid.wallet.address();
-  const utxos = await lucid.utxosAt(addr);
+  const addr = await getAddressFromLucid(lucid);
+  const utxos = await getUtxosForAddress(lucid, addr);
   const utxo = utxos[0];
-  const tn = fromText("nft");
-  const image = fromText("nft");
-  let policyId = "";
-  const nftPolicy = {
-    type: "PlutusV2",
-    script: applyParamsToScript(cborHex, [
-      utxo.txHash,
-      BigInt(utxo.outputIndex),
-      tn,
-      image,
-    ]),
-  };
-  policyId = lucid.utils.mintingPolicyToId(nftPolicy);
-  console.log(policyId, "policyId");
+  const tn = createTextValue("nft");
+  const image = createTextValue("nft");
+  const { nftPolicy, policyId } = generatePolicyFromSmartContract(
+    lucid,
+    utxo,
+    tn,
+    image
+  );
+
   let metadataX = {};
   let metadata = JSON.parse(window.localStorage.getItem("metadata"));
-  // let metadata = {
-  //   image: `ipfs://Qmc26if7L5k1Qy5bzGdNtuPBoTDJw3bDQbFuVqbuZ8ofqG`,
-  //   mediaType: "image/jpg",
-  //   description: "f",
-  //   name: "dfsdf",
-  //   description: "vsfsf",
-  //   creator: "fvfg",
-  //   link: "",
-  // };
+
   metadataX[metadata.name] = metadata;
-  const unit = policyId + fromText(metadata.name);
+  const unit = generateUnit(policyId, metadata.name);
   let obj = { [policyId]: metadataX };
-  console.log(obj, "obj");
   let tx;
   if (selectedValue == "b") {
     tx = await lucid
@@ -74,18 +61,7 @@ export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
       .complete();
   }
 
-  //   const tx = await lucid
-  //     .newTx()
-  //     .mintAssets({ [unit]: 1n }, Data.void())
-  //     .attachMetadata("721", obj)
-  //     .attachMintingPolicy(nftPolicy)
-  //     .collectFrom([utxo])
-  //     .payToAddress(selectedValue == "c" ? currentAddr : bankWalletAddress, {
-  //       [unit]: selectedValue == "c" ? 1n : 1000n,
-  //     })
-  //     .complete();
-  const signedTx = await tx.sign().complete();
-  const txHash = await signedTx.submit();
+  const txHash = await signAndSubmitTransaction(tx);
   return txHash;
 };
 export const transferNFT = async (connectedWallet, data, uploaded_image) => {
