@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography, Grid, useMediaQuery, useTheme } from "@mui/material";
-import { dummyData } from "/helper/dummyData";
+import { dummyData } from "../../data/dummyData";
 import styled from "styled-components";
 
 const RoyalityCard = ({ card, isMatch }) => {

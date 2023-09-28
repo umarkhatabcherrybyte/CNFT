@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { Box, Select, MenuItem, Button, Typography } from "@mui/material";
 import { Toast } from "../shared/Toast";
 import { setUser } from "../../redux/user/userActions";
-import { formatAmount } from "/helper/formatAmount";
+import { formatAmount } from "../../utils/formattingUtils";
 import { setInstance } from "../../redux/wallet/WalletActions";
 const wallets = [
   {

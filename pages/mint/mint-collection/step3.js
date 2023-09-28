@@ -34,8 +34,7 @@ import {
 import { INSTANCE } from "/config/axiosInstance";
 import { bankWalletAddress } from "../../../config/walletConstants";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
-import { transactionErrorHanlder } from "../../../helper/transactionError";
-import { getClientIp } from "../../../helper/clientIP";
+import { transactionErrorHanlder } from "../../../utils/errorUtils";
 import { cborHex } from "../../../config/constants";
 
 const payData = [
@@ -406,19 +405,7 @@ const CollectionStep3 = () => {
     } catch (error) {
       console.log("error", error);
       transactionErrorHanlder(error, "mint");
-      const clientIp = await getClientIp();
-      if (clientIp) {
-        try {
-          const response = await INSTANCE.post(`/log/create`, {
-            error: JSON.stringify(error),
-            ip: clientIp,
-            type: "collection mint",
-          });
-          console.log(response.data);
-        } catch (error) {
-          console.error(error);
-        }
-      }
+
       // Toast("error", "Error Occured while Minting");
       setIsLoading(false);
     }

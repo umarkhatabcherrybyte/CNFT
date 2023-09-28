@@ -25,12 +25,10 @@ import GetAdaPriceService from "/services/get-ada-price.service";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { Toast } from "/components/shared/Toast";
-import { getKeyData } from "/helper/localStorage";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
 import useFetchData from "../../../hooks/adaInfo";
 import { isVideoOrIsAudio } from "../../../utils/utils";
-import { transactionErrorHanlder } from "../../../helper/transactionError";
-import { getClientIp } from "../../../helper/clientIP";
+import { transactionErrorHanlder } from "../../../utils/errorUtils";
 import { getAssetDetail } from "../../../services/blockfrostService";
 // import { BigInt } from "lucid-cardano/types/src/core/wasm_modules/cardano_multiplatform_lib_web/cardano_multiplatform_lib";
 const List = [{}, {}, {}, {}];
@@ -150,7 +148,7 @@ const BuyDetail = () => {
   //         }
   //       } catch (e) {
   //         transactionErrorHanlder(e, "buy");
-  //         const clientIp = await getClientIp();
+
   //         if (clientIp) {
   //           try {
   //             const response = await INSTANCE.post(`/log/create`, {

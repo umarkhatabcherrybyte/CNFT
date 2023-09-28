@@ -22,8 +22,7 @@ import Baloon from "/components/Design/Ballon";
 import { useRouter } from "next/router";
 import { INSTANCE } from "/config/axiosInstance";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
-import { transactionErrorHanlder } from "../../../helper/transactionError";
-import { getClientIp } from "../../../helper/clientIP";
+import { transactionErrorHanlder } from "../../../utils/errorUtils";
 const payData = [
   // {
   //   title: "Mint for free and list with us ",

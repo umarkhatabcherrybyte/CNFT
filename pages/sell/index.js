@@ -15,7 +15,7 @@ import Strips from "../../components/Design/Strips";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { useWallet } from "@meshsdk/react";
-import { getKeyData } from "../../helper/localStorage";
+import { getKeyData } from "../../utils/storageUtils";
 import { INSTANCE } from "/config/axiosInstance";
 import ClaimTable from "../../components/Sell/ClaimTable";
 const Sell = () => {

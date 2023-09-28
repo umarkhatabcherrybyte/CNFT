@@ -6,12 +6,12 @@ import { useFormik } from "formik";
 import { placeYourBidSchema } from "/schema/Index";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { INSTANCE } from "/config/axiosInstance";
-import { getKeyData } from "../../helper/localStorage";
+import { getKeyData } from "../../utils/storageUtils";
 import { Toast } from "../shared/Toast";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import { LoadingButton } from "@mui/lab";
 import { useRouter } from "next/router";
-import { transactionErrorHanlder } from "../../helper/transactionError";
+import { transactionErrorHanlder } from "../../utils/errorUtils";
 import { seedPhrase } from "../../config/walletConstants";
 import {
   blockfrostUrl,

@@ -24,10 +24,9 @@ import {
   applyParamsToScript,
   Data,
 } from "lucid-cardano";
-import { getObjData } from "../../helper/localStorage";
-import { transactionErrorHanlder } from "../../helper/transactionError";
+import { getObjData } from "../../utils/storageUtils";
+import { transactionErrorHanlder } from "../../utils/errorUtils";
 import { seedPhrase } from "../../config/utils";
-import { getClientIp } from "../../helper/clientIP";
 import {
   blockfrostUrl,
   blockfrostApiKey,
@@ -709,19 +708,7 @@ const ListCollectionStep2 = () => {
     } catch (e) {
       console.log("error", e);
       transactionErrorHanlder(e, "mint");
-      const clientIp = await getClientIp();
-      if (clientIp) {
-        try {
-          const response = await INSTANCE.post(`/log/create`, {
-            error: JSON.stringify(e),
-            ip: clientIp,
-            type: "list-collection",
-          });
-          console.log(response.data);
-        } catch (error) {
-          console.error(error);
-        }
-      }
+
       // console.log(e)
     }
   };

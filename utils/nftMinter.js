@@ -1,3 +1,4 @@
+// servies me nft valy is ko dalna
 import {
   Lucid,
   fromText,

@@ -17,7 +17,7 @@ import Heading from "../shared/headings/Heading";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import { INSTANCE } from "../../config/axiosInstance";
 import styled from "styled-components";
-import { getKeyData } from "../../helper/localStorage";
+import { getKeyData } from "../../utils/storageUtils";
 import FullScreenLoader from "../shared/FullScreenLoader";
 import { Toast } from "../shared/Toast";
 import GetAdaPriceService from "/services/get-ada-price.service";
