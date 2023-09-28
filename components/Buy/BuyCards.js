@@ -20,7 +20,12 @@ const BuyCards = ({ type, uniquePolicies, buy, nfts, policyNFTs, label }) => {
               // console.log("same policy nfts ", uniquePolicyGroups[policy]);
               return (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={policy}>
-                  <NftCard card={policyNFTs[policy][0]} />
+                  <NftCard
+                    onclick={(nft_) => {
+                      alert("Handling nft");
+                    }}
+                    card={policyNFTs[policy][0]}
+                  />
                 </Grid>
               );
             }
