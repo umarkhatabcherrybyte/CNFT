@@ -8,10 +8,10 @@ import {
 import {
   decodeAssetName,
   listProviders,
-  callKuberAndSubmit,
   transformNftImageUrl,
   renderLovelace,
-} from "../../scripts/wallet";
+} from "../../services/cardanoService";
+import { callKuberAndSubmit } from "../../services/kuberService";
 import * as database from "../../services/indexDBService";
 import { market } from "../../config/marketConfig";
 import {
@@ -20,12 +20,8 @@ import {
   Ed25519KeyHash,
   StakeCredential,
 } from "@emurgo/cardano-serialization-lib-asmjs";
-import { useWalletState, useWalletAction } from "../../scripts/sotre";
 
 const YourReactComponent = ({ instance }) => {
-  const [walletState, setWalletState] = useWalletState();
-  const walletAction = useWalletAction();
-
   const [message, setMessage] = useState("Loading ...");
   const [hasIndexDb, setHasIndexDb] = useState(false);
   const [utxos, setUtxos] = useState([]);

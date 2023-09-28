@@ -5,14 +5,7 @@ import { BlockfrostProvider } from "@meshsdk/core";
 import { blockfrostApiKey } from "../../config/blockfrost";
 import { market } from "../../config/marketConfig";
 import Listing from "/components/testing/Listing.jsx";
-import {
-  calculatePolicyHash,
-  decodeAssetName,
-  listProviders,
-  walletValue,
-  callKuberAndSubmit,
-  transformNftImageUrl,
-} from "../../scripts/wallet.js";
+
 // import {
 //   Address,
 //   BaseAddress,

@@ -16,14 +16,7 @@ import FullScreenLoader from "../shared/FullScreenLoader";
 import { BlockfrostProvider } from "@meshsdk/core";
 import { useDispatch, useSelector } from "react-redux";
 import { blockfrostApiKey } from "../../config/blockfrost";
-import {
-  calculatePolicyHash,
-  decodeAssetName,
-  listProviders,
-  walletValue,
-  callKuberAndSubmit,
-  transformNftImageUrl,
-} from "../../scripts/wallet";
+
 const Mynft = ({ card }) => {
   // console.log(card);
   // console.log("Policy if of nft is: ", card.policyId);

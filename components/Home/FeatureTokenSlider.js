@@ -13,7 +13,7 @@ import { carouselNew } from "../setting/Slider";
 import { useRouter } from "next/router";
 import Heading from "../shared/headings/Heading";
 import { isVideoOrIsAudio } from "../../utils/utils";
-import { renderLovelace } from "../../scripts/wallet";
+import { renderLovelace } from "../../services/cardanoService";
 
 export function SliderArrow(props) {
   const { className, style, onClick, arrow } = props;

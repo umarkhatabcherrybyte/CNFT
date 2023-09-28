@@ -36,7 +36,7 @@ import {
 import { cborHex } from "../../config/constants";
 import { market } from "../../config/marketConfig";
 import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
-import { callKuberAndSubmit } from "../../scripts/wallet";
+import { callKuberAndSubmit } from "../../services/kuberService";
 import { BlockfrostProvider } from "@meshsdk/core";
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));

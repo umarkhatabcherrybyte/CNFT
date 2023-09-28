@@ -41,14 +41,7 @@ import { useRouter } from "next/router";
 import { buyDetailRoute, auctionRoute } from "../Routes/constants";
 import { getAssetDetail } from "../../services/koiosService";
 import { formatDateFromTimestamp } from "../../helper/formatDate";
-import {
-  calculatePolicyHash,
-  decodeAssetName,
-  listProviders,
-  walletValue,
-  callKuberAndSubmit,
-  transformNftImageUrl,
-} from "../../scripts/wallet";
+import { callKuberAndSubmit } from "../../services/kuberService";
 import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
 import { market } from "../../config/marketConfig";
 const SaleMethod = () => {

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { decodeAssetName, transformNftImageUrl } from "../scripts/wallet";
+import {
+  decodeAssetName,
+  transformNftImageUrl,
+} from "../services/cardanoService";
 import * as database from "../services/indexDBService";
 import {
   listMarket,

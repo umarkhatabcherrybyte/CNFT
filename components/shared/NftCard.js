@@ -9,7 +9,7 @@ import {
   auctionDetailRoute,
 } from "../Routes/constants";
 import { isVideoOrIsAudio } from "../../utils/utils";
-import { renderLovelace } from "../../scripts/wallet";
+import { renderLovelace } from "../../services/cardanoService";
 import { fromText } from "lucid-cardano";
 const NftCard = ({ card }) => {
   // console.log(card, "card1");

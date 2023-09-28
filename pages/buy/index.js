@@ -20,10 +20,10 @@ import * as database from "../../services/indexDBService";
 import {
   decodeAssetName,
   listProviders,
-  callKuberAndSubmit,
   transformNftImageUrl,
   renderLovelace,
-} from "../../scripts/wallet";
+} from "../../services/cardanoService";
+import { callKuberAndSubmit } from "../../services/kuberService";
 import { Buffer } from "buffer";
 import { useWallet } from "@meshsdk/react";
 import {
