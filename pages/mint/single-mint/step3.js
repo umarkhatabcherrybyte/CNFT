@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Layout from "../../../components/Mint/Layout";
 import { useLovelace, useWallet } from "@meshsdk/react";
 import { Toast } from "../../../components/shared/Toast";
-import { mintNFT } from "../../../utils/nftMinter";
+import { mintNFT } from "../../../services/nftService";
 import {
   Box,
   Container,

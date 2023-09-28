@@ -25,18 +25,15 @@ const Sell = () => {
   const { type } = router.query;
   const [tabValue, setTabValue] = useState("active");
   const [activeBids, setActiveBids] = useState([]);
-  console.log(activeBids, "activeBidsactiveBidsactiveBidsactiveBids");
   const [claim, setClaim] = useState([]);
 
   useEffect(() => {
     if (connected && user.user_id) {
-      console.log("myyyyyyyyyyyyyyy");
       getActiveBid();
       getClaim();
     }
   }, [connected, user.user_id]);
   const getActiveBid = async () => {
-    console.log("bideeeeeeeerrrrrrrrrrrrrr");
     try {
       const response = await INSTANCE.post("/bid/lister", {
         lister_id: user.user_id,
