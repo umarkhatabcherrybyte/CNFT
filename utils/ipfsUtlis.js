@@ -22,11 +22,3 @@ export const handleFileUpload = async (file) => {
     // throw new Error("Failed to upload image to IPFS");
   }
 };
-export const isVideoOrIsAudio = (file) => {
-  return (
-    file.media_type == "audio/mpeg" ||
-    file.media_type == "audio/mp4" ||
-    file.media_type == "audio/mp3" ||
-    file.media_type == "video/mp4"
-  );
-};

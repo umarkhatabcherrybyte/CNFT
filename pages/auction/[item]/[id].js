@@ -19,7 +19,7 @@ import useFetchData from "../../../hooks/adaInfo";
 import { INSTANCE } from "/config/axiosInstance";
 import dynamic from "next/dynamic";
 import FullScreenLoader from "../../../components/shared/FullScreenLoader";
-import { isVideoOrIsAudio } from "../../../utils/utils";
+import { isVideoOrIsAudio } from "../../../utils/fileUtlis";
 const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
   ssr: false,
 });
