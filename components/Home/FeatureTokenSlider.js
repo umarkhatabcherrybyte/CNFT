@@ -12,7 +12,7 @@ import Slider from "react-slick";
 import { carouselNew } from "../setting/Slider";
 import { useRouter } from "next/router";
 import Heading from "../shared/headings/Heading";
-import { isVideoOrIsAudio } from "../../utils/utils";
+// import { isVideoOrIsAudio } from "../../utils/utils";
 import { renderLovelace } from "../../services/cardanoService";
 
 export function SliderArrow(props) {
