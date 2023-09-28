@@ -32,7 +32,7 @@ import {
   blockfrostUrl,
   blockfrostApiKey,
   blockfrostNetworkName,
-} from "../../config/blockfrostConfig";
+} from "../../config/blockfrost";
 import { handleFileUpload } from "../../utils/utils";
 const inputFileStyle = {
   my: 2,
@@ -180,6 +180,7 @@ const MylistTabs = () => {
                 if (txHash) {
                   //  api call
                   if (values.imageFile) {
+                    console.log("iffffffffffffffffffffffffffffff");
                     var reader = new FileReader();
                     reader.readAsDataURL(values.imageFile);
                     reader.onload = async () => {
@@ -221,6 +222,8 @@ const MylistTabs = () => {
                       }
                     };
                   } else {
+                    console.log("elseeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+
                     try {
                       const user_id = window.localStorage.getItem("user_id");
                       metadata["unit"] = unit;
@@ -246,6 +249,7 @@ const MylistTabs = () => {
                           "listing",
                           JSON.stringify(res?.data.data)
                         );
+                        window.localStorage.setItem("asset_name", values.name);
                       }
                     } catch (e) {
                       setIsLoading(false);
@@ -288,6 +292,7 @@ const MylistTabs = () => {
     }
   };
 
+  // console.log(formik.values, "formik");
   return (
     <>
       {isLoading && <FullScreenLoader />}

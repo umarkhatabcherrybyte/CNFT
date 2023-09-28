@@ -84,8 +84,6 @@ const AddImage = ({ heading, desc, width, formik, name }) => {
   );
 };
 const ListCollection = () => {
-
-  console.log("hi");
   const router = useRouter();
   const dispatch = useDispatch();
   useEffect(() => {}, []);
@@ -122,14 +120,18 @@ const ListCollection = () => {
 
           // Read file3 as data URL
           reader.readAsDataURL(values.banner_image);
-          reader.onload = async() => {
+          reader.onload = async () => {
             const file3DataURL = reader.result;
 
             // Create a new object with the form data and file data URLs
-            let file1DataURL_ipfs=await handleFileUpload(file1DataURL)
-            let file2DataURL_ipfs=await handleFileUpload(file2DataURL)
-            let file3DataURL_ipfs=await handleFileUpload(file3DataURL)
-            console.log("uploadeded to ipfs ",{file1DataURL_ipfs,file2DataURL_ipfs,file3DataURL_ipfs});
+            let file1DataURL_ipfs = await handleFileUpload(file1DataURL);
+            let file2DataURL_ipfs = await handleFileUpload(file2DataURL);
+            let file3DataURL_ipfs = await handleFileUpload(file3DataURL);
+            console.log("uploadeded to ipfs ", {
+              file1DataURL_ipfs,
+              file2DataURL_ipfs,
+              file3DataURL_ipfs,
+            });
             const dataWithFiles = {
               ...values,
               logo_image: file1DataURL_ipfs,

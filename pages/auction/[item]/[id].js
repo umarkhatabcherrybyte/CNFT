@@ -190,18 +190,20 @@ const AuctionDetail = () => {
             )}
           </Box>
         </Box>
-        {!isLoading && detail?.lists_by_user.length > 0 && (
-          <Box sx={{ py: 5 }}>
-            <BarHeading heading="Live Auction" />
-            <Grid container spacing={3}>
-              {detail?.lists_by_user.map((card) => (
-                <Grid item lg={3} md={4} sm={6} xs={12}>
-                  <DetailCard card={card} />
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        )}
+        {!isLoading &&
+          detail?.lists_by_user &&
+          detail?.lists_by_user.length > 0 && (
+            <Box sx={{ py: 5 }}>
+              <BarHeading heading="Live Auction" />
+              <Grid container spacing={3}>
+                {detail?.lists_by_user.map((card) => (
+                  <Grid item lg={3} md={4} sm={6} xs={12}>
+                    <DetailCard card={card} />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          )}
       </ContainerLayout>
       <AuctionModal
         auctionIndex={item}

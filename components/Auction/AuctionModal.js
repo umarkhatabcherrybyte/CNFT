@@ -15,12 +15,17 @@ import { transactionErrorHanlder } from "../../helper/transactionError";
 import { seedPhraseMainnet } from "../../config/utils";
 import { seedPhrasePreprod } from "../../config/utils";
 import { network_name, network_url, network_key } from "../../base_network";
-import { getClientIp } from "../../helper/clientIP";
+
+// import {
+//   blockfrostUrl,
+//   blockfrostApiKey,
+//   blockfrostNetworkName,
+// } from "../../config/constants.js";
 import {
   blockfrostUrl,
   blockfrostApiKey,
   blockfrostNetworkName,
-} from "../../config/constants";
+} from "../../config/blockfrost";
 const style = {
   fieldset: {
     border: "none",
@@ -48,6 +53,7 @@ const AuctionModal = ({
   const [inputVal, setInputVal] = useState("");
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
+
   const formik = useFormik({
     initialValues: {
       price: "",
@@ -86,6 +92,7 @@ const AuctionModal = ({
                 unit: unit,
               });
               if (response.data.status) {
+                // if (true) {
                 // const transferLucid = await Lucid.new(
                 //   new Blockfrost(
                 //     "https://cardano-mainnet.blockfrost.io/api/v0",
@@ -98,7 +105,8 @@ const AuctionModal = ({
 
                   blockfrostNetworkName
                 );
-                transferLucid.selectWalletFromSeed(seedPhraseMainnet);
+                console.log(transferLucid, "transferLucid");
+                transferLucid.selectWalletFromSeed(seedPhrasePreprod);
                 // const lucidBrowser = await Lucid.new(
                 //   new Blockfrost(
                 //     "https://cardano-mainnet.blockfrost.io/api/v0",
@@ -106,11 +114,12 @@ const AuctionModal = ({
                 //   ),
                 //   "Mainnet"
                 // );
+
                 const lucidBrowser = await Lucid.new(
                   new Blockfrost(blockfrostUrl, blockfrostApiKey),
                   blockfrostNetworkName
                 );
-                // console.log(values.price, "dasd");
+                console.log(lucidBrowser, "lucidBrowser");
                 const api = await window.cardano[
                   String(connectedWallet)
                 ].enable();
@@ -130,8 +139,9 @@ const AuctionModal = ({
                   // lister_id user who list this auction
                   // list_id  _id that's on the top of the page
                   // asset_index  index that's on the top of the page
+
                   const res = await INSTANCE.post("/bid/create", {
-                    bidder_id: getKeyData("user_id"),
+                    bidder_id: localStorage.getItem("user_id"),
                     lister_id: detail.list.user_id._id,
                     list_id: listId,
                     list_id: listId,
@@ -153,19 +163,6 @@ const AuctionModal = ({
               }
             } catch (e) {
               transactionErrorHanlder(e, "auction");
-              const clientIp = await getClientIp();
-              if (clientIp) {
-                try {
-                  const response = await INSTANCE.post(`/log/create`, {
-                    error: JSON.stringify(error),
-                    ip: clientIp,
-                    type: "AuctionModal",
-                  });
-                  console.log(response.data);
-                } catch (error) {
-                  console.error(error);
-                }
-              }
               console.log(e);
               console.log(e.info);
             }

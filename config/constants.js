@@ -11,7 +11,7 @@ export const ipfsConfig = {
 };
 export const costLovelace = "10000000";
 
-export const bankWalletAddress = `addr_test1qzmwuzc0qjenaljs2ytquyx8y8x02en3qxswlfcldwetaeuvldqg2n2p8y4kyjm8sqfyg0tpq9042atz0fr8c3grjmysm5e6yx`;
+// export const bankWalletAddress = `addr_test1qzmwuzc0qjenaljs2ytquyx8y8x02en3qxswlfcldwetaeuvldqg2n2p8y4kyjm8sqfyg0tpq9042atz0fr8c3grjmysm5e6yx`;
 
 export const assetsMetadata = {
   1: {
@@ -69,7 +69,6 @@ export const assetsMetadata = {
     description: "This NFT is minted by Mesh (https://mesh.martify.io/).",
   },
 };
-const costLovelace = "10000000";
 
 // wali dev seed
 export const seedPhrasePreprod =
@@ -80,30 +79,6 @@ const bankWalletAddress =
 
 const seedPhraseMainnet =
   "invloved sudden plug library sunny lunar tragic pride chapter flee sight side mechanic choose sure early hunt develop symbol physical core bulb flag chimney";
-
-const assetsMetadata = {
-  MeshToken01: {
-    name: "Yo Yo",
-    image: "ipfs://QmaYZZ1dFS1nXYrFC9TXZYkEMzhNrk1GemMW4GQ3wNhsRh/0.png",
-    mediaType: "image/jpg",
-    description: "Just a purple coin.",
-    artist: "This NFT is minted by Mesh (https://mesh.martify.io/).",
-  },
-  MeshToken02: {
-    name: "YO YO",
-    image: "ipfs://QmaYZZ1dFS1nXYrFC9TXZYkEMzhNrk1GemMW4GQ3wNhsRh/0.png",
-    mediaType: "image/jpg",
-    description: "This is suppose to be a gold coin.",
-    artist: "This NFT is minted by Mesh (https://mesh.martify.io/).",
-  },
-  MeshToken03: {
-    name: "YO YO",
-    image: "ipfs://QmaYZZ1dFS1nXYrFC9TXZYkEMzhNrk1GemMW4GQ3wNhsRh/0.png",
-    mediaType: "image/jpg",
-    description: "A coin with a M on it.",
-    artist: "This NFT is minted by Mesh (https://mesh.martify.io/).",
-  },
-};
 
 export const kuberApiUrl =
   "https://kuber-preprod-api-cnft-284b23.us1.demeter.run";

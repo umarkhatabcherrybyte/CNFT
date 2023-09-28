@@ -23,67 +23,70 @@ const Sell = () => {
   const { listing, user } = useSelector((store) => store);
   const { connected } = useWallet();
   const { type } = router.query;
-  const [tabValue, setTabValue] = useState("list");
+  const [tabValue, setTabValue] = useState("active");
   const [activeBids, setActiveBids] = useState([]);
+  console.log(activeBids, "activeBidsactiveBidsactiveBidsactiveBids");
   const [claim, setClaim] = useState([]);
+
   useEffect(() => {
-    const getActiveBid = async () => {
-      try {
-        const response = await INSTANCE.post("/bid/lister", {
-          lister_id: user.user_id,
-        });
-        const data = response?.data?.data;
-        const currentDate = new Date();
-        const temp = data.map((obj) => {
-          const targetDate = new Date(obj?.list_id?.sell_type_id?.end_time);
-          const differenceInMilliseconds =
-            targetDate.getTime() - currentDate.getTime();
-          // Check if the target date is in the past
-          if (differenceInMilliseconds > 0) {
-            // Convert milliseconds to days, hours, and minutes
-            const days = Math.floor(
-              differenceInMilliseconds / (1000 * 60 * 60 * 24)
-            );
-            const hours = Math.floor(
-              (differenceInMilliseconds % (1000 * 60 * 60 * 24)) /
-                (1000 * 60 * 60)
-            );
-            const minutes = Math.floor(
-              (differenceInMilliseconds % (1000 * 60 * 60)) / (1000 * 60)
-            );
-
-            return {
-              ...obj,
-              days_remaining: days,
-              hours_remaining: hours,
-              minutes_remaining: minutes,
-            };
-          }
-        });
-
-        setActiveBids([...temp]);
-      } catch (e) {
-        setActiveBids([]);
-        console.log(e);
-      }
-    };
-    const getClaim = async () => {
-      try {
-        const response = await INSTANCE.post("/bid/all", {
-          user_id: user.user_id,
-        });
-        setClaim(response?.data?.data);
-      } catch (e) {
-        setClaim([]);
-        console.log(e);
-      }
-    };
-
     if (connected && user.user_id) {
+      console.log("myyyyyyyyyyyyyyy");
       getActiveBid();
       getClaim();
     }
   }, [connected, user.user_id]);
+  const getActiveBid = async () => {
+    console.log("bideeeeeeeerrrrrrrrrrrrrr");
+    try {
+      const response = await INSTANCE.post("/bid/lister", {
+        lister_id: user.user_id,
+      });
+      const data = response?.data?.data;
+      const currentDate = new Date();
+      const temp = data.map((obj) => {
+        const targetDate = new Date(obj?.list_id?.sell_type_id?.end_time);
+        const differenceInMilliseconds =
+          targetDate.getTime() - currentDate.getTime();
+        // Check if the target date is in the past
+        if (differenceInMilliseconds > 0) {
+          // Convert milliseconds to days, hours, and minutes
+          const days = Math.floor(
+            differenceInMilliseconds / (1000 * 60 * 60 * 24)
+          );
+          const hours = Math.floor(
+            (differenceInMilliseconds % (1000 * 60 * 60 * 24)) /
+              (1000 * 60 * 60)
+          );
+          const minutes = Math.floor(
+            (differenceInMilliseconds % (1000 * 60 * 60)) / (1000 * 60)
+          );
+
+          return {
+            ...obj,
+            days_remaining: days,
+            hours_remaining: hours,
+            minutes_remaining: minutes,
+          };
+        }
+      });
+
+      setActiveBids([...temp]);
+    } catch (e) {
+      setActiveBids([]);
+      console.log(e);
+    }
+  };
+  const getClaim = async () => {
+    try {
+      const response = await INSTANCE.post("/bid/all", {
+        user_id: user.user_id,
+      });
+      setClaim(response?.data?.data);
+    } catch (e) {
+      setClaim([]);
+      console.log(e);
+    }
+  };
   const onTabChange = (event, newValue) => {
     setTabValue(newValue);
     if (newValue === "design") {
@@ -173,6 +176,7 @@ const Sell = () => {
                 }}
               >
                 {/* <Nobid /> */}
+
                 <SellTable activeBids={activeBids} />
               </Box>
             </TabPanel>

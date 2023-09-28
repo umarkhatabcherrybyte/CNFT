@@ -38,7 +38,7 @@ const Mynft = ({ card }) => {
     // "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj" //this was the mainnet key
     network_key // I added the key declared globally but importing in this file
   );
-  console.log(metadata, "metadatametadata");
+  // console.log(metadata, "metadatametadata");
 
   React.useEffect(() => {
     getMetaData();
