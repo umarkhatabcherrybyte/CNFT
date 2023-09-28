@@ -16,7 +16,7 @@ import {
   signAndSubmitTransaction,
 } from "../utils/lucidUtils";
 export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
-  const lucid = await initializeLucid(true);
+  const lucid = await initializeLucid();
 
   const api = await connectWallet(connectedWallet);
   lucid.selectWallet(api);
