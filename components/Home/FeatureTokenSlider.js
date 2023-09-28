@@ -68,7 +68,7 @@ const FeatureTokenSlider = ({ nfts }) => {
                       justifyContent: "space-between",
                     },
                   }}
-                  // onClick={() => router.push(`buy/0/${nft._id}`)}
+                  onClick={() => router.push(`buy/0/${nft.policy}`)}
                 >
                   <CardMedia
                     component="img"
