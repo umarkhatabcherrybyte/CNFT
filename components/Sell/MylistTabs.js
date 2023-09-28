@@ -34,6 +34,7 @@ import {
   blockfrostNetworkName,
 } from "../../config/blockfrost";
 import { handleFileUpload } from "../../utils/ipfsUtlis";
+import { checkAdaBalance } from "../../utils/balanceUtils";
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",
@@ -101,12 +102,8 @@ const MylistTabs = () => {
     onSubmit: async (values) => {
       try {
         if (connected) {
-          if (lovelace < 1000000) {
-            Toast(
-              "error",
-              "You do not have enough Ada to complete this transaction"
-            );
-            return;
+          if (!checkAdaBalance(lovelace)) {
+            return null;
           } else {
             setIsLoading(true);
             let connectedWallet =
@@ -159,11 +156,9 @@ const MylistTabs = () => {
                   metadata["description"] = values.description;
                 }
                 metadataX[metadata.name] = metadata;
-                console.log(metadataX, "dsadasd");
                 const unit = policyId + fromText(metadata.name);
 
                 let obj = { [policyId]: metadataX };
-                // console.log(obj, "obj");
                 const tx = await lucidBrowser
                   .newTx()
                   .attachMetadata("721", obj)
@@ -176,11 +171,8 @@ const MylistTabs = () => {
                   .complete();
                 const signedTx = await tx.sign().complete();
                 const txHash = await signedTx.submit();
-                // console.log(txHash, "hasg");
                 if (txHash) {
-                  //  api call
                   if (values.imageFile) {
-                    console.log("iffffffffffffffffffffffffffffff");
                     var reader = new FileReader();
                     reader.readAsDataURL(values.imageFile);
                     reader.onload = async () => {
@@ -222,8 +214,6 @@ const MylistTabs = () => {
                       }
                     };
                   } else {
-                    console.log("elseeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-
                     try {
                       const user_id = window.localStorage.getItem("user_id");
                       metadata["unit"] = unit;
@@ -253,7 +243,6 @@ const MylistTabs = () => {
                       }
                     } catch (e) {
                       setIsLoading(false);
-
                       console.log(e);
                     }
                   }

@@ -8,7 +8,7 @@ import {
   MycollectionRoute,
   auctionDetailRoute,
 } from "../Routes/constants";
-import { isVideoOrIsAudio } from "../../utils/utils";
+// import { isVideoOrIsAudio } from "../../utils/utils";
 import { renderLovelace } from "../../services/cardanoService";
 import { fromText } from "lucid-cardano";
 const NftCard = ({ card }) => {
