@@ -31,7 +31,6 @@ import useFetchData from "../../../hooks/adaInfo";
 import { isVideoOrIsAudio } from "../../../utils/utils";
 import { transactionErrorHanlder } from "../../../helper/transactionError";
 import { getClientIp } from "../../../helper/clientIP";
-import { network_name, network_url, network_key } from "../../../base_network";
 import { getAssetDetail } from "../../../scripts/blockfrost";
 // import { BigInt } from "lucid-cardano/types/src/core/wasm_modules/cardano_multiplatform_lib_web/cardano_multiplatform_lib";
 const List = [{}, {}, {}, {}];

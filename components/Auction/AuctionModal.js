@@ -13,13 +13,6 @@ import { LoadingButton } from "@mui/lab";
 import { useRouter } from "next/router";
 import { transactionErrorHanlder } from "../../helper/transactionError";
 import { seedPhrase } from "../../config/walletConstants";
-import { network_name, network_url, network_key } from "../../base_network";
-
-// import {
-//   blockfrostUrl,
-//   blockfrostApiKey,
-//   blockfrostNetworkName,
-// } from "../../config/constants.js";
 import {
   blockfrostUrl,
   blockfrostApiKey,

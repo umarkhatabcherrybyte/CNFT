@@ -28,7 +28,11 @@ import { getObjData } from "../../helper/localStorage";
 import { transactionErrorHanlder } from "../../helper/transactionError";
 import { seedPhrase } from "../../config/utils";
 import { getClientIp } from "../../helper/clientIP";
-import { network_name, network_url, network_key } from "../../base_network";
+import {
+  blockfrostUrl,
+  blockfrostApiKey,
+  blockfrostNetworkName,
+} from "../../config/blockfrost";
 import { cborHex } from "../../config/constants";
 import { market } from "../../config/marketConfig";
 import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
@@ -404,7 +408,7 @@ const ListCollectionStep2 = () => {
   const sellNft = async (policyId_, selectedNFTsNames) => {
     const providerInstance = await window.cardano.nami.enable();
     const res = await connect("Nami");
-    const blockfrostProvider = new BlockfrostProvider(network_key);
+    const blockfrostProvider = new BlockfrostProvider(blockfrostApiKey);
     let selectedNFTs = [];
     let latestAssets = null;
     /** Wait until the latest transaction is mined and we obtain the assets by latest policy id */
@@ -541,9 +545,9 @@ const ListCollectionStep2 = () => {
           //   "Mainnet"
           // );
           const transferLucid = await Lucid.new(
-            new Blockfrost(network_url, network_key),
+            new Blockfrost(blockfrostUrl, blockfrostApiKey),
 
-            network_name
+            blockfrostNetworkName
           );
           transferLucid.selectWalletFromSeed(seedPhrase);
           console.log(
@@ -561,9 +565,9 @@ const ListCollectionStep2 = () => {
           //   "Mainnet"
           // );
           const lucid = await Lucid.new(
-            new Blockfrost(network_url, network_key),
+            new Blockfrost(blockfrostUrl, blockfrostApiKey),
 
-            network_name
+            blockfrostNetworkName
           );
 
           const api = await window.cardano[String(connectedWallet)].enable();

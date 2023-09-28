@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { useAssets, useWallet } from "@meshsdk/react";
 import React, { useEffect, useState } from "react";
 import { BlockfrostProvider } from "@meshsdk/core";
-import { network_key } from "../../base_network";
+import { blockfrostApiKey } from "../../config/blockfrost";
 import { market } from "../../config/marketConfig";
 import Listing from "/components/testing/Listing.jsx";
 import {
@@ -24,7 +24,7 @@ const Testing = () => {
   const [selectedNFTs, setSelectedNFTs] = useState([]); // Track selected NFTs
   console.log(selectedNFTs, "selectedNFTs");
   const assets = useAssets();
-  const blockfrostProvider = new BlockfrostProvider(network_key);
+  const blockfrostProvider = new BlockfrostProvider(blockfrostApiKey);
   useEffect(() => {
     getAssets();
   }, [assets]);

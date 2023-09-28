@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Layout from "../../../components/Mint/Layout";
-import { network_name, network_url, network_key } from "../../../base_network";
+import {
+  blockfrostApiKey,
+  blockfrostNetworkName,
+  blockfrostUrl,
+} from "../../../config/blockfrost";
 import {
   Box,
   Container,
@@ -93,9 +97,9 @@ const CollectionStep3 = () => {
             //   "Mainnet"
             // );
             const lucid = await Lucid.new(
-              new Blockfrost(network_url, network_key),
+              new Blockfrost(blockfrostUrl, blockfrostApiKey),
 
-              network_name
+              blockfrostNetworkName
             );
             const api = await window.cardano[String(connectedWallet)].enable();
             lucid.selectWallet(api);
@@ -200,9 +204,9 @@ const CollectionStep3 = () => {
             //   "Mainnet"
             // );
             const lucid = await Lucid.new(
-              new Blockfrost(network_url, network_key),
+              new Blockfrost(blockfrostUrl, blockfrostApiKey),
 
-              network_name
+              blockfrostNetworkName
             );
 
             const api = await window.cardano[String(connectedWallet)].enable();
@@ -304,9 +308,9 @@ const CollectionStep3 = () => {
             //   "Mainnet"
             // );
             const lucid = await Lucid.new(
-              new Blockfrost(network_url, network_key),
+              new Blockfrost(blockfrostUrl, blockfrostApiKey),
 
-              network_name
+              blockfrostNetworkName
             );
 
             const api = await window.cardano[String(connectedWallet)].enable();
