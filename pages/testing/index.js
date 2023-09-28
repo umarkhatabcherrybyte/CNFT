@@ -3,7 +3,7 @@ import { useAssets, useWallet } from "@meshsdk/react";
 import React, { useEffect, useState } from "react";
 import { BlockfrostProvider } from "@meshsdk/core";
 import { network_key } from "../../base_network";
-import { market } from "../../config";
+import { market } from "../../config/marketConfig";
 import Listing from "/components/testing/Listing.jsx";
 import {
   calculatePolicyHash,
@@ -40,7 +40,7 @@ const Testing = () => {
 
       const data = await Promise.all(assetMetadataPromises);
       // You can now use the data array containing all the resolved results.
-      console.log("assets are ",data);
+      console.log("assets are ", data);
       setNfts(data); // Update the state with the final array
     }
   };

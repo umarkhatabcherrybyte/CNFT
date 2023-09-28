@@ -26,11 +26,11 @@ import {
 } from "lucid-cardano";
 import { getObjData } from "../../helper/localStorage";
 import { transactionErrorHanlder } from "../../helper/transactionError";
-import { seedPhraseMainnet } from "../../config/utils";
-import { seedPhrasePreprod } from "../../config/utils";
+import { seedPhrase } from "../../config/utils";
 import { getClientIp } from "../../helper/clientIP";
 import { network_name, network_url, network_key } from "../../base_network";
-import { cborHex, market } from "../../config";
+import { cborHex } from "../../config/constants";
+import { market } from "../../config/marketConfig";
 import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
 import { callKuberAndSubmit } from "../../scripts/wallet";
 import { BlockfrostProvider } from "@meshsdk/core";
@@ -436,7 +436,7 @@ const ListCollectionStep2 = () => {
           isSelling: false,
           // price: "",
           ...item,
-          policyId:policyId_
+          policyId: policyId_,
         });
       }
     }
@@ -502,7 +502,7 @@ const ListCollectionStep2 = () => {
 
     let res_ = await callKuberAndSubmit(providerInstance, JSON.stringify(body));
     await delay(15000); // 15 seconds delay
-    // insert some notifier here 
+    // insert some notifier here
     console.log(res_);
   };
 
@@ -545,7 +545,7 @@ const ListCollectionStep2 = () => {
 
             network_name
           );
-          transferLucid.selectWalletFromSeed(seedPhrasePreprod);
+          transferLucid.selectWalletFromSeed(seedPhrase);
           console.log(
             transferLucid,
             "provieder ",
@@ -625,13 +625,13 @@ const ListCollectionStep2 = () => {
 
              */
             let element = metadataObjects[index];
-            console.log("metadata ",element);
+            console.log("metadata ", element);
             if (banner_image && feature_image && logo_image) {
               element.banner_image = banner_image;
               element.feature_image = feature_image;
               element.logo_image = logo_image;
             }
-            element.price=parseInt(element.price)*1000000
+            element.price = parseInt(element.price) * 1000000;
             // assetObj[String(policyId + fromText(element.name))] = 1n;
             // obj = { [policyId]: metadataX };
             let metadata = element;

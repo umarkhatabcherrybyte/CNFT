@@ -1,6 +1,6 @@
 import { create } from "ipfs-http-client";
-import { ipfsConfig } from "../config/ipfsConfig";
-const { projectId, projectSecret } = ipfsConfig; // Use the configuration
+import { ipfs } from "../config/ipfs";
+const { projectId, projectSecret } = ipfs; // Use the configuration
 const auth = `Basic ${Buffer.from(`${projectId}:${projectSecret}`).toString(
   "base64"
 )}`;

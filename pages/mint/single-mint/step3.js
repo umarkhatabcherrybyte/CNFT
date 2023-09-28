@@ -20,18 +20,6 @@ import QRCode from "react-qr-code";
 import Strips from "/components/Design/Strips";
 import Baloon from "/components/Design/Ballon";
 import { useRouter } from "next/router";
-import {
-  costLovelace,
-  bankWalletAddress,
-  seedPhrasePreprod,
-} from "../../../config/utils";
-import {
-  Lucid,
-  fromText,
-  Blockfrost,
-  Data,
-  applyParamsToScript,
-} from "lucid-cardano";
 import { INSTANCE } from "/config/axiosInstance";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
 import { transactionErrorHanlder } from "../../../helper/transactionError";

@@ -12,8 +12,7 @@ import { useWallet, useLovelace } from "@meshsdk/react";
 import { LoadingButton } from "@mui/lab";
 import { useRouter } from "next/router";
 import { transactionErrorHanlder } from "../../helper/transactionError";
-import { seedPhraseMainnet } from "../../config/utils";
-import { seedPhrasePreprod } from "../../config/utils";
+import { seedPhrase } from "../../config/walletConstants";
 import { network_name, network_url, network_key } from "../../base_network";
 
 // import {
@@ -106,7 +105,7 @@ const AuctionModal = ({
                   blockfrostNetworkName
                 );
                 console.log(transferLucid, "transferLucid");
-                transferLucid.selectWalletFromSeed(seedPhrasePreprod);
+                transferLucid.selectWalletFromSeed(seedPhrase);
                 // const lucidBrowser = await Lucid.new(
                 //   new Blockfrost(
                 //     "https://cardano-mainnet.blockfrost.io/api/v0",

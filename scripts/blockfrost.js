@@ -1,5 +1,5 @@
-import { blockfrost, market } from "../config";
-
+import { market } from "../config/marketConfig";
+import { blockfrostUrl, blockfrostApiKey } from "../config/blockfrost";
 export function listMarket() {
   return getBlockfrost("/addresses/" + market.address + "/utxos?order=desc");
 }
@@ -13,9 +13,9 @@ export function getDatum(hash) {
 }
 
 function getBlockfrost(path) {
-  const url = blockfrost.apiUrl + path;
+  const url = blockfrostUrl + path;
   return fetch(url, {
-    headers: { project_id: blockfrost.apiKey },
+    headers: { project_id: blockfrostApiKey },
   }).then((res) => {
     if (res.status === 200) {
       return res.json();

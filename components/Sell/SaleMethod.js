@@ -50,7 +50,7 @@ import {
   transformNftImageUrl,
 } from "../../scripts/wallet";
 import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
-import { market } from "../../config";
+import { market } from "../../config/marketConfig";
 const SaleMethod = () => {
   const router = useRouter();
   // const dispatch = useDispatch();

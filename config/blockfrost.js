@@ -4,3 +4,8 @@
 export const blockfrostUrl = "https://cardano-preprod.blockfrost.io/api/v0";
 export const blockfrostApiKey = "preprodmdx0R847kjabyIdpC8eHr7ZZOMxlpXbm";
 export const blockfrostNetworkName = "Preprod";
+
+// export const blockfrost = {
+//     apiUrl: "https://cardano-preprod.blockfrost.io/api/v0",
+//     apiKey: "preprodaOQmXopO9V50JKEH2OAbvYwOYMbgsiLG", // replace the api key
+//   };

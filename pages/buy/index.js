@@ -27,7 +27,7 @@ import {
   Ed25519KeyHash,
   StakeCredential,
 } from "@emurgo/cardano-serialization-lib-asmjs";
-import { market } from "../../config";
+import { market } from "../../config/marketConfig";
 import ShowNFT from "./ShowNFT";
 
 const Buy = () => {
@@ -341,7 +341,7 @@ const Buy = () => {
           {message != "Loading" && (
             <>
               <TabPanel value="single">
-              {uniquePolicies.map((policy) => {
+                {uniquePolicies.map((policy) => {
                   if (uniquePolicyGroups[policy].length == 1) {
                     console.log(
                       "same policy nfts ",
@@ -360,8 +360,7 @@ const Buy = () => {
                 {/* <BuyCards buy={buy} nfts={nfts[0]} /> */}
               </TabPanel>
               <TabPanel value="collection">
-             
-                  <BuyCards
+                <BuyCards
                   uniquePolicies={uniquePolicies}
                   type={0}
                   buy={buy}

@@ -10,7 +10,7 @@ import {
   blockfrostApiKey,
   blockfrostNetworkName,
 } from "../config/blockfrostConfig";
-import { bankWalletAddress, seedPhrasePreprod } from "../config/utils";
+import { bankWalletAddress, seedPhrase } from "../config/walletConstants";
 import { cborHex } from "../config";
 export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
   const lucid = await Lucid.new(
@@ -94,7 +94,7 @@ export const transferNFT = async (connectedWallet, data, uploaded_image) => {
     blockfrostNetworkName
   );
 
-  transferLucid.selectWalletFromSeed(seedPhrasePreprod);
+  transferLucid.selectWalletFromSeed(seedPhrase);
   const lucidBrowser = await Lucid.new(
     new Blockfrost(blockfrostUrl, blockfrostApiKey),
     blockfrostNetworkName

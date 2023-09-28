@@ -9,7 +9,7 @@ import {
   renderLovelace,
 } from "../../scripts/wallet";
 import * as database from "../../scripts/database";
-import { market } from "/config";
+import { market } from "../../config/marketConfig";
 import {
   Address,
   BaseAddress,
