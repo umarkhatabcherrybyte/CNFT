@@ -1,8 +1,7 @@
-import http from "../config/apiInstance";
-
+import { INSTANCE } from "../config/axiosInstance";
 class MintService {
   downloadMetadataFile(json_data) {
-    return http.post("api/mint/download", {
+    return INSTANCE.post("api/mint/download", {
       json_data: json_data,
     });
   }

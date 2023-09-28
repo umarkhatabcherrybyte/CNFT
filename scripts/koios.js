@@ -1,6 +1,5 @@
-// import koi
 import axios from "axios";
-import { koios_base_url } from "../config/endpoint";
+import { koios_base_url } from "../config/koios";
 export const getAssetDetail = async (asset) => {
   try {
     const response = await axios.get(
