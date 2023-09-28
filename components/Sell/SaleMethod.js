@@ -39,7 +39,7 @@ import moment from "moment";
 import { Toast } from "../shared/Toast";
 import { useRouter } from "next/router";
 import { buyDetailRoute, auctionRoute } from "../Routes/constants";
-import { getAssetDetail } from "../../scripts/koios";
+import { getAssetDetail } from "../../services/koiosService";
 import { formatDateFromTimestamp } from "../../helper/formatDate";
 import {
   calculatePolicyHash,

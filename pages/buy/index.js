@@ -11,8 +11,12 @@ import { useRouter } from "next/router";
 import FullScreenLoader from "../../components/shared/FullScreenLoader";
 import { INSTANCE } from "../../config/axiosInstance";
 import NftCard from "../../components/shared/NftCard";
-import { listMarket, getAssetDetail, getDatum } from "/scripts/blockfrost";
-import * as database from "../../scripts/database";
+import {
+  listMarket,
+  getAssetDetail,
+  getDatum,
+} from "../../services/blockfrostService";
+import * as database from "../../services/indexDBService";
 import {
   decodeAssetName,
   listProviders,

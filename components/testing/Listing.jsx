@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Buffer } from "buffer";
-import { listMarket, getAssetDetail, getDatum } from "/scripts/blockfrost"; // Import your required functions/modules
+import {
+  listMarket,
+  getAssetDetail,
+  getDatum,
+} from "../../services/blockfrostService"; // Import your required functions/modules
 import {
   decodeAssetName,
   listProviders,
@@ -8,7 +12,7 @@ import {
   transformNftImageUrl,
   renderLovelace,
 } from "../../scripts/wallet";
-import * as database from "../../scripts/database";
+import * as database from "../../services/indexDBService";
 import { market } from "../../config/marketConfig";
 import {
   Address,

@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { decodeAssetName, transformNftImageUrl } from "../scripts/wallet";
-import * as database from "../scripts/database";
-import { listMarket, getAssetDetail, getDatum } from "/scripts/blockfrost";
+import * as database from "../services/indexDBService";
+import {
+  listMarket,
+  getAssetDetail,
+  getDatum,
+} from "../services/blockfrostService";
 
 export const useFetchNFTData = () => {
   const [utxos, setUtxos] = useState([]);
