@@ -33,7 +33,7 @@ import {
   blockfrostApiKey,
   blockfrostNetworkName,
 } from "../../config/blockfrost";
-import { handleFileUpload } from "../../utils/utils";
+import { handleFileUpload } from "../../utils/ipfsUtlis";
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",

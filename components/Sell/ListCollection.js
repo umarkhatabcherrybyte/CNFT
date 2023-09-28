@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 import { listCollectionRoute } from "/components/Routes/constants";
 import { setListing } from "../../redux/listing/ListingActions";
 import { useDispatch, useSelector } from "react-redux";
-import { handleFileUpload } from "../../utils/utils";
+import { handleFileUpload } from "../../utils/ipfsUtlis";
 const AddImage = ({ heading, desc, width, formik, name }) => {
   return (
     <>
