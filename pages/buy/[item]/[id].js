@@ -27,7 +27,7 @@ import { Lucid, fromText, Blockfrost } from "lucid-cardano";
 import { Toast } from "/components/shared/Toast";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
 import useFetchData from "../../../hooks/adaInfo";
-import { isVideoOrIsAudio } from "../../../utils/utils";
+import { isVideoOrIsAudio } from "../../../utils/fileUtlis";
 import { transactionErrorHanlder } from "../../../utils/errorUtils";
 import { getAssetDetail } from "../../../services/blockfrostService";
 // import { BigInt } from "lucid-cardano/types/src/core/wasm_modules/cardano_multiplatform_lib_web/cardano_multiplatform_lib";
