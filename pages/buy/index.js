@@ -11,19 +11,15 @@ import { useRouter } from "next/router";
 import FullScreenLoader from "../../components/shared/FullScreenLoader";
 import { INSTANCE } from "../../config/axiosInstance";
 import NftCard from "../../components/shared/NftCard";
-import {
-  listMarket,
-  getAssetDetail,
-  getDatum,
-} from "../../services/blockfrostService";
-import * as database from "../../services/indexDBService";
+import { listMarket, getAssetDetail, getDatum } from "/scripts/blockfrost";
+import * as database from "../../scripts/database";
 import {
   decodeAssetName,
   listProviders,
+  callKuberAndSubmit,
   transformNftImageUrl,
   renderLovelace,
-} from "../../services/cardanoService";
-import { callKuberAndSubmit } from "../../services/kuberService";
+} from "../../scripts/wallet";
 import { Buffer } from "buffer";
 import { useWallet } from "@meshsdk/react";
 import {
@@ -31,7 +27,7 @@ import {
   Ed25519KeyHash,
   StakeCredential,
 } from "@emurgo/cardano-serialization-lib-asmjs";
-import { market } from "../../config/marketConfig";
+import { market } from "../../config";
 import ShowNFT from "./ShowNFT";
 
 const Buy = () => {
@@ -345,7 +341,7 @@ const Buy = () => {
           {message != "Loading" && (
             <>
               <TabPanel value="single">
-                {uniquePolicies.map((policy) => {
+              {uniquePolicies.map((policy) => {
                   if (uniquePolicyGroups[policy].length == 1) {
                     console.log(
                       "same policy nfts ",
@@ -364,7 +360,7 @@ const Buy = () => {
                 {/* <BuyCards buy={buy} nfts={nfts[0]} /> */}
               </TabPanel>
               <TabPanel value="collection">
-                <BuyCards
+                  <BuyCards
                   uniquePolicies={uniquePolicies}
                   type={0}
                   buy={buy}
