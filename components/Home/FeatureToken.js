@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Box, Typography, Tab } from "@mui/material";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { fetchNftsBreakdown } from "/redux/actions/thunks/nfts";
 import { useDispatch } from "react-redux";
 import FeatureTokenSlider from "./FeatureTokenSlider";
 import { INSTANCE } from "/config/axiosInstance";
@@ -10,7 +9,6 @@ const FeatureToken = () => {
   const dispatch = useDispatch();
   const [featureTokens, setFeatureTokens] = useState([]);
   useEffect(() => {
-    // dispatch(fetchNftsBreakdown());
     getFeaturedToken();
   }, [dispatch]);
 
