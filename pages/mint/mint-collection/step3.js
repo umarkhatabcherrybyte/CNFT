@@ -32,11 +32,11 @@ import {
   applyParamsToScript,
 } from "lucid-cardano";
 import { INSTANCE } from "/config/axiosInstance";
-import { costLovelace, bankWalletAddress } from "../../../config/utils";
+import { bankWalletAddress } from "../../../config/walletConstants";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
 import { transactionErrorHanlder } from "../../../helper/transactionError";
 import { getClientIp } from "../../../helper/clientIP";
-import { cborHex } from "../../../config";
+import { cborHex } from "../../../config/constants";
 
 const payData = [
   // {

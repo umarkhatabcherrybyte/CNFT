@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { createTransaction } from "/backend";
 import { CardanoWallet, useWallet } from "@meshsdk/react";
 import styled from "styled-components";
 import {
@@ -25,40 +24,40 @@ const SingleMintStep2 = () => {
   const [rangeValue, setRangeValue] = React.useState(10);
   const [loading, setLoading] = React.useState(false);
 
-  const [metadata, setMetadata] = React.useState({
-    image: `ipfs://${
-      typeof window !== "undefined" && window.localStorage.getItem("img")
-    }`,
-    mediaType: "image/jpg",
-    description: "",
-    name: "",
-    description: "",
-    creator: "",
-    link: "",
-  });
-
   // const [metadata, setMetadata] = React.useState({
   //   image: `ipfs://${
   //     typeof window !== "undefined" && window.localStorage.getItem("img")
   //   }`,
-  //   mediaType: `${
-  //     typeof window !== "undefined" &&
-  //     window.localStorage.getItem("file_mimeType")
-  //   }`,
+  //   mediaType: "image/jpg",
   //   description: "",
   //   name: "",
   //   description: "",
   //   creator: "",
   //   link: "",
-  //   featured_image: `ipfs://${
-  //     typeof window !== "undefined" &&
-  //     window.localStorage.getItem("featured_img")
-  //   }`,
-  //   featured_type: `${
-  //     typeof window !== "undefined" &&
-  //     window.localStorage.getItem("featured_type")
-  //   }`,
   // });
+
+  const [metadata, setMetadata] = React.useState({
+    image: `ipfs://${
+      typeof window !== "undefined" && window.localStorage.getItem("img")
+    }`,
+    mediaType: `${
+      typeof window !== "undefined" &&
+      window.localStorage.getItem("file_mimeType")
+    }`,
+    description: "",
+    name: "",
+    description: "",
+    creator: "",
+    link: "",
+    featured_image: `ipfs://${
+      typeof window !== "undefined" &&
+      window.localStorage.getItem("featured_img")
+    }`,
+    featured_type: `${
+      typeof window !== "undefined" &&
+      window.localStorage.getItem("featured_type")
+    }`,
+  });
 
   const onInputChange = (e) => {
     setMetadata({ ...metadata, [e.target.name]: e.target.value });

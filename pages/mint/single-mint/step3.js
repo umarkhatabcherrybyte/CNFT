@@ -24,7 +24,6 @@ import { INSTANCE } from "/config/axiosInstance";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
 import { transactionErrorHanlder } from "../../../helper/transactionError";
 import { getClientIp } from "../../../helper/clientIP";
-import { cborHex } from "../../../config";
 const payData = [
   // {
   //   title: "Mint for free and list with us ",

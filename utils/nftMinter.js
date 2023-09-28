@@ -9,9 +9,9 @@ import {
   blockfrostUrl,
   blockfrostApiKey,
   blockfrostNetworkName,
-} from "../config/blockfrostConfig";
+} from "../config/blockfrost";
 import { bankWalletAddress, seedPhrase } from "../config/walletConstants";
-import { cborHex } from "../config";
+import { cborHex } from "../config/constants";
 export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
   const lucid = await Lucid.new(
     new Blockfrost(blockfrostUrl, blockfrostApiKey),
