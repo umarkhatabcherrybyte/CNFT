@@ -1,4 +1,4 @@
-import { kuberApiUrl } from "../config";
+import { kuberApiUrl } from "../config/koios";
 import {
   Address,
   AssetName,
@@ -137,7 +137,7 @@ export async function callKuberAndSubmit(provider, data) {
     .catch((e) => {
       console.error(`${kuberUrlByNetwork}/api/v1/tx`, e);
       // throw Error(`Kubær API call : ` + e.message);
-      transactionErrorHanlder(e)
+      transactionErrorHanlder(e);
     })
     .then((res) => {
       if (res.status === 200) {
