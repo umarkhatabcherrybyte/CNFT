@@ -38,16 +38,6 @@ const Buy = () => {
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
 
-  console.log("wallet things ", {
-    wallet,
-    connected,
-    name,
-    // assets,_utxos,
-    connecting,
-    connect,
-    disconnect,
-    error,
-  });
   const router = useRouter();
   const [tabValue, setTabValue] = useState("single");
   const [isLoading, setIsLoading] = useState(true);
@@ -372,7 +362,6 @@ const Buy = () => {
                 />
                 {/* <BuyCards buy={buy} nfts={nfts[1]} /> */}
               </TabPanel>
-              {""}
             </>
           )}
 
