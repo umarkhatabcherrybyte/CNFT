@@ -24,7 +24,7 @@ import { Toast } from "../shared/Toast";
 import { INSTANCE } from "../../config/axiosInstance";
 import FullScreenLoader from "../shared/FullScreenLoader";
 import { transactionErrorHanlder } from "../../helper/transactionError";
-import { seedPhrasePreprod } from "../../config/utils";
+import { seedPhrase } from "../../config/walletConstants";
 import Heading from "../shared/headings/Heading";
 import Layout from "../Mint/Layout";
 import Mynft from "../Cards/Mynft";
@@ -119,7 +119,7 @@ const MylistTabs = () => {
                   blockfrostNetworkName
                 );
 
-                transferLucid.selectWalletFromSeed(seedPhrasePreprod);
+                transferLucid.selectWalletFromSeed(seedPhrase);
                 const lucidBrowser = await Lucid.new(
                   new Blockfrost(blockfrostUrl, blockfrostApiKey),
                   blockfrostNetworkName
