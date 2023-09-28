@@ -536,13 +536,6 @@ const ListCollectionStep2 = () => {
           );
           return;
         } else {
-          // const transferLucid = await Lucid.new(
-          //   new Blockfrost(
-          //     "https://cardano-mainnet.blockfrost.io/api/v0",
-          //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-          //   ),
-          //   "Mainnet"
-          // );
           const transferLucid = await Lucid.new(
             new Blockfrost(blockfrostUrl, blockfrostApiKey),
 
@@ -555,14 +548,6 @@ const ListCollectionStep2 = () => {
             transferLucid.wallet.address(),
             "address"
           );
-
-          // const lucid = await Lucid.new(
-          //   new Blockfrost(
-          //     "https://cardano-mainnet.blockfrost.io/api/v0",
-          //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-          //   ),
-          //   "Mainnet"
-          // );
           const lucid = await Lucid.new(
             new Blockfrost(blockfrostUrl, blockfrostApiKey),
 
@@ -646,9 +631,6 @@ const ListCollectionStep2 = () => {
             selectedNFTs.push(metadata.name);
             // delete element["price"];
           }
-          console.log("selectedNFTsNames are ", selectedNFTs);
-
-          // return 0;
 
           const txL = await lucid
             .newTx()

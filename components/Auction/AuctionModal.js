@@ -84,34 +84,17 @@ const AuctionModal = ({
                 unit: unit,
               });
               if (response.data.status) {
-                // if (true) {
-                // const transferLucid = await Lucid.new(
-                //   new Blockfrost(
-                //     "https://cardano-mainnet.blockfrost.io/api/v0",
-                //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-                //   ),
-                //   "Mainnet"
-                // );
                 const transferLucid = await Lucid.new(
                   new Blockfrost(blockfrostUrl, blockfrostApiKey),
 
                   blockfrostNetworkName
                 );
-                console.log(transferLucid, "transferLucid");
                 transferLucid.selectWalletFromSeed(seedPhrase);
-                // const lucidBrowser = await Lucid.new(
-                //   new Blockfrost(
-                //     "https://cardano-mainnet.blockfrost.io/api/v0",
-                //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-                //   ),
-                //   "Mainnet"
-                // );
 
                 const lucidBrowser = await Lucid.new(
                   new Blockfrost(blockfrostUrl, blockfrostApiKey),
                   blockfrostNetworkName
                 );
-                console.log(lucidBrowser, "lucidBrowser");
                 const api = await window.cardano[
                   String(connectedWallet)
                 ].enable();
