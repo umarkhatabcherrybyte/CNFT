@@ -7,9 +7,34 @@ import { useFetchNFTData } from ".././../hooks/useFetchNFTData";
 
 const FeatureToken = () => {
   const { utxos, isLoading, message } = useFetchNFTData();
-  // console.log(utxos, "utxosutxosutxosutxos");
-  // console.log(message, "messagemessagemessage");
+  console.log(utxos, "utxosutxosutxosutxos");
+  // Initialize empty arrays for audio, video, and image
+  let audioUtxos = [];
+  let videoUtxos = [];
+  let imageUtxos = [];
 
+  if (!isLoading) {
+    // Check if utxos is not empty
+    if (utxos && utxos.length > 0) {
+      // Filter for audio items
+      audioUtxos = utxos.filter(
+        (utxo) =>
+          utxo.detail.onchain_metadata.mediaType === "audio/mpeg" ||
+          utxo.detail.onchain_metadata.mediaType === "audio/mp4" ||
+          utxo.detail.onchain_metadata.mediaType === "audio/mp3"
+      );
+
+      // Filter for video items
+      videoUtxos = utxos.filter(
+        (utxo) => utxo.detail.onchain_metadata.mediaType === "video/mp4"
+      );
+
+      // Filter for image items
+      imageUtxos = utxos.filter((utxo) =>
+        utxo.detail.onchain_metadata.mediaType.includes("image")
+      );
+    }
+  }
   const [value, setValue] = React.useState("1");
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -66,13 +91,13 @@ const FeatureToken = () => {
                 <FeatureTokenSlider nfts={utxos} />
               </TabPanel>
               <TabPanel value="2" sx={{ p: 0 }}>
-                {/* <FeatureTokenSlider nfts={featureTokens.images} /> */}
+                <FeatureTokenSlider nfts={imageUtxos} />
               </TabPanel>
               <TabPanel value="3" sx={{ p: 0 }}>
-                {/* <FeatureTokenSlider nfts={featureTokens.audios} /> */}
+                <FeatureTokenSlider nfts={audioUtxos} />
               </TabPanel>
               <TabPanel value="4" sx={{ p: 0 }}>
-                {/* <FeatureTokenSlider nfts={featureTokens.videos} /> */}
+                <FeatureTokenSlider nfts={videoUtxos} />
               </TabPanel>
             </TabContext>
           </Box>
