@@ -7,9 +7,8 @@ import { useFetchNFTData } from ".././../hooks/useFetchNFTData";
 
 const FeatureToken = () => {
   const { utxos, isLoading, message } = useFetchNFTData();
-  console.log(utxos, "utxosutxosutxosutxos");
-  console.log(message, "messagemessagemessage");
-  const [featureTokens, setFeatureTokens] = useState([]);
+  // console.log(utxos, "utxosutxosutxosutxos");
+  // console.log(message, "messagemessagemessage");
 
   const [value, setValue] = React.useState("1");
   const handleChange = (event, newValue) => {
