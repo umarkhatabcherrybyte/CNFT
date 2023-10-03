@@ -4,36 +4,27 @@ import { Box, Grid, Typography, Button } from "@mui/material";
 import ContainerLayout from "/components/shared/ContainerLayout";
 import BreadCrumHeader from "/components/shared/BreadCrumHeader";
 
-import {
-  RemoveRedEyeOutlined,
-  FavoriteBorderOutlined,
-  CheckCircle,
-  ContentCopy,
-  Circle,
-} from "@mui/icons-material";
 import { TabContext, TabPanel } from "@mui/lab";
 
 import Strips from "/components/Design/Strips";
 import Ballon from "/components/Design/Ballon";
-import BarHeading from "/components/shared/headings/BarHeading";
-import ClientCard from "/components/Cards/ClientCard";
+
 import LineTab from "/components/Tabs/LineTab";
-import { buyPaymentRoute } from "/components/Routes/constants";
+
 import { useRouter } from "next/router";
 import { INSTANCE } from "/config/axiosInstance";
 import GetAdaPriceService from "/services/get-ada-price.service";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
-import { Toast } from "/components/shared/Toast";
+
 import FullScreenLoader from "/components/shared/FullScreenLoader";
-import useFetchData from "../../../../hooks/adaInfo";
-import { isVideoOrIsAudio } from "../../../../utils/fileUtlis";
-import { transactionErrorHanlder } from "../../../../utils/errorUtils";
+import useFetchData from "../../../hooks/adaInfo";
+
 import {
   getAssetDetail,
   getDatum,
   listMarket,
-} from "../../../../services/blockfrostService";
+} from "../../../services/blockfrostService";
 import {
   BaseAddress,
   Ed25519KeyHash,
@@ -43,13 +34,11 @@ import axios from "axios";
 import {
   decodeAssetName,
   transformNftImageUrl,
-} from "../../../../services/cardanoService";
-import { getAssetDetail as getNFTDetail } from "../../../../services/koiosService";
+} from "../../../services/cardanoService";
+import { useFetchNFTData } from "../../../hooks/useFetchNFTData";
+import { market } from "../../../config/marketConfig";
+import { callKuberAndSubmit } from "../../../services/kuberService";
 
-// import { BigInt } from "lucid-cardano/types/src/core/wasm_modules/cardano_multiplatform_lib_web/cardano_multiplatform_lib";
-const List = [{}, {}, {}, {}];
-
-const cardData = [{}, {}, {}, {}];
 const tabData = [
   {
     label: "Pay with ADA",
@@ -66,18 +55,26 @@ const tabData = [
 ];
 const BuyDetail = () => {
   const router = useRouter();
-  const lovelace = useLovelace();
-  const { id, item, cost, sellerPubKeyHashHex, sellerStakeKeyHashHex } =
-    router.query;
+  const {
+    utxos,
+    isLoading: notFetchedUtxosCompletely,
+    message,
+  } = useFetchNFTData();
+  const { id, Item: item } = router.query;
+  console.log(router.query);
+  console.log("policy ", id, " token ", item);
   const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
   const [tabValue, setTabValue] = useState("ada");
   const [detail, setDetail] = useState({});
   // const [selectedUtxo, setSelectedUtxo] = useState(null);
   const [datum, setDatum] = useState(null);
-
   const [isLoading, setIsLoading] = useState(true);
+  const [currentUtxo,setCurrentUtxo]=useState(null)
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
+
+  const lovelace = useLovelace();
+
   console.log(detail);
   useEffect(() => {
     const getData = async () => {
@@ -96,99 +93,6 @@ const BuyDetail = () => {
     }
   }, [id]);
 
-  const onBuy = async (e) => {};
-  // const onBuy = async (e) => {
-  //   if (connected) {
-  //     const price =
-  //       detail.list?.mint_type === "single"
-  //         ? detail.list?.sell_type_id?.price
-  //         : detail.list?.collection_id?.assets[item]?.price;
-  //     if (lovelace < price * 1000000) {
-  //       Toast(
-  //         "error",
-  //         "You do not have enough Ada to complete this transaction"
-  //       );
-  //       return;
-  //     } else {
-  //       try {
-  //         const user_address = getKeyData("user_address");
-  //         const connectedWallet = getKeyData("connectedWallet");
-  //         const address = detail.list?.collection_id?.recipient_address;
-  //         const lovelace = detail.list?.sell_type_id?.price * 1000000;
-  //         const user_value = Number(lovelace * 0.975);
-  //         const owner_value = Number(lovelace * 0.025);
-  //         const owner_address =
-  //           "addr_test1qpm6srkw5vndavk72khy58cht0f0u796xdmwq9kfu2j63064cwwrleufnnz36s8v0pk0l54kvfn3m7et69xxsvh4ajus55y7tq";
-  //         // const lucid = await Lucid.new(
-  //         //   new Blockfrost(
-  //         //     "https://cardano-mainnet.blockfrost.io/api/v0",
-  //         //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-  //         //   ),
-  //         //   "Mainnet"
-  //         // );
-  //         const lucid = await Lucid.new(
-  //           new Blockfrost(network_url, network_key),
-
-  //           network_name
-  //         );
-
-  //         const api = await window.cardano[String(connectedWallet)].enable();
-  //         lucid.selectWallet(api);
-  //         // console.log(await lucid.wallet.address());
-
-  //         const tx = await lucid
-  //           .newTx()
-  //           .payToAddress(address, { lovelace: BigInt(user_value) })
-  //           .payToAddress(owner_address, {
-  //             lovelace: BigInt(owner_value),
-  //           })
-  //           .validTo(Date.now() + 100000)
-  //           .complete();
-  //         // console.log(tx);
-  //         const signedTx = await tx.sign().complete();
-  //         const txHash = await signedTx.submit();
-  //         if (txHash) {
-  //           try {
-  //             const res = await INSTANCE.post("/list/approve", {
-  //               list_id: id,
-  //               index: item,
-  //               recipient_address: user_address,
-  //             });
-  //             if (res) {
-  //               Toast("success", "NFT Transfered to Your Wallet");
-  //               router.push("/buy");
-  //             }
-  //           } catch (e) {
-  //             Toast("error", "Try again later.");
-  //           }
-  //           // window.localStorage.setItem('policy', mintingPolicy.script)
-  //           // window.localStorage.setItem('policy-id', policyId)
-  //           // window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
-  //           // router.push('/mint')
-  //         }
-  //       } catch (e) {
-  //         transactionErrorHanlder(e, "buy");
-
-  //         if (clientIp) {
-  //           try {
-  //             const response = await INSTANCE.post(`/log/create`, {
-  //               error: JSON.stringify(error),
-  //               ip: clientIp,
-  //               type: "single buy item",
-  //             });
-  //             console.log(response.data);
-  //           } catch (error) {
-  //             console.error(error);
-  //           }
-  //         }
-  //         console.log(e, "errro");
-  //       }
-  //     }
-  //   } else {
-  //     Toast("error", "Please connect your wallet.");
-  //   }
-  // };
-
   const [asset, setAsset] = useState({});
   console.log({ asset });
   useEffect(() => {
@@ -196,11 +100,97 @@ const BuyDetail = () => {
     getNFTDetail();
   }, [id]);
 
+  const buy_utxo = async () => {
+    const api = await window.cardano.nami.enable();
+    const res = await connect("Nami");
+    let provider_=api;
+    
+    if (notFetchedUtxosCompletely) {
+      return 0;
+    }
+    console.log({ wallet });
+    if (!connected) {
+      alert("Please connect your wallet first !");
+      return 0;
+    }
+    console.log(asset);
+    const validUtxos = utxos;
+    console.log("Valid market utxos", validUtxos);
+      if (currentUtxo) {
+        let utxo=currentUtxo
+        console.log("buying ", utxo);
+        const datum = utxo.detail.datum;
+        const cost = datum.fields[1].int;
+        const sellerPubKeyHashHex = datum.fields[0].fields[0].fields[0].bytes;
+        const sellerStakeKeyHashHex =
+          datum.fields[0].fields[1].fields[0].fields[0].fields[0].bytes;
+        console.log({ cost, sellerPubKeyHashHex, sellerStakeKeyHashHex });
+        const vkey = StakeCredential.from_keyhash(
+          Ed25519KeyHash.from_bytes(Buffer.from(sellerPubKeyHashHex, "hex"))
+        );
+        const stakeKey = StakeCredential.from_keyhash(
+          Ed25519KeyHash.from_bytes(Buffer.from(sellerStakeKeyHashHex, "hex"))
+        );
+        const sellerAddr = BaseAddress.new(0, vkey, stakeKey);
+        let utxos__ = await provider_.getUtxos();
+        console.log({ utxos__ });
+        // Create constraints for buying
+        // walletAction.callback
+        // const by2 = async (provider) => {
+
+        const request = {
+          selections: utxos__,
+          inputs: [
+            {
+              address: market.address,
+              utxo: {
+                hash: utxo.tx_hash,
+                index: utxo.tx_index,
+              },
+              script: market.script,
+              redeemer: { fields: [], constructor: 0 },
+            },
+          ],
+          outputs: [
+            {
+              address: sellerAddr
+                .to_address()
+                .to_bech32(
+                  market.address.startsWith("addr_test") ? "addr_test" : "addr"
+                ),
+              value: cost,
+              insuffientUtxoAda: "increase",
+            },
+          ],
+        };
+        console.log({ request });
+        return callKuberAndSubmit(provider_, JSON.stringify(request));
+        // };
+      }
+    
+
+    // walletAction.enable = true;
+  };
+  let AdaPrice = currentUtxo?.detail.datum.fields[1].int
+    ? parseFloat(currentUtxo?.detail.datum.fields[1].int / 1000000).toFixed(2)
+    : 0;
+  if (!AdaPrice) AdaPrice = 0;
+  console.log({ AdaPrice });
+
+  useEffect(() => {
+    utxos.map(async (utxo) => {
+      if (fromText(utxo.assetName) == item){
+        setCurrentUtxo(utxo);
+      }
+    })
+
+  }, [item,utxos]);
+
   const getNFTDetail = async () => {
     if (id) {
       try {
         let asset = await getAssetDetail(id + item);
-        
+
         setIsLoading(false);
         setAsset(asset);
       } catch (e) {
@@ -209,172 +199,11 @@ const BuyDetail = () => {
       }
     }
   };
-  const buy_utxo = async () => {
-    // const datum = utxo.detail.datum;
-    // const cost = datum.fields[1].int;
-    // const sellerPubKeyHashHex = datum.fields[0].fields[0].fields[0].bytes;
-    // const sellerStakeKeyHashHex =
-    //   datum.fields[0].fields[1].fields[0].fields[0].fields[0].bytes;
-    let utxo = asset;
-    console.log("buying ", utxo);
-    const vkey = StakeCredential.from_keyhash(
-      Ed25519KeyHash.from_bytes(Buffer.from(sellerPubKeyHashHex, "hex"))
-    );
-    const stakeKey = StakeCredential.from_keyhash(
-      Ed25519KeyHash.from_bytes(Buffer.from(sellerStakeKeyHashHex, "hex"))
-    );
-    const sellerAddr = BaseAddress.new(0, vkey, stakeKey);
-    let utxos__ = await wallet.getUtxos();
-    console.log({ utxos__ });
-    // Create constraints for buying
-    // walletAction.callback
-    // const by2 = async (provider) => {
 
-    const request = {
-      selections: utxos__,
-      inputs: [
-        {
-          address: market.address,
-          utxo: {
-            hash: utxo.tx_hash,
-            index: utxo.tx_index,
-          },
-          script: market.script,
-          redeemer: { fields: [], constructor: 0 },
-        },
-      ],
-      outputs: [
-        {
-          address: sellerAddr
-            .to_address()
-            .to_bech32(
-              market.address.startsWith("addr_test") ? "addr_test" : "addr"
-            ),
-          value: cost,
-          insuffientUtxoAda: "increase",
-        },
-      ],
-    };
-
-    return callKuberAndSubmit(wallet, JSON.stringify(request));
-    // };
-
-    // walletAction.enable = true;
-  };
-  let AdaPrice = asset?.onchain_metadata?.price
-    ? parseFloat(asset?.onchain_metadata?.price / 1000000).toFixed(2)
-    : 0;
-  if (!AdaPrice) AdaPrice = 0;
-  console.log({ AdaPrice });
-
-  useEffect(() => {
-    // getUsdPrice(setUsdPrice);
-  }, []);
-
-  async function getUtxos() {
-    const response = await listMarket();
-    // console.log("All Market Utxos", response);
-
-    const utxos = response.filter((utxo) => {
-      const amount_ = utxo.amount.filter((x) => x.unit !== "lovelace");
-      if (amount_.length == 1 && amount_[0].quantity == 1) {
-        const nft = amount_[0].unit;
-        const policy = nft.substring(0, 56);
-        const asset_ = nft.substring(56);
-        const assetUtf8 = decodeAssetName(asset_);
-        utxo.policy = policy;
-        utxo.assetName = assetUtf8;
-        utxo.detail = {};
-        utxo.nft = nft;
-        utxo.id = utxo.tx_hash + "#" + utxo.tx_index;
-
-        return true;
-      } else {
-        return false;
-      }
-    });
-
-    const promises = utxos.map(async (utxo) => {
-      const dataResponse = await getDatum(utxo.data_hash);
-      utxo.datum = dataResponse.json_value;
-
-      const nftDetail = await getAssetDetail(utxo.nft);
-
-      if (nftDetail.onchain_metadata) {
-        if (nftDetail.onchain_metadata.name) {
-          nftDetail._name = nftDetail.onchain_metadata.name;
-        }
-        if (nftDetail.onchain_metadata.image) {
-          nftDetail._imageUrl = transformNftImageUrl(
-            nftDetail.onchain_metadata.image
-          );
-        }
-      }
-
-      nftDetail.utxo = utxo.id;
-      nftDetail.datum = utxo.datum;
-
-      // setTimeout(() => {
-      //   database.saveUtxos(db, [nftDetail]);
-      // });
-      console.log(nftDetail, "nftDetailnftDetailnftDetail");
-      return nftDetail;
-    });
-
-    const settledPromises = await Promise.allSettled(promises);
-
-    const lookup = {};
-    settledPromises
-      .filter((v) => v.value && v.value.datum)
-      .forEach((x) => {
-        lookup[x.value.utxo] = x.value;
-      });
-
-    utxos.forEach((v) => (v.detail = lookup[v.id]));
-
-    const validUtxos = utxos.filter((v) => v.detail);
-    validUtxos.map((item) => {
-      console.log(fromText(item.assetName), asset.asset_name);
-      fromText(item.assetName) == asset.asset_name ? setSelectedUtxo(item) : "";
-    });
-    console.log({ validUtxos });
-    return validUtxos;
-  }
-  async function getNftDatum() {
-    if (!asset.asset_name) {
-      return;
-    }
-    const assetPolicy = asset.policy_id;
-    const assetName = asset.asset_name;
-
-    let res = await getNFTDetail(assetPolicy);
-    console.log(res.data);
-    let hash = res.data[0].minting_tx_hash;
-    console.log({ hash });
-    const data = {
-      _tx_hashes: [
-        "f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e",
-      ],
-    };
-
-    axios
-      .post("https://api.koios.rest/api/v0/tx_info", data, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        console.log("Response:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }
   useEffect(() => {
     // getUtxos();
     // setDatum(asset.datum);
-    getNftDatum();
+    // getNftDatum();
   }, [asset]);
   console.log({ AdaPrice, datum });
   return (

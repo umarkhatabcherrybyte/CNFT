@@ -56,6 +56,7 @@ const Testing = () => {
     const api = await window.cardano.nami.enable();
     const res = await connect("Nami");
     setInstance(api);
+    
     // const addresses = await api.getUsedAddresses();
     // console.log(addresses, "addressesaddressesaddresses");
     // console.log(api, "sellNftsellNftsellNft");

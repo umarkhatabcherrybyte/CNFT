@@ -23,62 +23,30 @@ const NftCard = ({ onClick, card, type }) => {
   const [datum, setDatum] = useState(null);
   console.log("NFT is ", card);
 
-  async function getNftDatum() {
-    const assetPolicy = card.policy ? card.policy : card.policy_id;
-    // let res = await getAssetDetail(
-    //   assetPolicy + fromText(card.assetName ? card.assetName : card.name)
-    // );
-    console.log({
-      name: card.assetName ? card.assetName : card.name,
-      assetPolicy,
-    });
-
-    let client = new BlockfrostProvider(blockfrostApiKey);
-    let res = client.fetchAddressUTxOs(
-      market.address,
-      assetPolicy + fromText(card.assetName ? card.assetName : card.name)
-    );
-
-    console.log("asset utxo ", res);
-  }
   const router = useRouter();
   // let _datum = card.detail.datum;
   // console.log("datum is ", _datum);
 
+  let name = card.assetName
+    ? card.assetName
+    : card.asset_name
+    ? card.asset_name
+    : card.name;
+  console.log({ name });
+  let hexName = fromText(name);
   const navigationHanlder = () => {
     try {
       if (onClick) {
         onClick();
       }
-      // const route = type
-      //   ? `${MycollectionRoute}/${sell_model}`
-      //   : `${buyDetailRoute}/0`;
-      // router.push(`${route}/${card._id}`);
+
       console.log("navigating....");
-      let name = fromText(card.assetName ? card.assetName : card.name);
-      if (type == 1) {
-        console.log("individual");
-        /**
-       *     const cost = datum.fields[1].int;
-    const sellerPubKeyHashHex = datum.fields[0].fields[0].fields[0].bytes;
-    const sellerStakeKeyHashHex =
-      datum.fields[0].fields[1].fields[0].fields[0].fields[0].bytes;
-       */
-        // setAnchorEl(null);
-        router.push({
-          pathname: `/buy/${card.policy}`,
-          query: {
-            cost: _datum.fields[1].int,
-            sellerPubKeyHashHex: _datum.fields[0].fields[0].fields[0].bytes,
-            sellerStakeKeyHashHex:
-              _datum.fields[0].fields[1].fields[0].fields[0].fields[0].bytes,
-          }, // sellerPubKeyHashHex,sellerStakeKeyHashHex
-        });
-        // router.push(`/buy/${name}/${card?.policy}`);
-      } else {
-        console.log("collection");
-        router.push(`/buy/${card?.policy}`);
-      }
+      router.push({
+        pathname: `/buy/${hexName}/${card?.policy}`,
+        query: {
+          // policy: card?.policy,
+        },
+      });
     } catch (e) {
       console.log("error in NFt card ", e);
     }
@@ -107,7 +75,7 @@ const NftCard = ({ onClick, card, type }) => {
 
   // console.log("showing card", card);
   useEffect(() => {
-    getNftDatum();
+    // getNftDatum();
   }, []);
   return (
     <NftCardStyled>

@@ -21,19 +21,11 @@ import {
   decodeAssetName,
   transformNftImageUrl,
 } from "../../services/cardanoService";
-import { Buffer } from "buffer";
 import { useWallet } from "@meshsdk/react";
-import {
-  BaseAddress,
-  Ed25519KeyHash,
-  StakeCredential,
-} from "@emurgo/cardano-serialization-lib-asmjs";
-import { market } from "../../config/marketConfig";
-import CollectionCard from "./collection";
 import CollectionThumbnail from "../../components/shared/CollectionThumbnail";
 
 const Buy = () => {
-  const { wallet, connected, name, connecting, connect, disconnect, error } =
+  const { connected } =
     useWallet();
 
   const router = useRouter();
