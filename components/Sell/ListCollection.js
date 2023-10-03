@@ -142,6 +142,15 @@ const ListCollection = () => {
               feature_image: file2DataURL_ipfs,
               banner_image: file1DataURL_ipfs,
             };
+            // const dataWithFiles = {
+            //   ...values,
+            //   logo_image: file1DataURL,
+            //   feature_image: file2DataURL,
+            //   banner_image: file3DataURL,
+            //   ipfs_logo_image: file3DataURL_ipfs,
+            //   ipfs_feature_image: file2DataURL_ipfs,
+            //   ipfs_banner_image: file1DataURL_ipfs,
+            // };
 
             // Store the object in local storage
             localStorage.setItem("listing", JSON.stringify(dataWithFiles));

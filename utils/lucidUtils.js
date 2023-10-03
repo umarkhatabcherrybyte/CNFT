@@ -15,12 +15,14 @@ import { cborHex } from "../config/constants";
 export async function initializeLucid(fromSeed) {
   let lucid;
   if (fromSeed) {
+    console.log("from seeed");
     lucid = await Lucid.new(
       new Blockfrost(blockfrostUrl, blockfrostApiKey),
       blockfrostNetworkName
     );
     lucid.selectWalletFromSeed(seedPhrase);
   } else {
+    console.log("from browser");
     lucid = await Lucid.new(
       new Blockfrost(blockfrostUrl, blockfrostApiKey),
       blockfrostNetworkName

@@ -16,12 +16,11 @@ const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
 const AuctionCard = ({ data, index }) => {
   const router = useRouter();
   const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
-  const [date, setDate] = useState("");
 
   const asset_detail = data?.collection_id?.assets[0];
   const type = data.mint_type === "collection";
   const sell_model = data?.sell_model;
-  // console.log("model", sell_model);
+  console.log("model", data);
   const navigationHanlder = () => {
     const route = type
       ? `${MycollectionRoute}/${sell_model}`
