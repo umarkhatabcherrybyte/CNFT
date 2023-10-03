@@ -16,10 +16,12 @@ import FullScreenLoader from "../shared/FullScreenLoader";
 import { BlockfrostProvider } from "@meshsdk/core";
 import { useDispatch, useSelector } from "react-redux";
 import { blockfrostApiKey } from "../../config/blockfrost";
+import { useRouter } from "next/router";
 
 const Mynft = ({ card }) => {
   // console.log(card);
   // console.log("Policy if of nft is: ", card.policyId);
+  const router = useRouter();
   const dispatch = useDispatch();
   const instance = useSelector((store) => store.wallet);
   // console.log(instance, "instanceinstanceinstanceinstance");
@@ -48,7 +50,6 @@ const Mynft = ({ card }) => {
       // console.log("ifffffffffffffffffffffffffffff");
       setIsLoading(true);
       window.localStorage.setItem("policyId", JSON.stringify(card.policyId));
-      window.localStorage.setItem("assetName", JSON.stringify(card.assetName));
       const ipfsHash = metadata?.image.replace("ipfs://", "");
       const data = {
         metadata: [
@@ -69,10 +70,22 @@ const Mynft = ({ card }) => {
         type: "single",
         image_file: ``,
       };
-      window.localStorage.setItem("listing", JSON.stringify(data));
-      window.localStorage.setItem("asset_name", card.assetName);
-      setIsLoading(false);
-      // dispatch(setStep("step2"));
+
+      const res = await INSTANCE.post("/collection/create", data);
+
+      if (res) {
+        window.localStorage.setItem("listing", JSON.stringify(res?.data.data));
+        window.localStorage.setItem("asset_name", card.assetName);
+        setIsLoading(false);
+        router.push({
+          pathname: "/sell",
+          query: {
+            type: "add-listing",
+            action: "listing",
+          },
+        });
+        dispatch(setStep("step2"));
+      }
     }
     // setIsLoading(true);
     // console.log(

@@ -198,6 +198,7 @@ const MyListCard = () => {
                     pathname: "/sell",
                     query: {
                       type: "add-listing",
+                      action: "mint",
                     },
                   });
                 }}

@@ -222,6 +222,7 @@ const Navbar = () => {
                             pathname: "/sell",
                             query: {
                               type: "add-listing",
+                              action: "mint",
                             },
                           });
                         }}

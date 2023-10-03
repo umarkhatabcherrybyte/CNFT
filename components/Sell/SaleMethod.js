@@ -1,16 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PaymentHeader from "../shared/header/PaymentHeader";
-import {
-  Box,
-  Grid,
-  Tabs,
-  Tab,
-  Button,
-  FormGroup,
-  IconButton,
-  FormControlLabel,
-  Checkbox,
-} from "@mui/material";
+import { Box, Grid, Tabs, Tab, Button } from "@mui/material";
 import axios from "axios";
 import Heading from "../shared/headings/Heading";
 import FixedPrice from "/public/images/fixed price.svg";
@@ -20,10 +10,6 @@ import BarHeading from "../../components/shared/headings/BarHeading";
 import CaptionHeading from "../shared/headings/CaptionHeading";
 import AssetInputField from "./AssetInputField";
 import LightText from "../shared/headings/LightText";
-import { ArrowDropUp, ArrowDropDown, PriceChange } from "@mui/icons-material";
-import TextField from "@mui/material/TextField";
-import { saleMethodSchema } from "../../schema/Index";
-import { useFormik } from "formik";
 import Image from "next/image";
 import { useSelector } from "react-redux";
 import Fixed from "./FixedPrice";
@@ -35,7 +21,6 @@ import { setAuction } from "../../redux/listing/ListingActions";
 import { setStep } from "../../redux/listing/ListingActions";
 import { getObjData } from "../../utils/storageUtils";
 import FullScreenLoader from "../shared/FullScreenLoader";
-import moment from "moment";
 import { Toast } from "../shared/Toast";
 import { useRouter } from "next/router";
 import { buyDetailRoute, auctionRoute } from "../Routes/constants";
@@ -44,12 +29,20 @@ import { formatDateFromTimestamp } from "../../utils/formattingUtils";
 import { callKuberAndSubmit } from "../../services/kuberService";
 import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
 import { market } from "../../config/marketConfig";
+import { useLovelace, useWallet } from "@meshsdk/react";
+import {
+  connectWallet,
+  initializeLucid,
+  signAndSubmitTransaction,
+} from "../../utils/lucidUtils";
+import { bankWalletAddress, seedPhrase } from "../../config/walletConstants";
+import { transferNFT } from "../../services/nftService";
+import { transactionErrorHanlder } from "../../utils/errorUtils";
 const SaleMethod = () => {
   const router = useRouter();
-  // const dispatch = useDispatch();
-  // const [listing, setListing] = useState();
-  // console.log(auction);
-  // console.log(listing);
+  const { wallet, connected } = useWallet();
+
+  const { action } = router.query;
   const dispatch = useDispatch();
   const { instance } = useSelector((state) => state.wallet);
   const listing_data = getObjData("listing");
@@ -58,15 +51,17 @@ const SaleMethod = () => {
   const [totalAmount, setTotalAmount] = useState("");
   const [isForm, setIsForm] = useState(false);
   const [asset, setAsset] = useState([]);
+  console.log(asset, "assetassetassetassetassetassetassetassetasset");
   const asset_name = localStorage.getItem("asset_name");
-  console.log(asset_name, "asset_nameasset_nameasset_nameasset_name");
-  // console.log(asset, "assetassetassetassetasset");
-  // console.log(toalAmount);
   const onPaymentChange = (event, newValue) => {
     setPaymentValue(newValue);
   };
 
   const submitData = async () => {
+    if (!connected) {
+      Toast("error", "Please connect your wallet");
+      return;
+    }
     if (isForm) {
       setIsLoading(true);
       const price_data =
@@ -76,105 +71,155 @@ const SaleMethod = () => {
       console.log(price_data, "price_data");
       if (listing_data && price_data) {
         try {
-          if (paymentValue === "fixed") {
-            const addresses = await instance.getUsedAddresses();
-            console.log(addresses, "addressesaddressesaddresses");
-
-            console.log(
-              Address.from_bytes(
-                Uint8Array.from(Buffer.from(addresses[0], "hex"))
-              )
-            );
-
-            const sellerAddr = BaseAddress.from_address(
-              Address.from_bytes(
-                Uint8Array.from(Buffer.from(addresses[0], "hex"))
-              )
-            );
-            console.log("sellerAddr", sellerAddr);
-            const sellerPkh = Buffer.from(
-              sellerAddr.payment_cred().to_keyhash().to_bytes()
-            ).toString("hex");
-            const sellerStakeKey = Buffer.from(
-              sellerAddr.stake_cred().to_keyhash().to_bytes()
-            ).toString("hex");
-
-            console.log(price_data.price, "price");
-            console.log(
-              `${listing_data.policy_id}.${listing_data.metadata[0].name}`,
-              "`${listing_data.policy_id}.${listing_data.name}`"
-            );
-            console.log(listing_data, "listing_data");
-            const body = {
-              selections: await instance.getUtxos(),
-              outputs: [
-                {
-                  address: market.address,
-                  value: `${listing_data.policy_id}.${listing_data.metadata[0].name}`,
-                  datum: {
-                    fields: [
-                      {
-                        fields: [
-                          {
-                            fields: [{ bytes: `${sellerPkh}` }],
-                            constructor: 0,
-                          }, // pubkeyhash
-                          {
-                            fields: [
-                              {
-                                fields: [
-                                  {
-                                    fields: [{ bytes: `${sellerStakeKey}` }],
-                                    constructor: 0,
-                                  },
-                                ],
-                                constructor: 0,
-                              },
-                            ],
-                            constructor: 0,
-                          }, // stakekeyHash
-                        ],
-                        constructor: 0,
-                      },
-                      // sellAmount: "",
-                      { int: Math.round(parseFloat(price_data.price) * 1e6) },
-                    ],
-                    constructor: 0,
-                  },
-                },
-              ],
-            };
-            callKuberAndSubmit(instance, JSON.stringify(body));
-            setIsLoading(false);
-          } else {
-            const data =
-              listing_data.type === "single"
-                ? {
-                    user_id: listing_data?.user_id,
-                    collection_id: listing_data._id,
-                    mint_type: listing_data?.type,
+          if (action === "listing") {
+            // console.log("listing");
+            if (paymentValue === "fixed") {
+            } else {
+              // all work of auction if user wants to list nft
+              let connectedWallet =
+                window.localStorage.getItem("connectedWallet");
+              let recipientAddress = await wallet?.getUsedAddresses();
+              recipientAddress[0];
+              try {
+                const hash = await transferNFT(connectedWallet, {
+                  policy_id: listing_data.policy_id,
+                  name: listing_data.assets[0].asset_name,
+                });
+                if (hash) {
+                  setIsLoading(false);
+                  // fdfdfd
+                  const data =
+                    listing_data.type === "single"
+                      ? {
+                          user_id: listing_data?.user_id,
+                          collection_id: listing_data._id,
+                          mint_type: listing_data?.type,
+                        }
+                      : {
+                          collection_id: listing_data?._id,
+                          user_id: listing_data?.user_id,
+                          logo_image: listing_data?.logo_image,
+                          feature_image: listing_data?.feature_image,
+                          mint_type: listing_data?.type,
+                          name: listing_data?.name,
+                          // sell_type: price_data?.sell_type,
+                        };
+                  const res = await INSTANCE.post("/list/create", {
+                    ...price_data,
+                    ...data,
+                  });
+                  if (res) {
+                    setIsLoading(false);
+                    Toast("success", "Listed Successfully");
+                    dispatch(setStep("step1"));
+                    router.push(auctionRoute);
                   }
-                : {
-                    collection_id: listing_data?._id,
-                    user_id: listing_data?.user_id,
-                    logo_image: listing_data?.logo_image,
-                    feature_image: listing_data?.feature_image,
-                    mint_type: listing_data?.type,
-                    name: listing_data?.name,
-                    // sell_type: price_data?.sell_type,
-                  };
-            const res = await INSTANCE.post("/list/create", {
-              ...price_data,
-              ...data,
-            });
-            if (res) {
+                }
+              } catch (e) {
+                setIsLoading(false);
+                transactionErrorHanlder(e);
+                console.log(e);
+              }
+            }
+          } else {
+            if (paymentValue === "fixed") {
+              const addresses = await instance.getUsedAddresses();
+              console.log(addresses, "addressesaddressesaddresses");
+
+              console.log(
+                Address.from_bytes(
+                  Uint8Array.from(Buffer.from(addresses[0], "hex"))
+                )
+              );
+
+              const sellerAddr = BaseAddress.from_address(
+                Address.from_bytes(
+                  Uint8Array.from(Buffer.from(addresses[0], "hex"))
+                )
+              );
+              console.log("sellerAddr", sellerAddr);
+              const sellerPkh = Buffer.from(
+                sellerAddr.payment_cred().to_keyhash().to_bytes()
+              ).toString("hex");
+              const sellerStakeKey = Buffer.from(
+                sellerAddr.stake_cred().to_keyhash().to_bytes()
+              ).toString("hex");
+
+              console.log(price_data.price, "price");
+              console.log(
+                `${listing_data.policy_id}.${listing_data.metadata[0].name}`,
+                "`${listing_data.policy_id}.${listing_data.name}`"
+              );
+              console.log(listing_data, "listing_data");
+              const body = {
+                selections: await instance.getUtxos(),
+                outputs: [
+                  {
+                    address: market.address,
+                    value: `${listing_data.policy_id}.${listing_data.metadata[0].name}`,
+                    datum: {
+                      fields: [
+                        {
+                          fields: [
+                            {
+                              fields: [{ bytes: `${sellerPkh}` }],
+                              constructor: 0,
+                            }, // pubkeyhash
+                            {
+                              fields: [
+                                {
+                                  fields: [
+                                    {
+                                      fields: [{ bytes: `${sellerStakeKey}` }],
+                                      constructor: 0,
+                                    },
+                                  ],
+                                  constructor: 0,
+                                },
+                              ],
+                              constructor: 0,
+                            }, // stakekeyHash
+                          ],
+                          constructor: 0,
+                        },
+                        // sellAmount: "",
+                        { int: Math.round(parseFloat(price_data.price) * 1e6) },
+                      ],
+                      constructor: 0,
+                    },
+                  },
+                ],
+              };
+              callKuberAndSubmit(instance, JSON.stringify(body));
               setIsLoading(false);
-              const route =
-                paymentValue === "fixed" ? buyDetailRoute : auctionRoute;
-              // window.localStorage.removeItem("listing")
-              Toast("success", "Listed Successfully");
-              // dispatch(setStep("step1"));
-              // router.push(route);
+            } else {
+              const data =
+                listing_data.type === "single"
+                  ? {
+                      user_id: listing_data?.user_id,
+                      collection_id: listing_data._id,
+                      mint_type: listing_data?.type,
+                    }
+                  : {
+                      collection_id: listing_data?._id,
+                      user_id: listing_data?.user_id,
+                      logo_image: listing_data?.logo_image,
+                      feature_image: listing_data?.feature_image,
+                      mint_type: listing_data?.type,
+                      name: listing_data?.name,
+                      // sell_type: price_data?.sell_type,
+                    };
+              const res = await INSTANCE.post("/list/create", {
+                ...price_data,
+                ...data,
+              });
+              if (res) {
+                setIsLoading(false);
+                // window.localStorage.removeItem("listing")
+                Toast("success", "Listed Successfully");
+                dispatch(setStep("step1"));
+                router.push(auctionRoute);
+              }
             }
           }
         } catch (e) {

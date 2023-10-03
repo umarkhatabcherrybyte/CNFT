@@ -196,7 +196,7 @@ const MylistTabs = () => {
                         );
                         if (res) {
                           setIsLoading(false);
-                          // dispatch(setStep("step2"));
+                          dispatch(setStep("step2"));
                           // dispatch(setListing())
                           window.localStorage.setItem(
                             "listing",
@@ -233,7 +233,7 @@ const MylistTabs = () => {
                       );
                       if (res) {
                         setIsLoading(false);
-                        // dispatch(setStep("step2"));
+                        dispatch(setStep("step2"));
                         // dispatch(setListing())
                         window.localStorage.setItem(
                           "listing",
