@@ -4,36 +4,41 @@ import { Box, Grid, Typography, Button } from "@mui/material";
 import ContainerLayout from "/components/shared/ContainerLayout";
 import BreadCrumHeader from "/components/shared/BreadCrumHeader";
 
-import {
-  RemoveRedEyeOutlined,
-  FavoriteBorderOutlined,
-  CheckCircle,
-  ContentCopy,
-  Circle,
-} from "@mui/icons-material";
 import { TabContext, TabPanel } from "@mui/lab";
 
 import Strips from "/components/Design/Strips";
 import Ballon from "/components/Design/Ballon";
-import BarHeading from "/components/shared/headings/BarHeading";
-import ClientCard from "/components/Cards/ClientCard";
+
 import LineTab from "/components/Tabs/LineTab";
-import { buyPaymentRoute } from "/components/Routes/constants";
+
 import { useRouter } from "next/router";
 import { INSTANCE } from "/config/axiosInstance";
 import GetAdaPriceService from "/services/get-ada-price.service";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import { Lucid, fromText, Blockfrost } from "lucid-cardano";
-import { Toast } from "/components/shared/Toast";
+
 import FullScreenLoader from "/components/shared/FullScreenLoader";
 import useFetchData from "../../../hooks/adaInfo";
-import { isVideoOrIsAudio } from "../../../utils/fileUtlis";
-import { transactionErrorHanlder } from "../../../utils/errorUtils";
-import { getAssetDetail } from "../../../services/blockfrostService";
-// import { BigInt } from "lucid-cardano/types/src/core/wasm_modules/cardano_multiplatform_lib_web/cardano_multiplatform_lib";
-const List = [{}, {}, {}, {}];
 
-const cardData = [{}, {}, {}, {}];
+import {
+  getAssetDetail,
+  getDatum,
+  listMarket,
+} from "../../../services/blockfrostService";
+import {
+  BaseAddress,
+  Ed25519KeyHash,
+  StakeCredential,
+} from "@emurgo/cardano-serialization-lib-asmjs";
+import axios from "axios";
+import {
+  decodeAssetName,
+  transformNftImageUrl,
+} from "../../../services/cardanoService";
+import { useFetchNFTData } from "../../../hooks/useFetchNFTData";
+import { market } from "../../../config/marketConfig";
+import { callKuberAndSubmit } from "../../../services/kuberService";
+
 const tabData = [
   {
     label: "Pay with ADA",
@@ -50,15 +55,26 @@ const tabData = [
 ];
 const BuyDetail = () => {
   const router = useRouter();
-  const lovelace = useLovelace();
-  const { id, item } = router.query;
+  const {
+    utxos,
+    isLoading: notFetchedUtxosCompletely,
+    message,
+  } = useFetchNFTData();
+  const { id, Item: item } = router.query;
+  console.log(router.query);
+  console.log("policy ", id, " token ", item);
   const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
   const [tabValue, setTabValue] = useState("ada");
   const [detail, setDetail] = useState({});
-
+  // const [selectedUtxo, setSelectedUtxo] = useState(null);
+  const [datum, setDatum] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentUtxo,setCurrentUtxo]=useState(null)
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
+
+  const lovelace = useLovelace();
+
   console.log(detail);
   useEffect(() => {
     const getData = async () => {
@@ -76,110 +92,105 @@ const BuyDetail = () => {
       // getData();
     }
   }, [id]);
-  const onBuy = async (e) => {};
-  // const onBuy = async (e) => {
-  //   if (connected) {
-  //     const price =
-  //       detail.list?.mint_type === "single"
-  //         ? detail.list?.sell_type_id?.price
-  //         : detail.list?.collection_id?.assets[item]?.price;
-  //     if (lovelace < price * 1000000) {
-  //       Toast(
-  //         "error",
-  //         "You do not have enough Ada to complete this transaction"
-  //       );
-  //       return;
-  //     } else {
-  //       try {
-  //         const user_address = getKeyData("user_address");
-  //         const connectedWallet = getKeyData("connectedWallet");
-  //         const address = detail.list?.collection_id?.recipient_address;
-  //         const lovelace = detail.list?.sell_type_id?.price * 1000000;
-  //         const user_value = Number(lovelace * 0.975);
-  //         const owner_value = Number(lovelace * 0.025);
-  //         const owner_address =
-  //           "addr_test1qpm6srkw5vndavk72khy58cht0f0u796xdmwq9kfu2j63064cwwrleufnnz36s8v0pk0l54kvfn3m7et69xxsvh4ajus55y7tq";
-  //         // const lucid = await Lucid.new(
-  //         //   new Blockfrost(
-  //         //     "https://cardano-mainnet.blockfrost.io/api/v0",
-  //         //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-  //         //   ),
-  //         //   "Mainnet"
-  //         // );
-  //         const lucid = await Lucid.new(
-  //           new Blockfrost(network_url, network_key),
-
-  //           network_name
-  //         );
-
-  //         const api = await window.cardano[String(connectedWallet)].enable();
-  //         lucid.selectWallet(api);
-  //         // console.log(await lucid.wallet.address());
-
-  //         const tx = await lucid
-  //           .newTx()
-  //           .payToAddress(address, { lovelace: BigInt(user_value) })
-  //           .payToAddress(owner_address, {
-  //             lovelace: BigInt(owner_value),
-  //           })
-  //           .validTo(Date.now() + 100000)
-  //           .complete();
-  //         // console.log(tx);
-  //         const signedTx = await tx.sign().complete();
-  //         const txHash = await signedTx.submit();
-  //         if (txHash) {
-  //           try {
-  //             const res = await INSTANCE.post("/list/approve", {
-  //               list_id: id,
-  //               index: item,
-  //               recipient_address: user_address,
-  //             });
-  //             if (res) {
-  //               Toast("success", "NFT Transfered to Your Wallet");
-  //               router.push("/buy");
-  //             }
-  //           } catch (e) {
-  //             Toast("error", "Try again later.");
-  //           }
-  //           // window.localStorage.setItem('policy', mintingPolicy.script)
-  //           // window.localStorage.setItem('policy-id', policyId)
-  //           // window.localStorage.setItem('minting-script', JSON.stringify(mintingPolicy))
-  //           // router.push('/mint')
-  //         }
-  //       } catch (e) {
-  //         transactionErrorHanlder(e, "buy");
-
-  //         if (clientIp) {
-  //           try {
-  //             const response = await INSTANCE.post(`/log/create`, {
-  //               error: JSON.stringify(error),
-  //               ip: clientIp,
-  //               type: "single buy item",
-  //             });
-  //             console.log(response.data);
-  //           } catch (error) {
-  //             console.error(error);
-  //           }
-  //         }
-  //         console.log(e, "errro");
-  //       }
-  //     }
-  //   } else {
-  //     Toast("error", "Please connect your wallet.");
-  //   }
-  // };
 
   const [asset, setAsset] = useState({});
-  console.log(asset, "assetassetassetassetasset");
+  console.log({ asset });
   useEffect(() => {
     setIsLoading(true);
-    getNFTDetial();
+    getNFTDetail();
   }, [id]);
 
-  const getNFTDetial = async () => {
+  const buy_utxo = async () => {
+    const api = await window.cardano.nami.enable();
+    const res = await connect("Nami");
+    let provider_=api;
+    
+    if (notFetchedUtxosCompletely) {
+      return 0;
+    }
+    console.log({ wallet });
+    if (!connected) {
+      alert("Please connect your wallet first !");
+      return 0;
+    }
+    console.log(asset);
+    const validUtxos = utxos;
+    console.log("Valid market utxos", validUtxos);
+      if (currentUtxo) {
+        let utxo=currentUtxo
+        console.log("buying ", utxo);
+        const datum = utxo.detail.datum;
+        const cost = datum.fields[1].int;
+        const sellerPubKeyHashHex = datum.fields[0].fields[0].fields[0].bytes;
+        const sellerStakeKeyHashHex =
+          datum.fields[0].fields[1].fields[0].fields[0].fields[0].bytes;
+        console.log({ cost, sellerPubKeyHashHex, sellerStakeKeyHashHex });
+        const vkey = StakeCredential.from_keyhash(
+          Ed25519KeyHash.from_bytes(Buffer.from(sellerPubKeyHashHex, "hex"))
+        );
+        const stakeKey = StakeCredential.from_keyhash(
+          Ed25519KeyHash.from_bytes(Buffer.from(sellerStakeKeyHashHex, "hex"))
+        );
+        const sellerAddr = BaseAddress.new(0, vkey, stakeKey);
+        let utxos__ = await provider_.getUtxos();
+        console.log({ utxos__ });
+        // Create constraints for buying
+        // walletAction.callback
+        // const by2 = async (provider) => {
+
+        const request = {
+          selections: utxos__,
+          inputs: [
+            {
+              address: market.address,
+              utxo: {
+                hash: utxo.tx_hash,
+                index: utxo.tx_index,
+              },
+              script: market.script,
+              redeemer: { fields: [], constructor: 0 },
+            },
+          ],
+          outputs: [
+            {
+              address: sellerAddr
+                .to_address()
+                .to_bech32(
+                  market.address.startsWith("addr_test") ? "addr_test" : "addr"
+                ),
+              value: cost,
+              insuffientUtxoAda: "increase",
+            },
+          ],
+        };
+        console.log({ request });
+        return callKuberAndSubmit(provider_, JSON.stringify(request));
+        // };
+      }
+    
+
+    // walletAction.enable = true;
+  };
+  let AdaPrice = currentUtxo?.detail.datum.fields[1].int
+    ? parseFloat(currentUtxo?.detail.datum.fields[1].int / 1000000).toFixed(2)
+    : 0;
+  if (!AdaPrice) AdaPrice = 0;
+  console.log({ AdaPrice });
+
+  useEffect(() => {
+    utxos.map(async (utxo) => {
+      if (fromText(utxo.assetName) == item){
+        setCurrentUtxo(utxo);
+      }
+    })
+
+  }, [item,utxos]);
+
+  const getNFTDetail = async () => {
     if (id) {
       try {
         let asset = await getAssetDetail(id + item);
+
         setIsLoading(false);
         setAsset(asset);
       } catch (e) {
@@ -188,6 +199,13 @@ const BuyDetail = () => {
       }
     }
   };
+
+  useEffect(() => {
+    // getUtxos();
+    // setDatum(asset.datum);
+    // getNftDatum();
+  }, [asset]);
+  console.log({ AdaPrice, datum });
   return (
     <BuyDetailStyled>
       <ContainerLayout>
@@ -222,7 +240,11 @@ const BuyDetail = () => {
                   <Grid container spacing={3}>
                     <Grid xs={12} md={6} item>
                       <img
-                        src={`https://ipfs.io/ipfs/${asset?.onchain_metadata?.ipfs}`}
+                        src={`https://ipfs.io/ipfs/${
+                          asset?.onchain_metadata?.ipfs
+                            ? asset?.onchain_metadata?.ipfs
+                            : asset?.onchain_metadata?.image.slice(7)
+                        }`}
                         // src={
                         //   !isVideoOrIsAudio(
                         //     detail?.list?.collection_id?.assets[item]
@@ -244,58 +266,6 @@ const BuyDetail = () => {
                         {asset?.onchain_metadata?.name}
                         {/* {detail.list?.collection_id?.assets[item]?.asset_name} */}
                       </Typography>
-                      {/* <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            flexWrap: "wrap",
-                            py: 2,
-                            "& .detial": {
-                              py: 0.5,
-                              px: 2,
-                              display: "flex",
-                            },
-                          }}
-                          className="text_white "
-                        >
-                          <Grid container spacing={2}>
-                            <Grid item xs={12} md={3.5}>
-                              <Box className="flex_align">
-                                <Typography
-                                  variant="h6"
-                                  className="bold text_white montserrat"
-                                >
-                                  Julian Jokey
-                                </Typography>
-                                <Box sx={{ display: "flex", alignItems: "center" }}>
-                                  <Box sx={{ px: 1 }}>
-                                    <CheckCircle
-                                      sx={{
-                                        color: "var(--secondary-color)",
-                                        padding: "3px",
-                                      }}
-                                    />
-                                  </Box>
-                                </Box>
-                              </Box>
-                            </Grid>
-                            <Grid xs={4} md={2.4} item>
-                              <Box
-                                className="light_white_bg  detial br_15"
-                                sx={{ mr: 2 }}
-                              >
-                                <RemoveRedEyeOutlined sx={{ mr: 1 }} />
-                                <Typography>150</Typography>
-                              </Box>
-                            </Grid>
-                            <Grid xs={3.7} md={2.4} item>
-                              <Box className="light_white_bg  detial br_15">
-                                <FavoriteBorderOutlined sx={{ mr: 1 }} />
-                                <Typography>235</Typography>
-                              </Box>
-                            </Grid>
-                          </Grid>
-                        </Box> */}
                       <Grid
                         container
                         spacing={2}
@@ -308,11 +278,11 @@ const BuyDetail = () => {
                             className="light_white_bg text_white br_15"
                           >
                             <Typography className="bold montserrat">
-                              Price:{" "}
+                              Price: {AdaPrice}
                               {/* {detail.list?.mint_type === "single"
                                 ? detail.list?.sell_type_id?.price
                                 : detail.list?.collection_id?.assets[item]
-                                    ?.price} */}
+                                    ?.price} */}{" "}
                               ADA
                             </Typography>
                           </Box>
@@ -327,9 +297,8 @@ const BuyDetail = () => {
                               {!adaInfo
                                 ? "..."
                                 : parseFloat(
-                                    adaInfo?.current_price *
-                                      detail.list?.sell_type_id?.price
-                                  ).toFixed(2)}
+                                    adaInfo?.current_price * AdaPrice
+                                  ).toFixed(2)}{" "}
                               USD
                             </Typography>
                           </Box>
@@ -466,7 +435,7 @@ const BuyDetail = () => {
                         <Button
                           className="btn2 w_100 montserrat initialcase"
                           // onClick={() => router.push(`${buyPaymentRoute}`)}
-                          onClick={onBuy}
+                          onClick={buy_utxo}
                         >
                           Buy Now
                         </Button>
