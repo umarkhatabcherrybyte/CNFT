@@ -144,12 +144,12 @@ const ListCollection = () => {
             // };
             const dataWithFiles = {
               ...values,
-              blob_ogo_image: file1DataURL,
-              blob_feature_image: file2DataURL,
-              blob_banner_image: file3DataURL,
-              logo_image: file3DataURL_ipfs,
-              feature_image: file2DataURL_ipfs,
-              banner_image: file1DataURL_ipfs,
+              logo_image: file1DataURL,
+              feature_image: file2DataURL,
+              banner_image: file3DataURL,
+              ipfs_logo_image: file3DataURL_ipfs,
+              ipfs_feature_image: file2DataURL_ipfs,
+              ipfs_banner_image: file1DataURL_ipfs,
             };
 
             // Store the object in local storage

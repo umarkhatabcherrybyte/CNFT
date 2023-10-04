@@ -34,12 +34,6 @@ import {
   blockfrostNetworkName,
 } from "../../config/blockfrost";
 import { cborHex } from "../../config/constants";
-import { market } from "../../config/marketConfig";
-import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
-import { callKuberAndSubmit } from "../../services/kuberService";
-import { BlockfrostProvider } from "@meshsdk/core";
-
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 const ListCollectionStep2 = () => {
   const lovelace = useLovelace();
@@ -58,7 +52,7 @@ const ListCollectionStep2 = () => {
   const [imagePaths, setImagePaths] = useState([]);
   const [walletAddress, setWalletAddress] = useState("");
   const [connectedWallet, setConnectedWallet] = useState("");
-  const [isWebform, setIsWebform] = useState(false);
+  const [isWebform, setIsWebform] = useState(true);
   const [metadataFileUploaded, setMetadataFileUploaded] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [latestPolicy, setLatestPolicy] = useState(null);
@@ -193,32 +187,6 @@ const ListCollectionStep2 = () => {
     }
   };
 
-  function upload(path, idx, file) {
-    _progressInfos = [..._progressInfos];
-    UploadService.upload(file, path, (event) => {
-      _progressInfos[idx].percentage = Math.round(
-        (100 * event.loaded) / event.total
-      );
-      setProgressInfos(_progressInfos);
-    })
-      .then((response) => {
-        setMetaData([]);
-        t();
-      })
-      .catch(() => {
-        _progressInfos[idx].percentage = 0;
-        setProgressInfos(_progressInfos);
-      });
-
-    function t() {
-      UploadService.getFiles(connectedWallet + "_" + walletAddress).then(
-        (files) => {
-          setFileInfos(files.data);
-        }
-      );
-    }
-  }
-
   async function onNextStep() {
     console.log(metaFile, "dasd");
     if (!isWebform && metaFile && metadataObjectsFromFile.length > 0) {
@@ -262,25 +230,6 @@ const ListCollectionStep2 = () => {
     }
   }
 
-  function onBackStep() {
-    navigate("/mint");
-  }
-
-  function onRemoveImage(fileName) {
-    const path = connectedWallet + "_" + walletAddress;
-    UploadService.remove(fileName, path)
-      .then((response) => {
-        Toast("success", response.data.message);
-        return UploadService.getFiles(path);
-      })
-      .then((response) => {
-        setFileInfos(response.data);
-      })
-      .catch((e) => {
-        Toast("error", "Remove images failed. " + e.message);
-      });
-  }
-
   const convertMetadataObjects = () => {
     let metadataObjectPropertiesClone = metadataObjects;
     let metadataArr = [];
@@ -301,56 +250,6 @@ const ListCollectionStep2 = () => {
     return metadataArr;
   };
 
-  const convertToJson = () => {
-    const excelData = excelRef.current.convertToJson();
-    const objectKey = excelData[0];
-    let convertedJson = {
-      Metadata: [],
-    };
-    excelData.map((row, index) => {
-      if (index !== 0) {
-        let oneObject = {
-          ImageName: row[1],
-          attributes: {},
-        };
-        row.map((value, indexAttr) => {
-          if (indexAttr > 1) {
-            oneObject.attributes[objectKey[indexAttr]] = value;
-          }
-        });
-        convertedJson.Metadata = [...convertedJson.Metadata, oneObject];
-      }
-    });
-
-    // const path = connectedWallet + "_" + walletAddress;
-    // UploadService.uploadWebExcelMeta(
-    //   JSON.stringify(convertedJson),
-    //   path,
-    //   (event) => {}
-    // )
-    //   .then((response) => {
-    //     Toast("success", "Upload Metadata successed.");
-    //     setMetaDataURL(
-    //       `/resources/static/assets/uploads/meta/${path}/metadata.json`
-    //     );
-    //   })
-    //   .catch((e) => {
-    //     Toast("error", e.message);
-    //   });
-  };
-
-  const metaFileDown = () => {
-    const path = connectedWallet + "_" + walletAddress;
-    UploadService.downloadMetafile(path, (event) => {})
-      .then((response) => {
-        const metadata = JSON.stringify(response.data, null, 2);
-        download(metadata, "metadata.json");
-      })
-      .catch((e) => {
-        Toast("error", e.message);
-      });
-  };
-
   const onFileInputButton = () => {
     // console.log("onFileInputButton");
     hiddenFileInputRef.current.click();
@@ -358,10 +257,6 @@ const ListCollectionStep2 = () => {
 
   const onMetaFileInputButton = () => {
     metaFileInputRef.current.click();
-  };
-
-  const viewImagesPaths = () => {
-    console.log(imagePaths, "o");
   };
 
   const validateCollectionData = (objs) => {
@@ -405,127 +300,23 @@ const ListCollectionStep2 = () => {
       return false;
     }
   };
-  const sellNft = async (policyId_, selectedNFTsNames) => {
-    const providerInstance = await window.cardano.nami.enable();
-    const res = await connect("Nami");
-    const blockfrostProvider = new BlockfrostProvider(blockfrostApiKey);
-
-    let selectedNFTs = [];
-    let latestAssets = null;
-    /** Wait until the latest transaction is mined and we obtain the assets by latest policy id */
-    while (!latestAssets || latestAssets.assets.length == 0) {
-      console.log("fetching assets...");
-      try {
-        latestAssets = await blockfrostProvider.fetchCollectionAssets(
-          policyId_
-        );
-        console.log({ latestAssets });
-      } catch (e) {}
-
-      await delay(5000);
-      // Insert some notifier here
-    }
-    latestAssets = latestAssets.assets;
-    console.log(latestAssets, "latest assets");
-    for (let index = 0; index < latestAssets.length; index++) {
-      const item = latestAssets[index];
-      const main = await blockfrostProvider.fetchAssetMetadata(item.unit);
-
-      console.log("metadata is ", main);
-      const url = new URL(main.image);
-      // const hash = url.pathname.slice(1);
-      console.log(main.name);
-      if (selectedNFTsNames.includes(main.name)) {
-        selectedNFTs.push({
-          ...main,
-          isSelling: false,
-          // price: "",
-          ...item,
-          policyId: policyId_,
-        });
-      }
-    }
-
-    console.log(providerInstance, "providerInstance");
-
-    console.log(selectedNFTs, "selectedNFTs");
-
-    const addresses = await providerInstance.getUsedAddresses();
-    console.log(addresses, "addressesaddressesaddresses");
-
-    const sellerAddr = BaseAddress.from_address(
-      Address.from_bytes(Uint8Array.from(Buffer.from(addresses[0], "hex")))
-    );
-
-    console.log("sellerAddr", sellerAddr);
-    const sellerPkh = Buffer.from(
-      sellerAddr.payment_cred().to_keyhash().to_bytes()
-    ).toString("hex");
-    const sellerStakeKey = Buffer.from(
-      sellerAddr.stake_cred().to_keyhash().to_bytes()
-    ).toString("hex");
-
-    const outputs = selectedNFTs.map((asset) => ({
-      address: market.address,
-      value: `${asset.policyId}.${asset.name}`,
-      datum: {
-        fields: [
-          {
-            fields: [
-              { fields: [{ bytes: `${sellerPkh}` }], constructor: 0 }, // pubkeyhash
-              {
-                fields: [
-                  {
-                    fields: [
-                      {
-                        fields: [{ bytes: `${sellerStakeKey}` }],
-                        constructor: 0,
-                      },
-                    ],
-                    constructor: 0,
-                  },
-                ],
-                constructor: 0,
-              }, // stakekeyHash
-            ],
-            constructor: 0,
-          },
-          { int: Math.round(parseFloat(40) * 1e6) },
-        ],
-        constructor: 0,
-      },
-    }));
-
-    const selections = await providerInstance.getUtxos();
-    console.log(selections, "selections");
-    const body = {
-      selections,
-      outputs,
-    };
-    console.log("Selling NFTs ");
-    console.log(body, "body");
-
-    let res_ = await callKuberAndSubmit(providerInstance, JSON.stringify(body));
-    await delay(15000); // 15 seconds delay
-    // insert some notifier here
-    console.log(res_);
-  };
-
   const mintCollection = async (metadataObjects) => {
+    console.log(metadataObjects, "metadataObjects");
     const listing_previous = getObjData("listing");
-    console.log(listing_previous);
+    console.log(listing_previous, "listing_previous");
     let banner_image = undefined,
       feature_image = undefined,
       logo_image = undefined;
-    if (
-      listing_previous &&
-      listing_previous.banner_image &&
-      listing_previous.logo_image &&
-      listing_previous.feature_image
-    ) {
+    //   blob_banner_image = undefined,
+    //   blob_feature_image = undefined,
+    //   blob_logo_image = undefined;
+    if (listing_previous) {
       banner_image = listing_previous.banner_image.path;
       feature_image = listing_previous.feature_image.path;
-      logo_image = listing_previous.logo_image.path;
+      //   logo_image = listing_previous.logo_image.path;
+      //   blob_banner_image = listing_previous.blob_banner_image;
+      //   blob_feature_image = listing_previous.blob_feature_image;
+      //   blob_logo_image = listing_previous.blob_logo_image;
     }
 
     try {
@@ -544,12 +335,7 @@ const ListCollectionStep2 = () => {
             blockfrostNetworkName
           );
           transferLucid.selectWalletFromSeed(seedPhrase);
-          console.log(
-            transferLucid,
-            "provieder ",
-            transferLucid.wallet.address(),
-            "address"
-          );
+
           const lucid = await Lucid.new(
             new Blockfrost(blockfrostUrl, blockfrostApiKey),
 
@@ -603,19 +389,23 @@ const ListCollectionStep2 = () => {
           console.log(policyId, "policyId");
           setLatestPolicy(policyId);
 
-          console.log(obj, "obj");
           console.log({ units }, "uits");
           console.log({ metadataX }, "metadataX");
           console.log({ prices }, "prices");
           let selectedNFTs = [];
-
+          let arr = [];
+          //   for (let index = 0; index < metadataObjects.length; index++) {
+          //     const element = metadataObjects[index];
+          //     element["unit"] = String(policyId + fromText(element.name));
+          //     element["price"] = Number(prices[index]);
+          //     arr.push(element);
+          //   }
           for (let index = 0; index < metadataObjects.length; index++) {
             /**
              * artist,assetName,fingerprint ,image,isSelling,name,policyId,price,quantity:"1",unit
 
              */
             let element = metadataObjects[index];
-            console.log("metadata ", element);
             if (banner_image && feature_image && logo_image) {
               element.banner_image = banner_image;
               element.feature_image = feature_image;
@@ -630,10 +420,12 @@ const ListCollectionStep2 = () => {
             obj = { [policyId]: metadataX };
             prices.push(element.price);
             // lovelace.push(element.price * 10000000);
-            selectedNFTs.push(metadata.name);
+            selectedNFTs.push(element);
+            arr.push(metadata);
             // delete element["price"];
           }
-
+          console.log(obj, "obj");
+          console.log(assetObj, "assetObj");
           const txL = await lucid
             .newTx()
             .mintAssets(assetObj, Data.void())
@@ -646,44 +438,46 @@ const ListCollectionStep2 = () => {
           const signedTxL = await txL.sign().complete();
           const txHashL = await signedTxL.submit();
           console.log({ txHashL, txL, signedTxL });
-          let arr = [];
-          if (txHashL) {
-            await sellNft(policyId, selectedNFTs);
 
-            // const user_id = window.localStorage.getItem("user_id");
+          console.log(arr, "arr");
+          console.log(selectedNFTs, "selectedNFTs");
+          if (txHashL) {
+            // await sellNft(policyId, selectedNFTs);
+            const user_id = window.localStorage.getItem("user_id");
             // for (let index = 0; index < metadataObjects.length; index++) {
             //   const element = metadataObjects[index];
             //   element["unit"] = String(policyId + fromText(element.name));
             //   element["price"] = Number(prices[index]);
-
             //   arr.push(element);
             // }
             // // debugger
-            // const data = {
-            //   metadata: arr,
-            //   prices,
-            //   user_id: user_id,
-            //   recipient_address: await lucid.wallet.address(),
-            //   policy_id: policyId,
-            //   type: "collection",
-            //   minting_policy: JSON.stringify(nftPolicy),
-            //   // asset_hex_name: unit,
-            // };
-            // const res = await INSTANCE.post("/collection/create", data);
-            // // if (res) {
-            // window.localStorage.setItem(
-            //   "listing",
-            //   JSON.stringify({ ...listing_previous, ...res?.data.data })
-            // );
+            // console.log(selectedNFTs, "selectedNFTs");
 
-            // dispatch(setStep("step2"));
-            // router.push({
-            //   pathname: "/sell",
-            //   query: {
-            //     type: "add-listing",
-            //   },
-            // });
-            // }
+            const data = {
+              metadata: selectedNFTs,
+              prices,
+              user_id: user_id,
+              recipient_address: await lucid.wallet.address(),
+              policy_id: policyId,
+              type: "collection",
+              minting_policy: JSON.stringify(nftPolicy),
+              //   asset_hex_name: unit,
+            };
+            const res = await INSTANCE.post("/collection/create", data);
+            if (res) {
+              window.localStorage.setItem(
+                "listing",
+                JSON.stringify({ ...listing_previous, ...res?.data.data })
+              );
+              dispatch(setStep("step2"));
+              router.push({
+                pathname: "/sell",
+                query: {
+                  type: "add-listing",
+                  actions: "mint",
+                },
+              });
+            }
           }
         }
       } else {
@@ -696,7 +490,103 @@ const ListCollectionStep2 = () => {
       // console.log(e)
     }
   };
+  const viewImagesPaths = () => {
+    console.log(imagePaths, "o");
+  };
 
+  const convertToJson = () => {
+    const excelData = excelRef.current.convertToJson();
+    const objectKey = excelData[0];
+    let convertedJson = {
+      Metadata: [],
+    };
+    excelData.map((row, index) => {
+      if (index !== 0) {
+        let oneObject = {
+          ImageName: row[1],
+          attributes: {},
+        };
+        row.map((value, indexAttr) => {
+          if (indexAttr > 1) {
+            oneObject.attributes[objectKey[indexAttr]] = value;
+          }
+        });
+        convertedJson.Metadata = [...convertedJson.Metadata, oneObject];
+      }
+    });
+
+    // const path = connectedWallet + "_" + walletAddress;
+    // UploadService.uploadWebExcelMeta(
+    //   JSON.stringify(convertedJson),
+    //   path,
+    //   (event) => {}
+    // )
+    //   .then((response) => {
+    //     Toast("success", "Upload Metadata successed.");
+    //     setMetaDataURL(
+    //       `/resources/static/assets/uploads/meta/${path}/metadata.json`
+    //     );
+    //   })
+    //   .catch((e) => {
+    //     Toast("error", e.message);
+    //   });
+  };
+
+  const metaFileDown = () => {
+    const path = connectedWallet + "_" + walletAddress;
+    UploadService.downloadMetafile(path, (event) => {})
+      .then((response) => {
+        const metadata = JSON.stringify(response.data, null, 2);
+        download(metadata, "metadata.json");
+      })
+      .catch((e) => {
+        Toast("error", e.message);
+      });
+  };
+
+  function onBackStep() {
+    navigate("/mint");
+  }
+
+  function onRemoveImage(fileName) {
+    const path = connectedWallet + "_" + walletAddress;
+    UploadService.remove(fileName, path)
+      .then((response) => {
+        Toast("success", response.data.message);
+        return UploadService.getFiles(path);
+      })
+      .then((response) => {
+        setFileInfos(response.data);
+      })
+      .catch((e) => {
+        Toast("error", "Remove images failed. " + e.message);
+      });
+  }
+  function upload(path, idx, file) {
+    _progressInfos = [..._progressInfos];
+    UploadService.upload(file, path, (event) => {
+      _progressInfos[idx].percentage = Math.round(
+        (100 * event.loaded) / event.total
+      );
+      setProgressInfos(_progressInfos);
+    })
+      .then((response) => {
+        setMetaData([]);
+        t();
+      })
+      .catch(() => {
+        _progressInfos[idx].percentage = 0;
+        setProgressInfos(_progressInfos);
+      });
+
+    function t() {
+      UploadService.getFiles(connectedWallet + "_" + walletAddress).then(
+        (files) => {
+          setFileInfos(files.data);
+        }
+      );
+    }
+  }
   return (
     <Step1Styled>
       <ContainerLayout>
@@ -906,12 +796,12 @@ const ListCollectionStep2 = () => {
                 )}
               </div> */}
             </Box>
-            <Box>
+            {/* <Box>
               <Header
                 heading="Add Metadata"
                 desc="Royalty fees may be set up to 15%; However, the lower your royalty fee, the better chance that your NFT(s) will sell. Royalty fees in excess of 10% are not recommended."
               />
-            </Box>
+            </Box> */}
 
             <Grid
               container
@@ -922,7 +812,7 @@ const ListCollectionStep2 = () => {
                 },
               }}
             >
-              <Grid xs={12} md={8} item>
+              {/* <Grid xs={12} md={8} item>
                 <div className="col-9 file-input-wrapper">
                   <div
                     className="file-select-button"
@@ -992,16 +882,12 @@ const ListCollectionStep2 = () => {
                     ref={metaFileInputRef}
                   />
                 </div>
-              </Grid>
-              <Grid item md={4} xs={12}>
-                <Button
-                  className="btn  w_100"
-                  // disabled={!metaFile}
-                  onClick={() => uploadMeta()}
-                >
+              </Grid> */}
+              {/* <Grid item md={4} xs={12}>
+                <Button className="btn  w_100" onClick={() => uploadMeta()}>
                   Upload
                 </Button>
-              </Grid>
+              </Grid> */}
               {/* <Grid item md={2} xs={12}>
                 <Button onClick={viewImagesPaths} className="btn w_100">
                   Verify
