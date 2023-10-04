@@ -221,7 +221,7 @@ const MylistTabs = () => {
                           data
                         );
                         if (res) {
-                          // setIsLoading(false);
+                          setIsLoading(false);
                           dispatch(setStep("step2"));
                           // dispatch(setListing())
                           window.localStorage.setItem(
@@ -255,12 +255,12 @@ const MylistTabs = () => {
                         metadata: [metadata],
                         user_id: user_id,
                         recipient_address: recipientAddress,
-                        policy_id: policyId_?policyId_:policyId,
+                        policy_id: policyId_ ? policyId_ : policyId,
                         type: "single",
                         minting_policy: "",
                         image_file: "",
                       };
-                  
+
                       const res = await INSTANCE.post(
                         "/collection/create",
                         data

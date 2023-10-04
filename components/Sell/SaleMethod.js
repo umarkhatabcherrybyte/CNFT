@@ -36,6 +36,7 @@ import { blockfrostApiKey } from "../../config/blockfrost";
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 import { BlockfrostProvider } from "@meshsdk/core";
+
 const SaleMethod = () => {
   const router = useRouter();
   const { wallet, name: walletName, connected, connect } = useWallet();
@@ -54,6 +55,116 @@ const SaleMethod = () => {
   const asset_name = localStorage.getItem("asset_name");
   const onPaymentChange = (event, newValue) => {
     setPaymentValue(newValue);
+  };
+  const sellNft = async (policyId, selectedNFTsNames) => {
+    setIsLoading(true);
+    const providerInstance = await window.cardano.nami.enable();
+    const res = await connect(walletName);
+    const blockfrostProvider = new BlockfrostProvider(blockfrostApiKey);
+    let selectedNFTs = [];
+    let latestAssets = null;
+    /** Wait until the latest transaction is mined and we obtain the assets by latest policy id */
+    while (!latestAssets || latestAssets.assets.length == 0) {
+      console.log("fetching assets...");
+      try {
+        latestAssets = await blockfrostProvider.fetchCollectionAssets(policyId);
+        console.log({ latestAssets });
+      } catch (e) {}
+
+      await delay(5000);
+      // Insert some notifier here
+    }
+    latestAssets = latestAssets.assets;
+    console.log(latestAssets, "latest assets");
+    for (let index = 0; index < latestAssets.length; index++) {
+      const item = latestAssets[index];
+      const main = await blockfrostProvider.fetchAssetMetadata(item.unit);
+
+      console.log("metadata is ", main);
+      const url = new URL(main.image);
+      // const hash = url.pathname.slice(1);
+      console.log(selectedNFTsNames, main.name);
+      if (selectedNFTsNames.includes(main.name)) {
+        selectedNFTs.push({
+          ...main,
+          isSelling: false,
+          // price: "",
+          ...item,
+          policyId: policyId,
+        });
+      }
+    }
+
+    console.log(providerInstance, "providerInstance");
+
+    console.log(selectedNFTs, "selectedNFTs");
+
+    const addresses = await providerInstance.getUsedAddresses();
+    console.log(addresses, "addressesaddressesaddresses");
+
+    const sellerAddr = BaseAddress.from_address(
+      Address.from_bytes(Uint8Array.from(Buffer.from(addresses[0], "hex")))
+    );
+
+    console.log("sellerAddr", sellerAddr);
+    const sellerPkh = Buffer.from(
+      sellerAddr.payment_cred().to_keyhash().to_bytes()
+    ).toString("hex");
+    const sellerStakeKey = Buffer.from(
+      sellerAddr.stake_cred().to_keyhash().to_bytes()
+    ).toString("hex");
+    console.log("selected NFTs ", selectedNFTs);
+
+    const outputs = selectedNFTs.map((asset) => ({
+      address: market.address,
+      value: `${asset.policyId}.${asset.name}`,
+      datum: {
+        fields: [
+          {
+            fields: [
+              {
+                fields: [{ bytes: `${sellerPkh}` }],
+                constructor: 0,
+              }, // pubkeyhash
+              {
+                fields: [
+                  {
+                    fields: [
+                      {
+                        fields: [{ bytes: `${sellerStakeKey}` }],
+                        constructor: 0,
+                      },
+                    ],
+                    constructor: 0,
+                  },
+                ],
+                constructor: 0,
+              }, // stakekeyHash
+            ],
+            constructor: 0,
+          },
+          { int: Math.round(parseFloat(price_data.price) * 1e6) },
+        ],
+        constructor: 0,
+      },
+    }));
+
+    const selections = await providerInstance.getUtxos();
+    console.log(selections, "selections");
+    const body = {
+      selections,
+      outputs,
+    };
+    console.log("Selling NFTs ");
+    console.log(body, "body");
+
+    let res_ = await callKuberAndSubmit(providerInstance, JSON.stringify(body));
+
+    await delay(10000); // 15 seconds delay
+    setIsLoading(false);
+
+    // insert some notifier here
+    console.log(res_);
   };
 
   const submitData = async () => {
@@ -74,14 +185,9 @@ const SaleMethod = () => {
           if (action === "listing") {
             // console.log("listing");
             if (paymentValue === "fixed") {
-              console.log("transferring", {
-                policy_id: listing_data.policy_id,
-                name: listing_data.assets[0].asset_name,
-              });
-              const hash = await transferNFT(connectedWallet, {
-                policy_id: listing_data.policy_id,
-                name: listing_data.assets[0].asset_name,
-              });
+              await sellNft(listing_data.policy_id, [
+                listing_data.assets[0].asset_name,
+              ]);
               setIsLoading(false);
             } else {
               // all work of auction if user wants to list nft
@@ -151,127 +257,7 @@ const SaleMethod = () => {
               }
               console.log(selectedNFTsNames);
 
-              const sellNft = async () => {
-                setIsLoading(true);
-                const providerInstance = await window.cardano.nami.enable();
-                const res = await connect(walletName);
-                const blockfrostProvider = new BlockfrostProvider(
-                  blockfrostApiKey
-                );
-                let selectedNFTs = [];
-                let latestAssets = null;
-                /** Wait until the latest transaction is mined and we obtain the assets by latest policy id */
-                while (!latestAssets || latestAssets.assets.length == 0) {
-                  console.log("fetching assets...");
-                  try {
-                    latestAssets =
-                      await blockfrostProvider.fetchCollectionAssets(policyId);
-                    console.log({ latestAssets });
-                  } catch (e) {}
-
-                  await delay(5000);
-                  // Insert some notifier here
-                }
-                latestAssets = latestAssets.assets;
-                console.log(latestAssets, "latest assets");
-                for (let index = 0; index < latestAssets.length; index++) {
-                  const item = latestAssets[index];
-                  const main = await blockfrostProvider.fetchAssetMetadata(
-                    item.unit
-                  );
-
-                  console.log("metadata is ", main);
-                  const url = new URL(main.image);
-                  // const hash = url.pathname.slice(1);
-                  console.log(selectedNFTsNames, main.name);
-                  if (selectedNFTsNames.includes(main.name)) {
-                    selectedNFTs.push({
-                      ...main,
-                      isSelling: false,
-                      // price: "",
-                      ...item,
-                      policyId: policyId,
-                    });
-                  }
-                }
-
-                console.log(providerInstance, "providerInstance");
-
-                console.log(selectedNFTs, "selectedNFTs");
-
-                const addresses = await providerInstance.getUsedAddresses();
-                console.log(addresses, "addressesaddressesaddresses");
-
-                const sellerAddr = BaseAddress.from_address(
-                  Address.from_bytes(
-                    Uint8Array.from(Buffer.from(addresses[0], "hex"))
-                  )
-                );
-
-                console.log("sellerAddr", sellerAddr);
-                const sellerPkh = Buffer.from(
-                  sellerAddr.payment_cred().to_keyhash().to_bytes()
-                ).toString("hex");
-                const sellerStakeKey = Buffer.from(
-                  sellerAddr.stake_cred().to_keyhash().to_bytes()
-                ).toString("hex");
-                console.log("selected NFTs ", selectedNFTs);
-
-                const outputs = selectedNFTs.map((asset) => ({
-                  address: market.address,
-                  value: `${asset.policyId}.${asset.name}`,
-                  datum: {
-                    fields: [
-                      {
-                        fields: [
-                          {
-                            fields: [{ bytes: `${sellerPkh}` }],
-                            constructor: 0,
-                          }, // pubkeyhash
-                          {
-                            fields: [
-                              {
-                                fields: [
-                                  {
-                                    fields: [{ bytes: `${sellerStakeKey}` }],
-                                    constructor: 0,
-                                  },
-                                ],
-                                constructor: 0,
-                              },
-                            ],
-                            constructor: 0,
-                          }, // stakekeyHash
-                        ],
-                        constructor: 0,
-                      },
-                      { int: Math.round(parseFloat(price_data.price) * 1e6) },
-                    ],
-                    constructor: 0,
-                  },
-                }));
-
-                const selections = await providerInstance.getUtxos();
-                console.log(selections, "selections");
-                const body = {
-                  selections,
-                  outputs,
-                };
-                console.log("Selling NFTs ");
-                console.log(body, "body");
-
-                let res_ = await callKuberAndSubmit(
-                  providerInstance,
-                  JSON.stringify(body)
-                );
-
-                await delay(10000); // 15 seconds delay
-                setIsLoading(false);
-
-                // insert some notifier here
-                console.log(res_);
-              };
-              await sellNft();
+              await sellNft(policyId, selectedNFTsNames);
             } else {
               if (listing_data.type === "single") {
                 try {
