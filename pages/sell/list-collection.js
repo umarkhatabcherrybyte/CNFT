@@ -26,7 +26,8 @@ import {
 } from "lucid-cardano";
 import { getObjData } from "../../utils/storageUtils";
 import { transactionErrorHanlder } from "../../utils/errorUtils";
-import { seedPhrase } from "../../config/utils";
+// import { seedPhrase } from "../../config/utils";
+import { seedPhrase } from "../../config/walletConstants";
 import {
   blockfrostUrl,
   blockfrostApiKey,
