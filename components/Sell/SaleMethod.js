@@ -62,6 +62,8 @@ const SaleMethod = () => {
       return;
     }
     if (isForm) {
+      let connectedWallet =
+      window.localStorage.getItem("connectedWallet");
       setIsLoading(true);
       const price_data =
         paymentValue === "fixed"
@@ -75,8 +77,7 @@ const SaleMethod = () => {
             if (paymentValue === "fixed") {
             } else {
               // all work of auction if user wants to list nft
-              let connectedWallet =
-                window.localStorage.getItem("connectedWallet");
+             
               let recipientAddress = await wallet?.getUsedAddresses();
               recipientAddress[0];
               try {
@@ -110,7 +111,7 @@ const SaleMethod = () => {
                   if (res) {
                     setIsLoading(false);
                     Toast("success", "Listed Successfully");
-                    dispatch(setStep("step1"));
+                    // dispatch(setStep("step1"));
                     router.push(auctionRoute);
                   }
                 }
@@ -123,7 +124,7 @@ const SaleMethod = () => {
           } else {
             if (paymentValue === "fixed") {
               let policyId_ = listing_data.policy_id;
-              let selectedNFTsNames = [listing_data.name];
+              let selectedNFTsNames = [asset_name];
 
               const sellNft = async () => {
                 setIsLoading(true);
@@ -247,7 +248,41 @@ const SaleMethod = () => {
               };
               await sellNft();
             } else {
-              const data =
+              if(listing_data.type === "single"){
+                try {
+                  const hash = await transferNFT(connectedWallet, {
+                    policy_id: listing_data.policy_id,
+                    name: listing_data.assets[0].asset_name,
+                  });
+                  if (hash) {
+                    setIsLoading(false);
+                    // fdfdfd
+                    
+                    
+                    const data =     {
+                            user_id: listing_data?.user_id,
+                            collection_id: listing_data._id,
+                            mint_type: listing_data?.type,
+                          }
+                       
+                    const res = await INSTANCE.post("/list/create", {
+                      ...price_data,
+                      ...data,
+                    });
+                    if (res) {
+                      setIsLoading(false);
+                      Toast("success", "Listed Successfully");
+                      // dispatch(setStep("step1"));
+                      router.push(auctionRoute);
+                    }
+                  }
+                }catch(e){
+                  console.log(e)
+                  setIsLoading(false);
+
+                }
+              }else {
+                const data =
                 listing_data.type === "single"
                   ? {
                       user_id: listing_data?.user_id,
@@ -274,6 +309,8 @@ const SaleMethod = () => {
                 // dispatch(setStep("step1"));
                 // router.push(auctionRoute);
               }
+              }
+           
             }
           }
         } catch (e) {

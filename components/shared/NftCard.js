@@ -61,14 +61,14 @@ const NftCard = ({ onClick, card, type }) => {
   let cardImage = "https://ipfs.io/ipfs/";
 
   let imageHash =
-    type == 0
+    card.detail.onchain_metadata?.image && type == 0
       ? card.detail.onchain_metadata.feature_image
-      : card.detail.onchain_metadata.image.slice(7);
+      : card.detail.onchain_metadata?.image?.slice(7);
 
   if (!imageHash) {
     imageHash = card.detail._imageUrl;
   }
-  if (imageHash.startsWith("http")) {
+  if (imageHash?.startsWith("http")) {
     cardImage = imageHash;
   } else cardImage += imageHash;
   console.log("image is ", cardImage, card);
@@ -135,8 +135,8 @@ const NftCard = ({ onClick, card, type }) => {
                 sx={{ color: "var(--secondary-color)" }}
                 className="bold"
               >
-                {card?.detail?.onchain_metadata
-                  ? card.detail?.onchain_metadata?.price / 1000000
+                {card?.detail?.datum
+                  ? card.detail?.datum.fields[1].int / 1000000
                   : "Free"}
                 {/* {renderLovelace(card.detail?.datum?.fields[1]?.int)} */}
                 <Typography

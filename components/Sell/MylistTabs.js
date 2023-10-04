@@ -194,8 +194,9 @@ const MylistTabs = () => {
                 //   .complete();
                 const signedTx = await tx.sign().complete();
                 const txHash = await signedTx.submit();
-                console.log({txHash});
+                console.log({ txHash });
                 if (txHash) {
+                  console.log("values.imageFile", values.imageFile);
                   if (values.imageFile) {
                     var reader = new FileReader();
                     reader.readAsDataURL(values.imageFile);
@@ -220,7 +221,7 @@ const MylistTabs = () => {
                           data
                         );
                         if (res) {
-                          setIsLoading(false);
+                          // setIsLoading(false);
                           dispatch(setStep("step2"));
                           // dispatch(setListing())
                           window.localStorage.setItem(
@@ -233,13 +234,18 @@ const MylistTabs = () => {
                           );
                         }
                       } catch (e) {
-                        setIsLoading(false);
+                        console.log(e);
+                        isLoading && setIsLoading(false);
 
                         console.log(e);
                       }
                     };
                   } else {
                     try {
+                      console.log(
+                        " window.localStorage.getItem(user_id)",
+                        window.localStorage.getItem("user_id")
+                      );
                       const user_id = window.localStorage.getItem("user_id");
                       metadata["unit"] = unit;
                       metadata["ipfs"] = uploaded_image.path;
@@ -252,14 +258,14 @@ const MylistTabs = () => {
                         minting_policy: "",
                         image_file: "",
                       };
+                  
                       const res = await INSTANCE.post(
                         "/collection/create",
                         data
                       );
                       if (res) {
                         setIsLoading(false);
-                        dispatch(setStep("step2"));
-                        // dispatch(setListing())
+                        // dispatch(setStep("step2"));
                         window.localStorage.setItem(
                           "listing",
                           JSON.stringify(res?.data.data)
@@ -267,7 +273,8 @@ const MylistTabs = () => {
                         window.localStorage.setItem("asset_name", values.name);
                       }
                     } catch (e) {
-                      setIsLoading(false);
+                      console.log(e);
+                      isLoading && setIsLoading(false);
                       console.log(e);
                     }
                   }

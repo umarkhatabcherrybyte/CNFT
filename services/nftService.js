@@ -70,6 +70,7 @@ export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
   return txHash;
 };
 export const transferNFT = async (connectedWallet, data, uploaded_image) => {
+  console.log({connectedWallet, data, uploaded_image});
   const transferLucid = await Lucid.new(
     new Blockfrost(blockfrostUrl, blockfrostApiKey),
     blockfrostNetworkName
@@ -102,9 +103,10 @@ export const transferNFT = async (connectedWallet, data, uploaded_image) => {
   let metadataX = {};
   let metadata = {
     name: data.name,
-    image: `ipfs://${uploaded_image.path}`,
-    mediaType: data.file.type,
+    image: `ipfs://${uploaded_image?.path}`,
+    mediaType: data.file?.type,
   };
+  console.log({metadata});
   if (data.description.length > 0) {
     metadata["description"] = data.description;
   }
