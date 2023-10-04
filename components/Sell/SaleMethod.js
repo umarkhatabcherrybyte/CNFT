@@ -271,8 +271,8 @@ const SaleMethod = () => {
                 setIsLoading(false);
                 // window.localStorage.removeItem("listing")
                 Toast("success", "Listed Successfully");
-                dispatch(setStep("step1"));
-                router.push(auctionRoute);
+                // dispatch(setStep("step1"));
+                // router.push(auctionRoute);
               }
             }
           }

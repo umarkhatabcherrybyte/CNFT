@@ -111,7 +111,7 @@ const Auction = () => {
             {!isLoading && <AuctionTokens auction={auction} />}
           </TabPanel>
           <TabPanel value="collection">
-            {/* {!isLoading && <AuctionTokens auction={auction} />} */}
+            {!isLoading && <AuctionTokens auction={auction} />}
           </TabPanel>
         </TabContext>
       </ContainerLayout>

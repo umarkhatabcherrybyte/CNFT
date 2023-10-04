@@ -384,6 +384,7 @@ const ListCollectionStep2 = () => {
           let units = [];
           let metadataX = {};
           let prices = [];
+          let lovelace = [];
           let unit = "";
 
           console.log(policyId, "policyId");
@@ -411,7 +412,8 @@ const ListCollectionStep2 = () => {
               element.feature_image = feature_image;
               element.logo_image = logo_image;
             }
-            element.price = parseInt(element.price) * 1000000;
+            element.price = parseInt(element.price);
+            element.lovelace = parseInt(element.price) * 1000000;
             // assetObj[String(policyId + fromText(element.name))] = 1n;
             // obj = { [policyId]: metadataX };
             let metadata = element;
@@ -419,6 +421,7 @@ const ListCollectionStep2 = () => {
             assetObj[policyId + fromText(metadata.name)] = 1n;
             obj = { [policyId]: metadataX };
             prices.push(element.price);
+            lovelace.push(element.price);
             // lovelace.push(element.price * 10000000);
             selectedNFTs.push(element);
             arr.push(metadata);
