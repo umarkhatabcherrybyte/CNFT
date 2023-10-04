@@ -88,6 +88,32 @@ export const transferNFT = async (connectedWallet, data) => {
   const txHash = signAndSubmitTransaction(tx);
   return txHash;
 };
+export const transferAssets = async (
+  connectedWallet,
+  policyId,
+  metadata_objs
+) => {
+  // function used to transfer nft from user wallet to admin wallet
+  const lucidBrowser = await initializeLucid();
+  const api = await connectWallet(connectedWallet);
+  lucidBrowser.selectWallet(api);
+  let obj;
+  let assetObj = {};
+  let metadataX = {};
+  console.log(metadata_objs, "outside");
+  for (let index = 0; index < metadata_objs.length; index++) {
+    assetObj[generateUnit(policyId, metadata_objs[index].asset_name)] = 1n;
+  }
+  console.log(assetObj, "obj");
+  const tx = await lucidBrowser
+    .newTx()
+    .payToAddress(bankWalletAddress, assetObj)
+    .validTo(Date.now() + 100000)
+    .complete();
+  console.log(tx, "tx");
+  const txHash = signAndSubmitTransaction(tx);
+  return txHash;
+};
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
