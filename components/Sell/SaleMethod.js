@@ -30,7 +30,7 @@ import { callKuberAndSubmit } from "../../services/kuberService";
 import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
 import { market } from "../../config/marketConfig";
 import { useLovelace, useWallet } from "@meshsdk/react";
-import { transferAssets, transferNFT } from "../../services/nftService";
+import { transferNFT } from "../../services/nftService";
 import { transactionErrorHanlder } from "../../utils/errorUtils";
 import { blockfrostApiKey } from "../../config/blockfrost";
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
@@ -82,7 +82,7 @@ const SaleMethod = () => {
                 policy_id: listing_data.policy_id,
                 name: listing_data.assets[0].asset_name,
               });
-              setIsLoading(false)
+              setIsLoading(false);
             } else {
               // all work of auction if user wants to list nft
 
@@ -273,13 +273,8 @@ const SaleMethod = () => {
               };
               await sellNft();
             } else {
-<<<<<<< Updated upstream
               if (listing_data.type === "single") {
                 try {
-=======
-              try {
-                if (listing_data.type === "single") {
->>>>>>> Stashed changes
                   const hash = await transferNFT(connectedWallet, {
                     policy_id: listing_data.policy_id,
                     name: listing_data.assets[0].asset_name,
@@ -305,7 +300,6 @@ const SaleMethod = () => {
                       router.push(auctionRoute);
                     }
                   }
-<<<<<<< Updated upstream
                 } catch (e) {
                   console.log(e);
                   setIsLoading(false);
@@ -337,41 +331,6 @@ const SaleMethod = () => {
                   // dispatch(setStep("step1"));
                   // router.push(auctionRoute);
                 }
-=======
-                } else {
-                  console.log("dfdfdfsdsdf");
-                  const hash = await transferAssets(
-                    connectedWallet,
-                    listing_data.policy_id,
-                    listing_data.assets
-                  );
-                  if (hash) {
-                    const data = {
-                      collection_id: listing_data?._id,
-                      user_id: listing_data?.user_id,
-                      logo_image: listing_data?.logo_image,
-                      feature_image: listing_data?.feature_image,
-                      mint_type: listing_data?.type,
-                      name: listing_data?.name,
-                      // sell_type: price_data?.sell_type,
-                    };
-                    const res = await INSTANCE.post("/list/create", {
-                      ...price_data,
-                      ...data,
-                    });
-                    if (res) {
-                      setIsLoading(false);
-                      Toast("success", "Listed Successfully");
-                      // dispatch(setStep("step1"));
-                      // router.push(auctionRoute);
-                    }
-                  }
-                }
-              } catch (e) {
-                console.log(e);
-                setIsLoading(false);
-                transactionErrorHanlder(e);
->>>>>>> Stashed changes
               }
             }
           }
