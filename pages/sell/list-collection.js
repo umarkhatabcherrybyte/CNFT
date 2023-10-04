@@ -26,6 +26,7 @@ import {
 } from "lucid-cardano";
 import { getObjData } from "../../utils/storageUtils";
 import { transactionErrorHanlder } from "../../utils/errorUtils";
+// import { seedPhrase } from "../../config/utils";
 import { seedPhrase } from "../../config/walletConstants";
 import {
   blockfrostUrl,
@@ -408,6 +409,7 @@ const ListCollectionStep2 = () => {
     const providerInstance = await window.cardano.nami.enable();
     const res = await connect("Nami");
     const blockfrostProvider = new BlockfrostProvider(blockfrostApiKey);
+
     let selectedNFTs = [];
     let latestAssets = null;
     /** Wait until the latest transaction is mined and we obtain the assets by latest policy id */
