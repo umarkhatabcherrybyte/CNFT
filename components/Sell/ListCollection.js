@@ -97,6 +97,7 @@ const ListCollection = () => {
       banner_image: null,
       name: "",
       description: "",
+      
     },
     validationSchema: addCollectioneListingSchema,
     onSubmit: async (values) => {
@@ -150,10 +151,12 @@ const ListCollection = () => {
               ipfs_logo_image: file3DataURL_ipfs,
               ipfs_feature_image: file2DataURL_ipfs,
               ipfs_banner_image: file1DataURL_ipfs,
+              
             };
 
             // Store the object in local storage
             localStorage.setItem("listing", JSON.stringify(dataWithFiles));
+            localStorage.setItem("asset_name",values.name)
             router.push(listCollectionRoute);
           };
         };

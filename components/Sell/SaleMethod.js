@@ -62,8 +62,7 @@ const SaleMethod = () => {
       return;
     }
     if (isForm) {
-      let connectedWallet =
-      window.localStorage.getItem("connectedWallet");
+      let connectedWallet = window.localStorage.getItem("connectedWallet");
       setIsLoading(true);
       const price_data =
         paymentValue === "fixed"
@@ -75,9 +74,18 @@ const SaleMethod = () => {
           if (action === "listing") {
             // console.log("listing");
             if (paymentValue === "fixed") {
+              console.log("transferring", {
+                policy_id: listing_data.policy_id,
+                name: listing_data.assets[0].asset_name,
+              });
+              const hash = await transferNFT(connectedWallet, {
+                policy_id: listing_data.policy_id,
+                name: listing_data.assets[0].asset_name,
+              });
+              setIsLoading(false)
             } else {
               // all work of auction if user wants to list nft
-             
+
               let recipientAddress = await wallet?.getUsedAddresses();
               recipientAddress[0];
               try {
@@ -123,8 +131,25 @@ const SaleMethod = () => {
             }
           } else {
             if (paymentValue === "fixed") {
-              let policyId_ = listing_data.policy_id;
-              let selectedNFTsNames = [asset_name];
+              let policyId = window.localStorage.getItem("policy_id");
+              policyId = policyId ? policyId : listing_data.policy_id;
+              console.log({ listing_data });
+              let selectedNFTsNames = [];
+              console.log({ assts: listing_data.assets });
+              console.log(listing_data.type, "collection");
+              if (listing_data.type == "collection") {
+                for (
+                  let index = 0;
+                  index < listing_data.assets.length;
+                  index++
+                ) {
+                  const name_ = listing_data.assets[index].asset_name;
+                  selectedNFTsNames.push(name_);
+                }
+              } else {
+                selectedNFTsNames = [asset_name];
+              }
+              console.log(selectedNFTsNames);
 
               const sellNft = async () => {
                 setIsLoading(true);
@@ -140,7 +165,7 @@ const SaleMethod = () => {
                   console.log("fetching assets...");
                   try {
                     latestAssets =
-                      await blockfrostProvider.fetchCollectionAssets(policyId_);
+                      await blockfrostProvider.fetchCollectionAssets(policyId);
                     console.log({ latestAssets });
                   } catch (e) {}
 
@@ -165,7 +190,7 @@ const SaleMethod = () => {
                       isSelling: false,
                       // price: "",
                       ...item,
-                      policyId: policyId_,
+                      policyId: policyId,
                     });
                   }
                 }
@@ -248,7 +273,7 @@ const SaleMethod = () => {
               };
               await sellNft();
             } else {
-              if(listing_data.type === "single"){
+              if (listing_data.type === "single") {
                 try {
                   const hash = await transferNFT(connectedWallet, {
                     policy_id: listing_data.policy_id,
@@ -257,14 +282,13 @@ const SaleMethod = () => {
                   if (hash) {
                     setIsLoading(false);
                     // fdfdfd
-                    
-                    
-                    const data =     {
-                            user_id: listing_data?.user_id,
-                            collection_id: listing_data._id,
-                            mint_type: listing_data?.type,
-                          }
-                       
+
+                    const data = {
+                      user_id: listing_data?.user_id,
+                      collection_id: listing_data._id,
+                      mint_type: listing_data?.type,
+                    };
+
                     const res = await INSTANCE.post("/list/create", {
                       ...price_data,
                       ...data,
@@ -276,40 +300,38 @@ const SaleMethod = () => {
                       router.push(auctionRoute);
                     }
                   }
-                }catch(e){
-                  console.log(e)
+                } catch (e) {
+                  console.log(e);
                   setIsLoading(false);
-
                 }
-              }else {
+              } else {
                 const data =
-                listing_data.type === "single"
-                  ? {
-                      user_id: listing_data?.user_id,
-                      collection_id: listing_data._id,
-                      mint_type: listing_data?.type,
-                    }
-                  : {
-                      collection_id: listing_data?._id,
-                      user_id: listing_data?.user_id,
-                      logo_image: listing_data?.logo_image,
-                      feature_image: listing_data?.feature_image,
-                      mint_type: listing_data?.type,
-                      name: listing_data?.name,
-                      // sell_type: price_data?.sell_type,
-                    };
-              const res = await INSTANCE.post("/list/create", {
-                ...price_data,
-                ...data,
-              });
-              if (res) {
-                setIsLoading(false);
-                Toast("success", "Listed Successfully");
-                // dispatch(setStep("step1"));
-                // router.push(auctionRoute);
+                  listing_data.type === "single"
+                    ? {
+                        user_id: listing_data?.user_id,
+                        collection_id: listing_data._id,
+                        mint_type: listing_data?.type,
+                      }
+                    : {
+                        collection_id: listing_data?._id,
+                        user_id: listing_data?.user_id,
+                        logo_image: listing_data?.logo_image,
+                        feature_image: listing_data?.feature_image,
+                        mint_type: listing_data?.type,
+                        name: listing_data?.name,
+                        // sell_type: price_data?.sell_type,
+                      };
+                const res = await INSTANCE.post("/list/create", {
+                  ...price_data,
+                  ...data,
+                });
+                if (res) {
+                  setIsLoading(false);
+                  Toast("success", "Listed Successfully");
+                  // dispatch(setStep("step1"));
+                  // router.push(auctionRoute);
+                }
               }
-              }
-           
             }
           }
         } catch (e) {

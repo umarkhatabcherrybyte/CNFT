@@ -247,13 +247,15 @@ const MylistTabs = () => {
                         window.localStorage.getItem("user_id")
                       );
                       const user_id = window.localStorage.getItem("user_id");
+                      const policyId_ = window.localStorage.getItem("policyId");
+
                       metadata["unit"] = unit;
                       metadata["ipfs"] = uploaded_image.path;
                       const data = {
                         metadata: [metadata],
                         user_id: user_id,
                         recipient_address: recipientAddress,
-                        policy_id: policyId,
+                        policy_id: policyId_?policyId_:policyId,
                         type: "single",
                         minting_policy: "",
                         image_file: "",

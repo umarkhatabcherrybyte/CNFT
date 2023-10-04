@@ -71,6 +71,9 @@ const NftCard = ({ onClick, card, type }) => {
   if (imageHash?.startsWith("http")) {
     cardImage = imageHash;
   } else cardImage += imageHash;
+if(imageHash==undefined){
+  cardImage="https://i.pinimg.com/originals/f2/d1/22/f2d122bd112252d193a197e9d9c203d2.jpg"
+}
   console.log("image is ", cardImage, card);
 
   // console.log("showing card", card);

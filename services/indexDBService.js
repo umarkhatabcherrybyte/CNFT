@@ -37,27 +37,31 @@ export function openDB() {
   });
 }
 export function saveUtxos(db, objects) {
-  if (!db) {
-    return Promise.reject("Null db instance");
-  }
-  return new Promise((resolve, reject) => {
-    console.log("Starting to save");
-    let trans = db.transaction("utxoContent", "readwrite");
-    trans.oncomplete = () => {
-      resolve(objects);
-    };
-    trans.onerror = (e) => {
-      console.log("Saving error", e);
-      reject("Error");
-    };
+  try {
+    if (!db) {
+      return Promise.reject("Null db instance");
+    }
+    return new Promise((resolve, reject) => {
+      console.log("Starting to save");
+      let trans = db.transaction("utxoContent", "readwrite");
+      trans.oncomplete = () => {
+        resolve(objects);
+      };
+      trans.onerror = (e) => {
+        console.log("Saving error", e);
+        reject("Error");
+      };
 
-    let store = trans.objectStore("utxoContent");
-    objects.forEach((x) => {
-      console.log("putting", x);
-      store.put(x);
+      let store = trans.objectStore("utxoContent");
+      objects.forEach((x) => {
+        console.log("putting", x);
+        store.put(x);
+      });
+      trans.commit();
     });
-    trans.commit();
-  });
+  } catch (e) {
+    console.log("error in saving utxos",e);
+  }
 }
 export function getReadHandle(db) {
   const trans = db.transaction("utxoContent");

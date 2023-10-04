@@ -311,8 +311,10 @@ const ListCollectionStep2 = () => {
     //   blob_feature_image = undefined,
     //   blob_logo_image = undefined;
     if (listing_previous) {
-      banner_image = listing_previous.banner_image.path;
-      feature_image = listing_previous.feature_image.path;
+      banner_image = listing_previous.ipfs_banner_image.path;
+      feature_image = listing_previous.ipfs_feature_image.path;
+      logo_image = listing_previous.ipfs_logo_image.path;
+
       //   logo_image = listing_previous.logo_image.path;
       //   blob_banner_image = listing_previous.blob_banner_image;
       //   blob_feature_image = listing_previous.blob_feature_image;
@@ -388,6 +390,8 @@ const ListCollectionStep2 = () => {
           let unit = "";
 
           console.log(policyId, "policyId");
+          localStorage.setItem("policy_id", policyId);
+
           setLatestPolicy(policyId);
 
           console.log({ units }, "uits");
@@ -407,7 +411,7 @@ const ListCollectionStep2 = () => {
 
              */
             let element = metadataObjects[index];
-            if (banner_image && feature_image && logo_image) {
+            if (logo_image) {
               element.banner_image = banner_image;
               element.feature_image = feature_image;
               element.logo_image = logo_image;
