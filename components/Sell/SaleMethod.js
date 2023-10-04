@@ -30,21 +30,20 @@ import { callKuberAndSubmit } from "../../services/kuberService";
 import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
 import { market } from "../../config/marketConfig";
 import { useLovelace, useWallet } from "@meshsdk/react";
-import {
-  connectWallet,
-  initializeLucid,
-  signAndSubmitTransaction,
-} from "../../utils/lucidUtils";
-import { bankWalletAddress, seedPhrase } from "../../config/walletConstants";
 import { transferNFT } from "../../services/nftService";
 import { transactionErrorHanlder } from "../../utils/errorUtils";
+import { blockfrostApiKey } from "../../config/blockfrost";
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+import { BlockfrostProvider } from "@meshsdk/core";
 const SaleMethod = () => {
   const router = useRouter();
-  const { wallet, connected } = useWallet();
+  const { wallet, name: walletName, connected, connect } = useWallet();
 
   const { action } = router.query;
   const dispatch = useDispatch();
-  const { instance } = useSelector((state) => state.wallet);
+
+  // const { instance } = useSelector((state) => state.wallet);
   const listing_data = getObjData("listing");
   const [paymentValue, setPaymentValue] = useState("fixed");
   const [isLoading, setIsLoading] = useState(false);
@@ -123,75 +122,130 @@ const SaleMethod = () => {
             }
           } else {
             if (paymentValue === "fixed") {
-              const addresses = await instance.getUsedAddresses();
-              console.log(addresses, "addressesaddressesaddresses");
+              let policyId_ = listing_data.policy_id;
+              let selectedNFTsNames = [listing_data.name];
 
-              console.log(
-                Address.from_bytes(
-                  Uint8Array.from(Buffer.from(addresses[0], "hex"))
-                )
-              );
+              const sellNft = async () => {
+                setIsLoading(true);
+                const providerInstance = await window.cardano.nami.enable();
+                const res = await connect(walletName);
+                const blockfrostProvider = new BlockfrostProvider(
+                  blockfrostApiKey
+                );
+                let selectedNFTs = [];
+                let latestAssets = null;
+                /** Wait until the latest transaction is mined and we obtain the assets by latest policy id */
+                while (!latestAssets || latestAssets.assets.length == 0) {
+                  console.log("fetching assets...");
+                  try {
+                    latestAssets =
+                      await blockfrostProvider.fetchCollectionAssets(policyId_);
+                    console.log({ latestAssets });
+                  } catch (e) {}
 
-              const sellerAddr = BaseAddress.from_address(
-                Address.from_bytes(
-                  Uint8Array.from(Buffer.from(addresses[0], "hex"))
-                )
-              );
-              console.log("sellerAddr", sellerAddr);
-              const sellerPkh = Buffer.from(
-                sellerAddr.payment_cred().to_keyhash().to_bytes()
-              ).toString("hex");
-              const sellerStakeKey = Buffer.from(
-                sellerAddr.stake_cred().to_keyhash().to_bytes()
-              ).toString("hex");
+                  await delay(5000);
+                  // Insert some notifier here
+                }
+                latestAssets = latestAssets.assets;
+                console.log(latestAssets, "latest assets");
+                for (let index = 0; index < latestAssets.length; index++) {
+                  const item = latestAssets[index];
+                  const main = await blockfrostProvider.fetchAssetMetadata(
+                    item.unit
+                  );
 
-              console.log(price_data.price, "price");
-              console.log(
-                `${listing_data.policy_id}.${listing_data.metadata[0].name}`,
-                "`${listing_data.policy_id}.${listing_data.name}`"
-              );
-              console.log(listing_data, "listing_data");
-              const body = {
-                selections: await instance.getUtxos(),
-                outputs: [
-                  {
-                    address: market.address,
-                    value: `${listing_data.policy_id}.${listing_data.metadata[0].name}`,
-                    datum: {
-                      fields: [
-                        {
-                          fields: [
-                            {
-                              fields: [{ bytes: `${sellerPkh}` }],
-                              constructor: 0,
-                            }, // pubkeyhash
-                            {
-                              fields: [
-                                {
-                                  fields: [
-                                    {
-                                      fields: [{ bytes: `${sellerStakeKey}` }],
-                                      constructor: 0,
-                                    },
-                                  ],
-                                  constructor: 0,
-                                },
-                              ],
-                              constructor: 0,
-                            }, // stakekeyHash
-                          ],
-                          constructor: 0,
-                        },
-                        // sellAmount: "",
-                        { int: Math.round(parseFloat(price_data.price) * 1e6) },
-                      ],
-                      constructor: 0,
-                    },
+                  console.log("metadata is ", main);
+                  const url = new URL(main.image);
+                  // const hash = url.pathname.slice(1);
+                  console.log(selectedNFTsNames, main.name);
+                  if (selectedNFTsNames.includes(main.name)) {
+                    selectedNFTs.push({
+                      ...main,
+                      isSelling: false,
+                      // price: "",
+                      ...item,
+                      policyId: policyId_,
+                    });
+                  }
+                }
+
+                console.log(providerInstance, "providerInstance");
+
+                console.log(selectedNFTs, "selectedNFTs");
+
+                const addresses = await providerInstance.getUsedAddresses();
+                console.log(addresses, "addressesaddressesaddresses");
+
+                const sellerAddr = BaseAddress.from_address(
+                  Address.from_bytes(
+                    Uint8Array.from(Buffer.from(addresses[0], "hex"))
+                  )
+                );
+
+                console.log("sellerAddr", sellerAddr);
+                const sellerPkh = Buffer.from(
+                  sellerAddr.payment_cred().to_keyhash().to_bytes()
+                ).toString("hex");
+                const sellerStakeKey = Buffer.from(
+                  sellerAddr.stake_cred().to_keyhash().to_bytes()
+                ).toString("hex");
+                console.log("selected NFTs ", selectedNFTs);
+
+                const outputs = selectedNFTs.map((asset) => ({
+                  address: market.address,
+                  value: `${asset.policyId}.${asset.name}`,
+                  datum: {
+                    fields: [
+                      {
+                        fields: [
+                          {
+                            fields: [{ bytes: `${sellerPkh}` }],
+                            constructor: 0,
+                          }, // pubkeyhash
+                          {
+                            fields: [
+                              {
+                                fields: [
+                                  {
+                                    fields: [{ bytes: `${sellerStakeKey}` }],
+                                    constructor: 0,
+                                  },
+                                ],
+                                constructor: 0,
+                              },
+                            ],
+                            constructor: 0,
+                          }, // stakekeyHash
+                        ],
+                        constructor: 0,
+                      },
+                      { int: Math.round(parseFloat(price_data.price) * 1e6) },
+                    ],
+                    constructor: 0,
                   },
-                ],
+                }));
+
+                const selections = await providerInstance.getUtxos();
+                console.log(selections, "selections");
+                const body = {
+                  selections,
+                  outputs,
+                };
+                console.log("Selling NFTs ");
+                console.log(body, "body");
+
+                let res_ = await callKuberAndSubmit(
+                  providerInstance,
+                  JSON.stringify(body)
+                );
+
+                await delay(10000); // 15 seconds delay
+                setIsLoading(false);
+
+                // insert some notifier here
+                console.log(res_);
               };
-              callKuberAndSubmit(instance, JSON.stringify(body));
-              setIsLoading(false);
+              await sellNft();
             } else {
               const data =
                 listing_data.type === "single"

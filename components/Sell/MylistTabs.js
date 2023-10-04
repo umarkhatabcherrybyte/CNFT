@@ -14,7 +14,13 @@ import InputField from "./InputField";
 import { addSingleListingSchema } from "../../schema/Index";
 import { useFormik } from "formik";
 import ListCollection from "./ListCollection";
-import { Lucid, fromText, Blockfrost } from "lucid-cardano";
+import {
+  Lucid,
+  fromText,
+  Blockfrost,
+  applyParamsToScript,
+  Data,
+} from "lucid-cardano";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { setListing } from "../../redux/listing/ListingActions";
@@ -35,6 +41,7 @@ import {
 } from "../../config/blockfrost";
 import { handleFileUpload } from "../../utils/ipfsUtlis";
 import { checkAdaBalance } from "../../utils/balanceUtils";
+import { cborHex } from "../../config/constants";
 const inputFileStyle = {
   my: 2,
   background: "#FFFFFF33 ",
@@ -117,35 +124,39 @@ const MylistTabs = () => {
                 );
 
                 transferLucid.selectWalletFromSeed(seedPhrase);
-                const lucidBrowser = await Lucid.new(
+                const lucid = await Lucid.new(
                   new Blockfrost(blockfrostUrl, blockfrostApiKey),
+
                   blockfrostNetworkName
                 );
 
                 const api = await window.cardano[
                   String(connectedWallet)
                 ].enable();
-                lucidBrowser.selectWallet(api);
+                lucid.selectWallet(api);
 
-                const { paymentCredential } =
-                  lucidBrowser.utils.getAddressDetails(
-                    await lucidBrowser.wallet.address()
-                  );
-                const mintingPolicy = lucidBrowser.utils.nativeScriptFromJson({
-                  type: "all",
-                  scripts: [
-                    { type: "sig", keyHash: paymentCredential?.hash },
-                    {
-                      type: "before",
-                      slot: lucidBrowser.utils.unixTimeToSlot(
-                        Date.now() + 518400000
-                      ),
-                    },
-                  ],
-                });
+                const { paymentCredential } = lucid.utils.getAddressDetails(
+                  await lucid.wallet.address()
+                );
+                const addr = await lucid.wallet.address();
+                const utxos = await lucid.utxosAt(addr);
+                const utxo = utxos[0]; // assign utxo having x amount
+                const tn = fromText("nft");
+                const image = fromText("nft");
 
-                const policyId =
-                  lucidBrowser.utils.mintingPolicyToId(mintingPolicy);
+                let policyId = "";
+                const nftPolicy = {
+                  type: "PlutusV2",
+                  script: applyParamsToScript(cborHex, [
+                    utxo.txHash,
+                    BigInt(utxo.outputIndex),
+                    tn,
+                    image,
+                  ]),
+                };
+
+                policyId = lucid.utils.mintingPolicyToId(nftPolicy);
+
                 let metadataX = {};
                 let metadata = {
                   name: values.name,
@@ -159,18 +170,31 @@ const MylistTabs = () => {
                 const unit = policyId + fromText(metadata.name);
 
                 let obj = { [policyId]: metadataX };
-                const tx = await lucidBrowser
+                const tx = await lucid
                   .newTx()
+                  .mintAssets({ [unit]: 1n }, Data.void())
+                  .attachMintingPolicy(nftPolicy)
                   .attachMetadata("721", obj)
-                  .mintAssets({ [unit]: 1n })
-                  .payToAddress(await transferLucid.wallet.address(), {
+                  // .payToAddress(addr, assetObj)
+                  .payToAddress(await lucid.wallet.address(), {
                     [unit]: 1n,
                   })
-                  .validTo(Date.now() + 100000)
-                  .attachMintingPolicy(mintingPolicy)
+                  .collectFrom([utxo])
                   .complete();
+
+                // const tx = await lucidBrowser
+                //   .newTx()
+                //   .attachMetadata("721", obj)
+                //   .mintAssets({ [unit]: 1n })
+                //   .payToAddress(await transferLucid.wallet.address(), {
+                //     [unit]: 1n,
+                //   })
+                //   .validTo(Date.now() + 100000)
+                //   .attachMintingPolicy(mintingPolicy)
+                //   .complete();
                 const signedTx = await tx.sign().complete();
                 const txHash = await signedTx.submit();
+                console.log({txHash});
                 if (txHash) {
                   if (values.imageFile) {
                     var reader = new FileReader();
@@ -187,7 +211,8 @@ const MylistTabs = () => {
                           recipient_address: recipientAddress,
                           policy_id: policyId,
                           type: "single",
-                          minting_policy: JSON.stringify(mintingPolicy),
+                          minting_policy: "",
+
                           image_file: file3DataURL,
                         };
                         const res = await INSTANCE.post(
@@ -224,7 +249,7 @@ const MylistTabs = () => {
                         recipient_address: recipientAddress,
                         policy_id: policyId,
                         type: "single",
-                        minting_policy: JSON.stringify(mintingPolicy),
+                        minting_policy: "",
                         image_file: "",
                       };
                       const res = await INSTANCE.post(
