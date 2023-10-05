@@ -186,7 +186,6 @@ const SaleMethod = () => {
       if (listing_data && price_data) {
         try {
           if (action === "listing") {
-            // console.log("listing");
             if (paymentValue === "fixed") {
               await sellNft(
                 listing_data.policy_id,
@@ -194,6 +193,8 @@ const SaleMethod = () => {
                 price_data.price
               );
               setIsLoading(false);
+              Toast("success", "Listed Successfully");
+              dispatch(setStep("step1"));
             } else {
               // all work of auction if user wants to list nft
 
@@ -235,7 +236,7 @@ const SaleMethod = () => {
                     setIsLoading(false);
                     Toast("success", "Listed Successfully");
                     dispatch(setStep("step1"));
-                    router.push(auctionRoute);
+                    // router.push(auctionRoute);
                   }
                 }
               } catch (e) {
@@ -267,6 +268,8 @@ const SaleMethod = () => {
               console.log({ selectedNFTsNames, policyId });
 
               await sellNft(policyId, selectedNFTsNames, price_data.price);
+              Toast("success", "Listed Successfully");
+              dispatch(setStep("step1"));
             } else {
               if (listing_data.type === "single") {
                 try {
@@ -295,7 +298,7 @@ const SaleMethod = () => {
                       setIsLoading(false);
                       Toast("success", "Listed Successfully");
                       dispatch(setStep("step1"));
-                      router.push(auctionRoute);
+                      // router.push(auctionRoute);
                     }
                   }
                 } catch (e) {
