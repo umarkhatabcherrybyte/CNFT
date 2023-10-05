@@ -193,7 +193,8 @@ const SaleMethod = () => {
                 price_data.price
               );
               setIsLoading(false);
-              Toast("success", "Listed Successfully");
+              router.push("/");
+              // Toast("success", "Listed Successfully");
               dispatch(setStep("step1"));
             } else {
               // all work of auction if user wants to list nft
@@ -234,7 +235,9 @@ const SaleMethod = () => {
                   });
                   if (res) {
                     setIsLoading(false);
-                    Toast("success", "Listed Successfully");
+                    // Toast("success", "Listed Successfully");
+                    router.push("/");
+
                     dispatch(setStep("step1"));
                     // router.push(auctionRoute);
                   }
@@ -270,6 +273,7 @@ const SaleMethod = () => {
               await sellNft(policyId, selectedNFTsNames, price_data.price);
               Toast("success", "Listed Successfully");
               dispatch(setStep("step1"));
+              router.push("/");
             } else {
               if (listing_data.type === "single") {
                 try {
@@ -296,8 +300,10 @@ const SaleMethod = () => {
                     });
                     if (res) {
                       setIsLoading(false);
-                      Toast("success", "Listed Successfully");
+                      // Toast("success", "Listed Successfully");
                       dispatch(setStep("step1"));
+                      router.push("/");
+
                       // router.push(auctionRoute);
                     }
                   }
@@ -332,8 +338,10 @@ const SaleMethod = () => {
                 });
                 if (res) {
                   setIsLoading(false);
-                  Toast("success", "Listed Successfully");
+                  // Toast("success", "Listed Successfully");
                   dispatch(setStep("step1"));
+                  router.push("/");
+
                   // router.push(auctionRoute);
                 }
               }
