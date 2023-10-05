@@ -60,7 +60,7 @@ const BuyDetail = () => {
     isLoading: notFetchedUtxosCompletely,
     message,
   } = useFetchNFTData();
-  const { id, Item: item } = router.query;
+  const { id, item } = router.query;
   console.log(router.query);
   console.log("policy ", id, " token ", item);
   const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
@@ -69,7 +69,7 @@ const BuyDetail = () => {
   // const [selectedUtxo, setSelectedUtxo] = useState(null);
   const [datum, setDatum] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentUtxo,setCurrentUtxo]=useState(null)
+  const [currentUtxo, setCurrentUtxo] = useState(null);
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
 
@@ -103,8 +103,8 @@ const BuyDetail = () => {
   const buy_utxo = async () => {
     const api = await window.cardano.nami.enable();
     const res = await connect("Nami");
-    let provider_=api;
-    
+    let provider_ = api;
+
     if (notFetchedUtxosCompletely) {
       return 0;
     }
@@ -116,58 +116,57 @@ const BuyDetail = () => {
     console.log(asset);
     const validUtxos = utxos;
     console.log("Valid market utxos", validUtxos);
-      if (currentUtxo) {
-        let utxo=currentUtxo
-        console.log("buying ", utxo);
-        const datum = utxo.detail.datum;
-        const cost = datum.fields[1].int;
-        const sellerPubKeyHashHex = datum.fields[0].fields[0].fields[0].bytes;
-        const sellerStakeKeyHashHex =
-          datum.fields[0].fields[1].fields[0].fields[0].fields[0].bytes;
-        console.log({ cost, sellerPubKeyHashHex, sellerStakeKeyHashHex });
-        const vkey = StakeCredential.from_keyhash(
-          Ed25519KeyHash.from_bytes(Buffer.from(sellerPubKeyHashHex, "hex"))
-        );
-        const stakeKey = StakeCredential.from_keyhash(
-          Ed25519KeyHash.from_bytes(Buffer.from(sellerStakeKeyHashHex, "hex"))
-        );
-        const sellerAddr = BaseAddress.new(0, vkey, stakeKey);
-        let utxos__ = await provider_.getUtxos();
-        console.log({ utxos__ });
-        // Create constraints for buying
-        // walletAction.callback
-        // const by2 = async (provider) => {
+    if (currentUtxo) {
+      let utxo = currentUtxo;
+      console.log("buying ", utxo);
+      const datum = utxo.detail.datum;
+      const cost = datum.fields[1].int;
+      const sellerPubKeyHashHex = datum.fields[0].fields[0].fields[0].bytes;
+      const sellerStakeKeyHashHex =
+        datum.fields[0].fields[1].fields[0].fields[0].fields[0].bytes;
+      console.log({ cost, sellerPubKeyHashHex, sellerStakeKeyHashHex });
+      const vkey = StakeCredential.from_keyhash(
+        Ed25519KeyHash.from_bytes(Buffer.from(sellerPubKeyHashHex, "hex"))
+      );
+      const stakeKey = StakeCredential.from_keyhash(
+        Ed25519KeyHash.from_bytes(Buffer.from(sellerStakeKeyHashHex, "hex"))
+      );
+      const sellerAddr = BaseAddress.new(0, vkey, stakeKey);
+      let utxos__ = await provider_.getUtxos();
+      console.log({ utxos__ });
+      // Create constraints for buying
+      // walletAction.callback
+      // const by2 = async (provider) => {
 
-        const request = {
-          selections: utxos__,
-          inputs: [
-            {
-              address: market.address,
-              utxo: {
-                hash: utxo.tx_hash,
-                index: utxo.tx_index,
-              },
-              script: market.script,
-              redeemer: { fields: [], constructor: 0 },
+      const request = {
+        selections: utxos__,
+        inputs: [
+          {
+            address: market.address,
+            utxo: {
+              hash: utxo.tx_hash,
+              index: utxo.tx_index,
             },
-          ],
-          outputs: [
-            {
-              address: sellerAddr
-                .to_address()
-                .to_bech32(
-                  market.address.startsWith("addr_test") ? "addr_test" : "addr"
-                ),
-              value: cost,
-              insuffientUtxoAda: "increase",
-            },
-          ],
-        };
-        console.log({ request });
-        return callKuberAndSubmit(provider_, JSON.stringify(request));
-        // };
-      }
-    
+            script: market.script,
+            redeemer: { fields: [], constructor: 0 },
+          },
+        ],
+        outputs: [
+          {
+            address: sellerAddr
+              .to_address()
+              .to_bech32(
+                market.address.startsWith("addr_test") ? "addr_test" : "addr"
+              ),
+            value: cost,
+            insuffientUtxoAda: "increase",
+          },
+        ],
+      };
+      console.log({ request });
+      return callKuberAndSubmit(provider_, JSON.stringify(request));
+      // };
+    }
 
     // walletAction.enable = true;
   };
@@ -179,12 +178,11 @@ const BuyDetail = () => {
 
   useEffect(() => {
     utxos.map(async (utxo) => {
-      if (fromText(utxo.assetName) == item){
+      if (fromText(utxo.assetName) == item) {
         setCurrentUtxo(utxo);
       }
-    })
-
-  }, [item,utxos]);
+    });
+  }, [item, utxos]);
 
   const getNFTDetail = async () => {
     if (id) {
