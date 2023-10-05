@@ -85,7 +85,7 @@ const Buy = () => {
         setHasIndexDb(true);
 
         const response = await listMarket();
-        // console.log("All Market Utxos", response);
+        console.log("All Market Utxos", response);
 
         const utxos_ = response.filter((utxo) => {
           const amount_ = utxo.amount.filter((x) => x.unit !== "lovelace");

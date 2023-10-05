@@ -56,7 +56,7 @@ const SaleMethod = () => {
   const onPaymentChange = (event, newValue) => {
     setPaymentValue(newValue);
   };
-  const sellNft = async (policyId, selectedNFTsNames) => {
+  const sellNft = async (policyId, selectedNFTsNames, price) => {
     setIsLoading(true);
     const providerInstance = await window.cardano.nami.enable();
     const res = await connect(walletName);
@@ -69,7 +69,9 @@ const SaleMethod = () => {
       try {
         latestAssets = await blockfrostProvider.fetchCollectionAssets(policyId);
         console.log({ latestAssets });
-      } catch (e) {}
+      } catch (e) {
+        console.log(e);
+      }
 
       await delay(5000);
       // Insert some notifier here
@@ -80,11 +82,12 @@ const SaleMethod = () => {
       const item = latestAssets[index];
       const main = await blockfrostProvider.fetchAssetMetadata(item.unit);
 
-      console.log("metadata is ", main);
+      // console.log("metadata is ", main);
       const url = new URL(main.image);
       // const hash = url.pathname.slice(1);
       console.log(selectedNFTsNames, main.name);
       if (selectedNFTsNames.includes(main.name)) {
+        console.log("match ".main);
         selectedNFTs.push({
           ...main,
           isSelling: false,
@@ -95,25 +98,25 @@ const SaleMethod = () => {
       }
     }
 
-    console.log(providerInstance, "providerInstance");
+    // console.log(providerInstance, "providerInstance");
 
     console.log(selectedNFTs, "selectedNFTs");
 
     const addresses = await providerInstance.getUsedAddresses();
-    console.log(addresses, "addressesaddressesaddresses");
+    // console.log(addresses, "addressesaddressesaddresses");
 
     const sellerAddr = BaseAddress.from_address(
       Address.from_bytes(Uint8Array.from(Buffer.from(addresses[0], "hex")))
     );
 
-    console.log("sellerAddr", sellerAddr);
+    // console.log("sellerAddr", sellerAddr);
     const sellerPkh = Buffer.from(
       sellerAddr.payment_cred().to_keyhash().to_bytes()
     ).toString("hex");
     const sellerStakeKey = Buffer.from(
       sellerAddr.stake_cred().to_keyhash().to_bytes()
     ).toString("hex");
-    console.log("selected NFTs ", selectedNFTs);
+    // console.log("selected NFTs ", selectedNFTs);
 
     const outputs = selectedNFTs.map((asset) => ({
       address: market.address,
@@ -143,7 +146,7 @@ const SaleMethod = () => {
             ],
             constructor: 0,
           },
-          { int: Math.round(parseFloat(price_data.price) * 1e6) },
+          { int: Math.round(parseFloat(price) * 1e6) },
         ],
         constructor: 0,
       },
@@ -185,9 +188,11 @@ const SaleMethod = () => {
           if (action === "listing") {
             // console.log("listing");
             if (paymentValue === "fixed") {
-              await sellNft(listing_data.policy_id, [
-                listing_data.assets[0].asset_name,
-              ]);
+              await sellNft(
+                listing_data.policy_id,
+                [listing_data.assets[0].asset_name],
+                price_data.price
+              );
               setIsLoading(false);
             } else {
               // all work of auction if user wants to list nft
@@ -218,6 +223,10 @@ const SaleMethod = () => {
                           name: listing_data?.name,
                           // sell_type: price_data?.sell_type,
                         };
+                  console.log("writing to databse ", {
+                    ...price_data,
+                    ...data,
+                  });
                   const res = await INSTANCE.post("/list/create", {
                     ...price_data,
                     ...data,
@@ -255,9 +264,9 @@ const SaleMethod = () => {
               } else {
                 selectedNFTsNames = [asset_name];
               }
-              console.log(selectedNFTsNames);
+              console.log({ selectedNFTsNames, policyId });
 
-              await sellNft(policyId, selectedNFTsNames);
+              await sellNft(policyId, selectedNFTsNames, price_data.price);
             } else {
               if (listing_data.type === "single") {
                 try {
@@ -274,7 +283,10 @@ const SaleMethod = () => {
                       collection_id: listing_data._id,
                       mint_type: listing_data?.type,
                     };
-
+                    console.log("writing to databse ", {
+                      ...price_data,
+                      ...data,
+                    });
                     const res = await INSTANCE.post("/list/create", {
                       ...price_data,
                       ...data,
@@ -307,6 +319,10 @@ const SaleMethod = () => {
                         name: listing_data?.name,
                         // sell_type: price_data?.sell_type,
                       };
+                console.log("writing to databse ", {
+                  ...price_data,
+                  ...data,
+                });
                 const res = await INSTANCE.post("/list/create", {
                   ...price_data,
                   ...data,

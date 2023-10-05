@@ -97,7 +97,6 @@ const ListCollection = () => {
       banner_image: null,
       name: "",
       description: "",
-      
     },
     validationSchema: addCollectioneListingSchema,
     onSubmit: async (values) => {
@@ -143,6 +142,7 @@ const ListCollection = () => {
             //   feature_image: file2DataURL_ipfs,
             //   banner_image: file1DataURL_ipfs,
             // };
+            console.log("creating listing object ");
             const dataWithFiles = {
               ...values,
               logo_image: file1DataURL,
@@ -151,13 +151,18 @@ const ListCollection = () => {
               ipfs_logo_image: file3DataURL_ipfs,
               ipfs_feature_image: file2DataURL_ipfs,
               ipfs_banner_image: file1DataURL_ipfs,
-              
             };
 
             // Store the object in local storage
+            console.log("storing in local storage");
             localStorage.setItem("listing", JSON.stringify(dataWithFiles));
-            localStorage.setItem("asset_name",values.name)
-            router.push(listCollectionRoute);
+            localStorage.setItem("asset_name", values.name);
+            console.log("navigating to listing form of collection");
+            router.push({
+              pathname: "/sell/list-collection",
+              query: {},
+            });
+            // router.push(listCollectionRoute);
           };
         };
       };

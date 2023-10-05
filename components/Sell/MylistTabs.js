@@ -60,27 +60,27 @@ const MylistTabs = () => {
   const assets = useAssets();
   const { wallet, connected, connecting } = useWallet();
   const [recipientAddress, setRecipientAddress] = useState("");
-  const [lists, setLists] = useState([]);
+  // const [lists, setLists] = useState([]);
   const [tabValue, setTabValue] = useState("add");
   const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    async function getAddress() {
-      if (connected) {
-        const user_id = window.localStorage.getItem("user_id");
-        let address = await wallet?.getUsedAddresses();
-        setRecipientAddress(address[0]);
-        let res = await INSTANCE.post("list/user/collection", {
-          user_id,
-        });
+  // useEffect(() => {
+  //   // async function getAddress() {
+  //   //   if (connected) {
+  //   //     const user_id = window.localStorage.getItem("user_id");
+  //   //     let address = await wallet?.getUsedAddresses();
+  //   //     setRecipientAddress(address[0]);
+  //   //     let res = await INSTANCE.post("list/user/collection", {
+  //   //       user_id,
+  //   //     });
 
-        if (res) {
-          // console.log(res.data);
-          setLists(res.data.data);
-        }
-      }
-    }
-    getAddress();
-  }, [wallet]);
+  //   //     if (res) {
+  //   //       // console.log(res.data);
+  //   //       setLists(res.data.data);
+  //   //     }
+  //   //   }
+  //   // }
+  //   // getAddress();
+  // }, [wallet]);
 
   useEffect(() => {
     if (connected) {
@@ -108,6 +108,7 @@ const MylistTabs = () => {
     validationSchema: addSingleListingSchema,
     onSubmit: async (values) => {
       try {
+        console.log("minting nft");
         if (connected) {
           if (!checkAdaBalance(lovelace)) {
             return null;
@@ -156,6 +157,9 @@ const MylistTabs = () => {
                 };
 
                 policyId = lucid.utils.mintingPolicyToId(nftPolicy);
+                window.localStorage.setItem("policy_id",policyId);
+
+                console.log("generated policy",policyId,window.localStorage.getItem("policy_id"));
 
                 let metadataX = {};
                 let metadata = {
@@ -247,7 +251,6 @@ const MylistTabs = () => {
                         window.localStorage.getItem("user_id")
                       );
                       const user_id = window.localStorage.getItem("user_id");
-                      const policyId_ = window.localStorage.getItem("policyId");
 
                       metadata["unit"] = unit;
                       metadata["ipfs"] = uploaded_image.path;
@@ -255,7 +258,7 @@ const MylistTabs = () => {
                         metadata: [metadata],
                         user_id: user_id,
                         recipient_address: recipientAddress,
-                        policy_id: policyId_ ? policyId_ : policyId,
+                        policy_id: policyId,
                         type: "single",
                         minting_policy: "",
                         image_file: "",
@@ -267,7 +270,7 @@ const MylistTabs = () => {
                       );
                       if (res) {
                         setIsLoading(false);
-                        // dispatch(setStep("step2"));
+                        dispatch(setStep("step2"));
                         window.localStorage.setItem(
                           "listing",
                           JSON.stringify(res?.data.data)

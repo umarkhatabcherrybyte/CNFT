@@ -73,10 +73,11 @@ const ListCollectionStep2 = () => {
   //   (window.localStorage)
   // );
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.getItem("connectedWallet", imagePaths);
-      // window.localStorage.getItem("metadataObjects", metadataObjects);
-    }
+    // if (typeof window !== "undefined") {
+    //   window?.localStorage?.getItem("connectedWallet", imagePaths);
+    //   // window.localStorage.getItem("metadataObjects", metadataObjects);
+    // }
+
   }, []);
 
   const onDeleteFile = (index_num) => {
@@ -388,6 +389,7 @@ const ListCollectionStep2 = () => {
           let prices = [];
           let lovelace = [];
           let unit = "";
+          policyId = policyId.replace(/"/g, "");
 
           console.log(policyId, "policyId");
           localStorage.setItem("policy_id", policyId);
@@ -459,7 +461,6 @@ const ListCollectionStep2 = () => {
             // }
             // // debugger
             // console.log(selectedNFTs, "selectedNFTs");
-
             const data = {
               metadata: selectedNFTs,
               prices,
@@ -470,7 +471,9 @@ const ListCollectionStep2 = () => {
               minting_policy: JSON.stringify(nftPolicy),
               //   asset_hex_name: unit,
             };
+            console.log("creating collection in db");
             const res = await INSTANCE.post("/collection/create", data);
+            console.log({ res });
             if (res) {
               window.localStorage.setItem(
                 "listing",
