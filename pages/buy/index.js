@@ -298,7 +298,10 @@ const Buy = () => {
                             nfts={uniquePolicyGroups[policy]}
                           />
                            */}
-                          <NftCard type={1} card={uniquePolicyGroups[policy][0]} />
+                          <NftCard
+                            type={1}
+                            card={uniquePolicyGroups[policy][0]}
+                          />
                         </Grid>
                       );
                     }
@@ -308,22 +311,31 @@ const Buy = () => {
                 {/* <BuyCards buy={buy} nfts={nfts[0]} /> */}
               </TabPanel>
               <TabPanel value="collection">
-                {uniquePolicies.map((policy) => {
-                  if (uniquePolicyGroups[policy].length > 1) {
-                    console.log(
-                      "NFTs for policy ",
-                      policy,
-                      uniquePolicyGroups[policy]
-                    );
-                    return (
-                      <CollectionThumbnail
-                        policy={policy}
-                        firstNFT={uniquePolicyGroups[policy][0]}
-                      />
-                    );
-                  }
-                  <hr />;
-                })}
+                {/* 
+                Grid container spacing={2}>
+          {auction.map((data, index) => (
+            <Grid item xs={12} sm={6} md={4} lg={3}>
+                */}
+                <Grid container spacing={2}>
+                  {uniquePolicies.map((policy) => {
+                    if (uniquePolicyGroups[policy].length > 1) {
+                      console.log(
+                        "NFTs for policy ",
+                        policy,
+                        uniquePolicyGroups[policy]
+                      );
+                      return (
+                        <Grid item xs={12} sm={6} md={4} lg={3}>
+                          <CollectionThumbnail
+                            policy={policy}
+                            firstNFT={uniquePolicyGroups[policy][0]}
+                          />
+                        </Grid>
+                      );
+                    }
+                    <hr />;
+                  })}
+                </Grid>
 
                 {/* <BuyCards
                   uniquePolicies={uniquePolicies}

@@ -14,7 +14,7 @@ import { fromText } from "lucid-cardano";
 import NftCard from "./NftCard";
 import { BlockfrostProvider } from "@meshsdk/core";
 const CollectionThumbnail = ({ policy, firstNFT }) => {
-  // console.log(card, "card1");
+  console.log(firstNFT, "first nft");
   let card = firstNFT;
   const router = useRouter();
   //   let _datum = card.detail.datum;
@@ -32,61 +32,64 @@ const CollectionThumbnail = ({ policy, firstNFT }) => {
     });
     // router.push(`/buy/collection/${policy}`);
   };
-
+  let res = fetch(`"https://ipfs.io/ipfs/" +
+${firstNFT.detail.onchain_metadata.feature_image}`);
+  console.log(res);
   return (
-    <NftCardStyled>
-      <>
-        <Grid item xs={12} sm={6} md={4} lg={3} key={"nft" + Date.now()}>
-          <NftCard onClick={navigationHanlder} type={0} card={firstNFT} />
-        </Grid>
-        <hr />;
-      </>
-    </NftCardStyled>
+    <AuctionCardStyled>
+      <Card
+        sx={{
+          boxShadow: "none",
+          background: "var(--main-color)",
+          borderRadius: "20px",
+          border: "solid 1px #ddd",
+          cursor: "pointer",
+          transition: "0.5s",
+          "&:hover": { transform: "translateY(-14px)" },
+
+          color: "#fff",
+          "& .flex": {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          },
+        }}
+        onClick={navigationHanlder}
+      >
+        <Box sx={{ position: "relative" }}>
+          <CardMedia
+            component="img"
+            height="290"
+            image={
+              firstNFT.detail.onchain_metadata.feature_image
+                ? "https://ipfs.io/ipfs/" +
+                  firstNFT.detail.onchain_metadata.feature_image
+                : "https://media.istockphoto.com/id/1264040074/vector/placeholder-rgb-color-icon.jpg?s=612x612&w=0&k=20&c=0ZFUNL28htu-zHRF9evishuNKYQAZVrfK0-TZNjnX3U="
+            }
+            alt="green iguana"
+          />
+          <Box sx={{ position: "absolute", bottom: "10px" }}></Box>
+        </Box>
+        {/* <CardContent sx={{ background: "#193361" }}>
+          <Typography
+            gutterBottom
+            variant="h6"
+            component="div"
+            className="uppercase poppin "
+          >
+            {firstNFT.name}
+          </Typography>
+        </CardContent> */}
+        <CardContent></CardContent>
+      </Card>
+    </AuctionCardStyled>
   );
 };
 
 export default CollectionThumbnail;
 
-const NftCardStyled = styled.section`
-  .next_arrow {
-    background: #fff;
-    width: 38px;
-    height: 38px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: 0.5s;
-    &:hover {
-      opacity: 0.6s;
-    }
-  }
-  .bg_heart {
-    padding: 5px;
-    font-size: 14px;
-    width: 30px;
-    height: 30px;
-    background-size: contain;
-    text-align: center;
-    background-repeat: no-repeat;
-    color: white;
-  }
-
-  .client_detail {
-    .img_parent {
-      background: #fff;
-      border-radius: 50%;
-      width: 48px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    img {
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      object-fit: cover;
-    }
+const AuctionCardStyled = styled.section`
+  .gray {
+    color: #e4e4e4;
   }
 `;
