@@ -60,7 +60,7 @@ const BuyDetail = () => {
     isLoading: notFetchedUtxosCompletely,
     message,
   } = useFetchNFTData();
-  const { id, Item: item } = router.query;
+  const { id, item } = router.query;
   console.log(router.query);
   console.log("policy ", id, " token ", item);
   const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
@@ -187,10 +187,10 @@ const BuyDetail = () => {
   const getNFTDetail = async () => {
     if (id) {
       try {
-        let asset = await getAssetDetail(id + item);
+        let asset_ = await getAssetDetail(id + item);
 
         setIsLoading(false);
-        setAsset(asset);
+        setAsset(asset_);
       } catch (e) {
         console.log(e);
         setAsset({});
