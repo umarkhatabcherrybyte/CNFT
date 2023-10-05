@@ -193,9 +193,10 @@ const SaleMethod = () => {
                 price_data.price
               );
               setIsLoading(false);
-              router.push("/");
+              // router.push("/");
               // Toast("success", "Listed Successfully");
-              dispatch(setStep("step1"));
+              // dispatch(setStep("step1"));
+              window.location.href = "/";
             } else {
               // all work of auction if user wants to list nft
 
@@ -236,9 +237,10 @@ const SaleMethod = () => {
                   if (res) {
                     setIsLoading(false);
                     // Toast("success", "Listed Successfully");
-                    router.push("/");
+                    // router.push("/");
+                    window.location.href = "/";
 
-                    dispatch(setStep("step1"));
+                    // dispatch(setStep("step1"));
                     // router.push(auctionRoute);
                   }
                 }
@@ -272,8 +274,9 @@ const SaleMethod = () => {
 
               await sellNft(policyId, selectedNFTsNames, price_data.price);
               Toast("success", "Listed Successfully");
-              dispatch(setStep("step1"));
-              router.push("/");
+              // dispatch(setStep("step1"));
+              // router.push("/");
+              window.location.href = "/";
             } else {
               if (listing_data.type === "single") {
                 try {
@@ -301,8 +304,9 @@ const SaleMethod = () => {
                     if (res) {
                       setIsLoading(false);
                       // Toast("success", "Listed Successfully");
-                      dispatch(setStep("step1"));
-                      router.push("/");
+                      // dispatch(setStep("step1"));
+                      // router.push("/");
+                      window.location.href = "/";
 
                       // router.push(auctionRoute);
                     }
@@ -339,8 +343,9 @@ const SaleMethod = () => {
                 if (res) {
                   setIsLoading(false);
                   // Toast("success", "Listed Successfully");
-                  dispatch(setStep("step1"));
-                  router.push("/");
+                  // dispatch(setStep("step1"));
+                  // router.push("/");
+                  window.location.href = "/";
 
                   // router.push(auctionRoute);
                 }
