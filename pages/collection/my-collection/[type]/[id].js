@@ -169,7 +169,10 @@ const MyCollection = () => {
         <>
           <Box sx={{ pt: { md: 5, xs: 20 } }}>
             <img
-              src={"https://ipfs.io/ipfs/"+firstNFT.detail.onchain_metadata.feature_image}
+              src={
+                "https://ipfs.io/ipfs/" +
+                firstNFT.detail.onchain_metadata.feature_image
+              }
               alt="Featured image"
               className="w_100"
               style={{
@@ -193,7 +196,13 @@ const MyCollection = () => {
                 },
               }}
             >
-              <img src={"https://ipfs.io/ipfs/"+firstNFT.detail.onchain_metadata.logo_image} alt="Collection Logo" />
+              <img
+                src={
+                  "https://ipfs.io/ipfs/" +
+                  firstNFT.detail.onchain_metadata.logo_image
+                }
+                alt="Collection Logo"
+              />
               <Box sx={{ py: 5 }}>
                 {/* <CaptionHeading heading="Created by@Julian" /> */}
                 <Heading
@@ -243,7 +252,7 @@ const MyCollection = () => {
                 </Box>
               </Box>
             </Box>
-          </Box>
+          </Box>{" "}
           <Box sx={{ pt: { md: 2, xs: 3 }, minHeight: "5rem" }}>
             {!isLoading && policyNFTs.length > 0 && (
               <Container maxWidth="xl">

@@ -60,7 +60,7 @@ const BuyDetail = () => {
     isLoading: notFetchedUtxosCompletely,
     message,
   } = useFetchNFTData();
-  const { id, item } = router.query;
+  const { id, Item: item } = router.query;
   console.log(router.query);
   console.log("policy ", id, " token ", item);
   const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
