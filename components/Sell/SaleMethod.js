@@ -316,38 +316,46 @@ const SaleMethod = () => {
                   setIsLoading(false);
                 }
               } else {
-                const data =
-                  listing_data.type === "single"
-                    ? {
-                        user_id: listing_data?.user_id,
-                        collection_id: listing_data._id,
-                        mint_type: listing_data?.type,
-                      }
-                    : {
-                        collection_id: listing_data?._id,
-                        user_id: listing_data?.user_id,
-                        logo_image: listing_data?.logo_image,
-                        feature_image: listing_data?.feature_image,
-                        mint_type: listing_data?.type,
-                        name: listing_data?.name,
-                        // sell_type: price_data?.sell_type,
-                      };
-                console.log("writing to databse ", {
-                  ...price_data,
-                  ...data,
-                });
-                const res = await INSTANCE.post("/list/create", {
-                  ...price_data,
-                  ...data,
-                });
-                if (res) {
-                  // setIsLoading(false);
-                  // Toast("success", "Listed Successfully");
-                  // dispatch(setStep("step1"));
-                  // router.push("/");
-                  window.location.href = "/";
+                // sdsdsd
+                const hash = await transferAssets(
+                  connectedWallet,
+                  listing_data.policy_id,
+                  listing_data.assets
+                );
+                if (hash) {
+                  const data =
+                    listing_data.type === "single"
+                      ? {
+                          user_id: listing_data?.user_id,
+                          collection_id: listing_data._id,
+                          mint_type: listing_data?.type,
+                        }
+                      : {
+                          collection_id: listing_data?._id,
+                          user_id: listing_data?.user_id,
+                          logo_image: listing_data?.logo_image,
+                          feature_image: listing_data?.feature_image,
+                          mint_type: listing_data?.type,
+                          name: listing_data?.name,
+                          // sell_type: price_data?.sell_type,
+                        };
+                  console.log("writing to databse ", {
+                    ...price_data,
+                    ...data,
+                  });
+                  const res = await INSTANCE.post("/list/create", {
+                    ...price_data,
+                    ...data,
+                  });
+                  if (res) {
+                    // setIsLoading(false);
+                    // Toast("success", "Listed Successfully");
+                    // dispatch(setStep("step1"));
+                    // router.push("/");
+                    window.location.href = "/";
 
-                  // router.push(auctionRoute);
+                    // router.push(auctionRoute);
+                  }
                 }
               }
             }
@@ -355,6 +363,7 @@ const SaleMethod = () => {
         } catch (e) {
           setIsLoading(false);
           console.log(e);
+          transactionErrorHanlder(e);
         }
       }
     } else {
