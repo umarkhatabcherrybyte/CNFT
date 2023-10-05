@@ -165,7 +165,7 @@ const SaleMethod = () => {
 
     await delay(10000); // 15 seconds delay
     setIsLoading(false);
-
+    dispatch(setStep("step1"));
     // insert some notifier here
     console.log(res_);
   };
