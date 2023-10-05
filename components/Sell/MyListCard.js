@@ -16,7 +16,7 @@ import Layout from "../Mint/Layout";
 import Heading from "../shared/headings/Heading";
 const data = [{}, {}, {}, {}, {}, {}, {}, {}];
 import { INSTANCE } from "../../config/axiosInstance";
-import { getKeyData } from "../../helper/localStorage";
+import { getKeyData } from "../../utils/storageUtils";
 import {
   MycollectionRoute,
   buyDetailRoute,
@@ -198,6 +198,7 @@ const MyListCard = () => {
                     pathname: "/sell",
                     query: {
                       type: "add-listing",
+                      action: "mint",
                     },
                   });
                 }}

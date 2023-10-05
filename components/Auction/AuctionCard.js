@@ -9,19 +9,18 @@ import useFetchData from "../../hooks/adaInfo";
 // import DateCountdown from "react-date-countdown-timer";
 // import Countdown from "react-countdown";
 import dynamic from "next/dynamic";
-import { isVideoOrIsAudio } from "../../utils/utils";
+import { isVideoOrIsAudio } from "../../utils/fileUtlis";
 const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
   ssr: false,
 });
 const AuctionCard = ({ data, index }) => {
   const router = useRouter();
   const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
-  const [date, setDate] = useState("");
 
   const asset_detail = data?.collection_id?.assets[0];
   const type = data.mint_type === "collection";
   const sell_model = data?.sell_model;
-  // console.log("model", sell_model);
+  console.log("model", data);
   const navigationHanlder = () => {
     const route = type
       ? `${MycollectionRoute}/${sell_model}`
@@ -92,7 +91,7 @@ const AuctionCard = ({ data, index }) => {
             component="div"
             className="bold uppercase poppin"
           >
-            Base Price
+            Price
           </Typography>
           <Box className="space_between">
             <Typography

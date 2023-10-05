@@ -16,13 +16,8 @@ import { store, wrapper } from "/store/Store";
 import { Provider } from "react-redux";
 import Navbar from "../components/Navbar/Navbar";
 import { MeshProvider } from "@meshsdk/react";
-import { useRouter } from "next/router";
 
 function MyApp({ Component, pageProps }) {
-  const router = useRouter();
-  //   useEffect(()=>{
-  //     router.push(window.location.href)
-  // },[])
   return (
     <MeshProvider>
       <ToastContainer />

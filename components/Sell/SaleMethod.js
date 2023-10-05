@@ -1,16 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PaymentHeader from "../shared/header/PaymentHeader";
-import {
-  Box,
-  Grid,
-  Tabs,
-  Tab,
-  Button,
-  FormGroup,
-  IconButton,
-  FormControlLabel,
-  Checkbox,
-} from "@mui/material";
+import { Box, Grid, Tabs, Tab, Button } from "@mui/material";
 import axios from "axios";
 import Heading from "../shared/headings/Heading";
 import FixedPrice from "/public/images/fixed price.svg";
@@ -20,10 +10,6 @@ import BarHeading from "../../components/shared/headings/BarHeading";
 import CaptionHeading from "../shared/headings/CaptionHeading";
 import AssetInputField from "./AssetInputField";
 import LightText from "../shared/headings/LightText";
-import { ArrowDropUp, ArrowDropDown, PriceChange } from "@mui/icons-material";
-import TextField from "@mui/material/TextField";
-import { saleMethodSchema } from "../../schema/Index";
-import { useFormik } from "formik";
 import Image from "next/image";
 import { useSelector } from "react-redux";
 import Fixed from "./FixedPrice";
@@ -33,96 +19,325 @@ import { useDispatch } from "react-redux";
 import { setListing } from "../../redux/listing/ListingActions";
 import { setAuction } from "../../redux/listing/ListingActions";
 import { setStep } from "../../redux/listing/ListingActions";
-import { getObjData } from "../../helper/localStorage";
+import { getObjData } from "../../utils/storageUtils";
 import FullScreenLoader from "../shared/FullScreenLoader";
-import moment from "moment";
 import { Toast } from "../shared/Toast";
 import { useRouter } from "next/router";
 import { buyDetailRoute, auctionRoute } from "../Routes/constants";
+import { getAssetDetail } from "../../services/koiosService";
+import { formatDateFromTimestamp } from "../../utils/formattingUtils";
+import { callKuberAndSubmit } from "../../services/kuberService";
+import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
+import { market } from "../../config/marketConfig";
+import { useLovelace, useWallet } from "@meshsdk/react";
+import { transferNFT } from "../../services/nftService";
+import { transactionErrorHanlder } from "../../utils/errorUtils";
+import { blockfrostApiKey } from "../../config/blockfrost";
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+import { BlockfrostProvider } from "@meshsdk/core";
+
 const SaleMethod = () => {
   const router = useRouter();
-  // const dispatch = useDispatch();
-  // const [listing, setListing] = useState();
-  // const { auction } = useSelector((state) => state.listing);
-  // console.log(auction);
-  // console.log(listing);
+  const { wallet, name: walletName, connected, connect } = useWallet();
 
+  const { action } = router.query;
   const dispatch = useDispatch();
 
+  // const { instance } = useSelector((state) => state.wallet);
   const listing_data = getObjData("listing");
   const [paymentValue, setPaymentValue] = useState("fixed");
   const [isLoading, setIsLoading] = useState(false);
   const [totalAmount, setTotalAmount] = useState("");
   const [isForm, setIsForm] = useState(false);
-  // console.log(toalAmount);
+  const [asset, setAsset] = useState([]);
+  console.log(asset, "assetassetassetassetassetassetassetassetasset");
+  const asset_name = localStorage.getItem("asset_name");
   const onPaymentChange = (event, newValue) => {
     setPaymentValue(newValue);
   };
-  // const getMintingTime = async() => {
-  //   const {time} = await axios.get("https://api.koios.rest/api/v0/asset_info?_asset_policy=750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501&_asset_name=424f4f4b" \
-  //   -H "accept: application/json")
+  const sellNft = async (policyId, selectedNFTsNames, price) => {
+    setIsLoading(true);
+    const providerInstance = await window.cardano.nami.enable();
+    const res = await connect(walletName);
+    const blockfrostProvider = new BlockfrostProvider(blockfrostApiKey);
+    let selectedNFTs = [];
+    let latestAssets = null;
+    /** Wait until the latest transaction is mined and we obtain the assets by latest policy id */
+    while (!latestAssets || latestAssets.assets.length == 0) {
+      console.log("fetching assets...");
+      try {
+        latestAssets = await blockfrostProvider.fetchCollectionAssets(policyId);
+        console.log({ latestAssets });
+      } catch (e) {
+        console.log(e);
+      }
 
-  // }
-  async function getAssetInfo(assetPolicy, assetName) {
-    try {
-      const baseURL = "https://api.koios.rest/api/v0/asset_info";
-      const queryParams = `_asset_policy=${assetPolicy}&_asset_name=${assetName}`;
-
-      const response = await axios.get(
-        `https://api.koios.rest/api/v0/asset_info?_asset_policy=e8a578c7ac07051bd5879f02de00ff12d7e88e0bf85d2f49e0a552f9&_asset_name=e8a578c7ac07051bd5879f02de00ff12d7e88e0bf85d2f49e0a552f974657374206d696e74`,
-        {
-          headers: {
-            accept: "application/json",
-          },
-        }
-      );
-
-      // Handle the response data here (e.g., print it)
-      console.log("Asset Info:---------------------", response.data);
-
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching asset info:", error.message);
-      return null;
+      await delay(5000);
+      // Insert some notifier here
     }
-  }
+    latestAssets = latestAssets.assets;
+    console.log(latestAssets, "latest assets");
+    for (let index = 0; index < latestAssets.length; index++) {
+      const item = latestAssets[index];
+      const main = await blockfrostProvider.fetchAssetMetadata(item.unit);
+
+      // console.log("metadata is ", main);
+      const url = new URL(main.image);
+      // const hash = url.pathname.slice(1);
+      console.log(selectedNFTsNames, main.name);
+      if (selectedNFTsNames.includes(main.name)) {
+        console.log("match ".main);
+        selectedNFTs.push({
+          ...main,
+          isSelling: false,
+          // price: "",
+          ...item,
+          policyId: policyId,
+        });
+      }
+    }
+
+    // console.log(providerInstance, "providerInstance");
+
+    console.log(selectedNFTs, "selectedNFTs");
+
+    const addresses = await providerInstance.getUsedAddresses();
+    // console.log(addresses, "addressesaddressesaddresses");
+
+    const sellerAddr = BaseAddress.from_address(
+      Address.from_bytes(Uint8Array.from(Buffer.from(addresses[0], "hex")))
+    );
+
+    // console.log("sellerAddr", sellerAddr);
+    const sellerPkh = Buffer.from(
+      sellerAddr.payment_cred().to_keyhash().to_bytes()
+    ).toString("hex");
+    const sellerStakeKey = Buffer.from(
+      sellerAddr.stake_cred().to_keyhash().to_bytes()
+    ).toString("hex");
+    // console.log("selected NFTs ", selectedNFTs);
+
+    const outputs = selectedNFTs.map((asset) => ({
+      address: market.address,
+      value: `${asset.policyId}.${asset.name}`,
+      datum: {
+        fields: [
+          {
+            fields: [
+              {
+                fields: [{ bytes: `${sellerPkh}` }],
+                constructor: 0,
+              }, // pubkeyhash
+              {
+                fields: [
+                  {
+                    fields: [
+                      {
+                        fields: [{ bytes: `${sellerStakeKey}` }],
+                        constructor: 0,
+                      },
+                    ],
+                    constructor: 0,
+                  },
+                ],
+                constructor: 0,
+              }, // stakekeyHash
+            ],
+            constructor: 0,
+          },
+          { int: Math.round(parseFloat(price) * 1e6) },
+        ],
+        constructor: 0,
+      },
+    }));
+
+    const selections = await providerInstance.getUtxos();
+    console.log(selections, "selections");
+    const body = {
+      selections,
+      outputs,
+    };
+    console.log("Selling NFTs ");
+    console.log(body, "body");
+
+    let res_ = await callKuberAndSubmit(providerInstance, JSON.stringify(body));
+
+    await delay(10000); // 15 seconds delay
+    setIsLoading(false);
+    dispatch(setStep("step1"));
+    // insert some notifier here
+    console.log(res_);
+  };
+
   const submitData = async () => {
+    if (!connected) {
+      Toast("error", "Please connect your wallet");
+      return;
+    }
     if (isForm) {
+      let connectedWallet = window.localStorage.getItem("connectedWallet");
       setIsLoading(true);
       const price_data =
         paymentValue === "fixed"
           ? getObjData("list-item-fixed")
           : getObjData("list-item-auction");
+      console.log(price_data, "price_data");
       if (listing_data && price_data) {
-        const data =
-          listing_data.type === "single"
-            ? {
-                user_id: listing_data?.user_id,
-                collection_id: listing_data._id,
-                mint_type: listing_data?.type,
-              }
-            : {
-                collection_id: listing_data?._id,
-                user_id: listing_data?.user_id,
-                logo_image: listing_data?.logo_image,
-                feature_image: listing_data?.feature_image,
-                mint_type: listing_data?.type,
-                name: listing_data?.name,
-                // sell_type: price_data?.sell_type,
-              };
         try {
-          const res = await INSTANCE.post("/list/create", {
-            ...price_data,
-            ...data,
-          });
-          if (res) {
-            setIsLoading(false);
-            const route =
-              paymentValue === "fixed" ? buyDetailRoute : auctionRoute;
-            // window.localStorage.removeItem("listing")
-            Toast("success", "Listed Successfully");
-            dispatch(setStep("step1"));
-            router.push(route);
+          if (action === "listing") {
+            if (paymentValue === "fixed") {
+              await sellNft(
+                listing_data.policy_id,
+                [listing_data.assets[0].asset_name],
+                price_data.price
+              );
+              setIsLoading(false);
+              Toast("success", "Listed Successfully");
+              dispatch(setStep("step1"));
+            } else {
+              // all work of auction if user wants to list nft
+
+              let recipientAddress = await wallet?.getUsedAddresses();
+              recipientAddress[0];
+              try {
+                const hash = await transferNFT(connectedWallet, {
+                  policy_id: listing_data.policy_id,
+                  name: listing_data.assets[0].asset_name,
+                });
+                if (hash) {
+                  setIsLoading(false);
+                  // fdfdfd
+                  const data =
+                    listing_data.type === "single"
+                      ? {
+                          user_id: listing_data?.user_id,
+                          collection_id: listing_data._id,
+                          mint_type: listing_data?.type,
+                        }
+                      : {
+                          collection_id: listing_data?._id,
+                          user_id: listing_data?.user_id,
+                          logo_image: listing_data?.logo_image,
+                          feature_image: listing_data?.feature_image,
+                          mint_type: listing_data?.type,
+                          name: listing_data?.name,
+                          // sell_type: price_data?.sell_type,
+                        };
+                  console.log("writing to databse ", {
+                    ...price_data,
+                    ...data,
+                  });
+                  const res = await INSTANCE.post("/list/create", {
+                    ...price_data,
+                    ...data,
+                  });
+                  if (res) {
+                    setIsLoading(false);
+                    Toast("success", "Listed Successfully");
+                    dispatch(setStep("step1"));
+                    // router.push(auctionRoute);
+                  }
+                }
+              } catch (e) {
+                setIsLoading(false);
+                transactionErrorHanlder(e);
+                console.log(e);
+              }
+            }
+          } else {
+            if (paymentValue === "fixed") {
+              let policyId = window.localStorage.getItem("policy_id");
+              policyId = policyId ? policyId : listing_data.policy_id;
+              console.log({ listing_data });
+              let selectedNFTsNames = [];
+              console.log({ assts: listing_data.assets });
+              console.log(listing_data.type, "collection");
+              if (listing_data.type == "collection") {
+                for (
+                  let index = 0;
+                  index < listing_data.assets.length;
+                  index++
+                ) {
+                  const name_ = listing_data.assets[index].asset_name;
+                  selectedNFTsNames.push(name_);
+                }
+              } else {
+                selectedNFTsNames = [asset_name];
+              }
+              console.log({ selectedNFTsNames, policyId });
+
+              await sellNft(policyId, selectedNFTsNames, price_data.price);
+              Toast("success", "Listed Successfully");
+              dispatch(setStep("step1"));
+            } else {
+              if (listing_data.type === "single") {
+                try {
+                  const hash = await transferNFT(connectedWallet, {
+                    policy_id: listing_data.policy_id,
+                    name: listing_data.assets[0].asset_name,
+                  });
+                  if (hash) {
+                    setIsLoading(false);
+                    // fdfdfd
+
+                    const data = {
+                      user_id: listing_data?.user_id,
+                      collection_id: listing_data._id,
+                      mint_type: listing_data?.type,
+                    };
+                    console.log("writing to databse ", {
+                      ...price_data,
+                      ...data,
+                    });
+                    const res = await INSTANCE.post("/list/create", {
+                      ...price_data,
+                      ...data,
+                    });
+                    if (res) {
+                      setIsLoading(false);
+                      Toast("success", "Listed Successfully");
+                      dispatch(setStep("step1"));
+                      // router.push(auctionRoute);
+                    }
+                  }
+                } catch (e) {
+                  console.log(e);
+                  setIsLoading(false);
+                }
+              } else {
+                const data =
+                  listing_data.type === "single"
+                    ? {
+                        user_id: listing_data?.user_id,
+                        collection_id: listing_data._id,
+                        mint_type: listing_data?.type,
+                      }
+                    : {
+                        collection_id: listing_data?._id,
+                        user_id: listing_data?.user_id,
+                        logo_image: listing_data?.logo_image,
+                        feature_image: listing_data?.feature_image,
+                        mint_type: listing_data?.type,
+                        name: listing_data?.name,
+                        // sell_type: price_data?.sell_type,
+                      };
+                console.log("writing to databse ", {
+                  ...price_data,
+                  ...data,
+                });
+                const res = await INSTANCE.post("/list/create", {
+                  ...price_data,
+                  ...data,
+                });
+                if (res) {
+                  setIsLoading(false);
+                  Toast("success", "Listed Successfully");
+                  dispatch(setStep("step1"));
+                  // router.push(auctionRoute);
+                }
+              }
+            }
           }
         } catch (e) {
           setIsLoading(false);
@@ -133,17 +348,17 @@ const SaleMethod = () => {
       Toast("error", "Please set your price.");
     }
   };
-  useEffect(() => {
-    getAssetInfo(
-      "e8a578c7ac07051bd5879f02de00ff12d7e88e0bf85d2f49e0a552f9",
-      "test mint"
-    );
+
+  useEffect(async () => {
+    setIsLoading(true);
+    const response = await getAssetDetail(listing_data?.policy_id);
+    console.log(response, "datadatadatadata");
+    setAsset(response?.data);
+    setIsLoading(false);
   }, []);
+
   return (
     <>
-      <p onClick={() => getAssetInfo()}>
-        sdfffffffffffffffffffffffffffffffffff
-      </p>
       {isLoading && <FullScreenLoader />}
       {/* <Button
         className="btn2"
@@ -279,11 +494,29 @@ const SaleMethod = () => {
             <Box>
               <CaptionHeading
                 font="montserrat"
-                heading={`${
-                  listing_data.type === "collection" ? "Collection" : "Asset"
-                } Name`}
+                heading="Asset Name"
+                // heading={`${
+                //   listing_data.type === "collection" ? "Collection" : "Asset"
+                // } Name`}
               />
               <AssetInputField
+                placeholder={`Enter Asset Name`}
+                name="asset_name"
+                value={asset_name && asset_name}
+              />
+              {/* <AssetInputField
+                placeholder={`Enter Asset Name`}
+                name="asset_name"
+                value={
+                  listing_data.type === "collection"
+                    ? listing_data.name
+                    : listing_data?.metadata &&
+                      listing_data?.metadata.length > 0
+                    ? listing_data?.metadata[0]?.name
+                    : ""
+                }
+              /> */}
+              {/* <AssetInputField
                 placeholder={`Enter ${
                   listing_data.type === "collection"
                     ? "Collection Name"
@@ -297,7 +530,7 @@ const SaleMethod = () => {
                     ? listing_data?.assets[0]?.asset_name
                     : listing_data?.onchain_metadata?.name
                 }
-              />
+              /> */}
             </Box>
           </Grid>
           {/* <Grid item xs={12} md={6}>
@@ -321,35 +554,32 @@ const SaleMethod = () => {
               />
             </Box>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <Box>
-              <CaptionHeading heading="Quantity" font="montserrat" />
-              <AssetInputField
-                placeholder="Enter Quantity"
-                name="quantity"
-                // value={listing_data?.assets?.length}
-                value={
-                  listing_data?.assets
-                    ? listing_data?.assets?.length
-                    : listing_data?.quantity
-                }
-              />
-            </Box>
-          </Grid>
-          {listing_data?.createdAt && (
-            <Grid item xs={12} md={6}>
-              <Box>
-                <CaptionHeading heading="Minted On" font="montserrat" />
-                <AssetInputField
-                  placeholder="Enter Minted Date"
-                  name="minted_on"
-                  // value={moment(new Date(listing_data?.createdAt)).format(
-                  //   "Do MMMM YYYY"
-                  // )}
-                  value={localStorage.getItem("policyId")}
-                />
-              </Box>
-            </Grid>
+
+          {asset?.length > 0 && (
+            <>
+              <Grid item xs={12} md={6}>
+                <Box>
+                  <CaptionHeading heading="Quantity" font="montserrat" />
+                  <AssetInputField
+                    placeholder="Enter Quantity"
+                    name="quantity"
+                    // value={listing_data?.assets?.length}
+                    value={asset[0]?.mint_cnt}
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Box>
+                  <CaptionHeading heading="Minted On" font="montserrat" />
+                  <AssetInputField
+                    placeholder="Enter Minted Date"
+                    name="minted_on"
+                    value={formatDateFromTimestamp(asset[0].creation_time)}
+                    // value={localStorage.getItem("policyId")}
+                  />
+                </Box>
+              </Grid>
+            </>
           )}
 
           <Grid item xs={12} className="flex">

@@ -16,17 +16,31 @@ import { create } from "ipfs-http-client";
 import { INSTANCE } from "../../config/axiosInstance";
 import { setStep } from "../../redux/listing/ListingActions";
 import { useDispatch, useSelector } from "react-redux";
-import { useLovelace, useWallet } from "@meshsdk/react";
-import { Lucid, fromText, Blockfrost } from "lucid-cardano";
-import { getObjData } from "../../helper/localStorage";
-import { transactionErrorHanlder } from "../../helper/transactionError";
-import { seedPhraseMainnet } from "../../config/utils";
-import { seedPhrasePreprod } from "../../config/utils";
-import { getClientIp } from "../../helper/clientIP";
-import { network_name, network_url, network_key } from "../../base_network";
+import { useAssets, useLovelace, useWallet } from "@meshsdk/react";
+import {
+  Lucid,
+  fromText,
+  Blockfrost,
+  applyParamsToScript,
+  Data,
+} from "lucid-cardano";
+import { getObjData } from "../../utils/storageUtils";
+import { transactionErrorHanlder } from "../../utils/errorUtils";
+// import { seedPhrase } from "../../config/utils";
+import { seedPhrase } from "../../config/walletConstants";
+import {
+  blockfrostUrl,
+  blockfrostApiKey,
+  blockfrostNetworkName,
+} from "../../config/blockfrost";
+import { cborHex } from "../../config/constants";
+
 const ListCollectionStep2 = () => {
   const lovelace = useLovelace();
-
+  const { wallet, connected, name, connecting, connect, disconnect, error } =
+    useWallet();
+  const assets = useAssets();
+  let walletName = name;
   const dispatch = useDispatch();
   const { step } = useSelector((store) => store.listing);
   const router = useRouter();
@@ -38,9 +52,10 @@ const ListCollectionStep2 = () => {
   const [imagePaths, setImagePaths] = useState([]);
   const [walletAddress, setWalletAddress] = useState("");
   const [connectedWallet, setConnectedWallet] = useState("");
-  const [isWebform, setIsWebform] = useState(false);
+  const [isWebform, setIsWebform] = useState(true);
   const [metadataFileUploaded, setMetadataFileUploaded] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [latestPolicy, setLatestPolicy] = useState(null);
 
   const [metadataObjects, setMetadataObjects] = useState([]);
   const [metadataObjectsFromFile, setMetadataObjectsFromFile] = useState([]);
@@ -51,16 +66,18 @@ const ListCollectionStep2 = () => {
   const hiddenFileInputRef = useRef(null);
   const metaFileLabelRef = useRef(null);
   const selectedFilesLabelRef = useRef(null);
-
-  const { wallet, connected } = useWallet();
   const [currentAddr, setCurrentAddr] = useState("");
   const [selectedValue, setSelectedValue] = React.useState();
-
+  // console.log(
+  //   "collection metadata ",
+  //   (window.localStorage)
+  // );
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.getItem("connectedWallet", imagePaths);
-      // window.localStorage.getItem("metadataObjects", metadataObjects);
-    }
+    // if (typeof window !== "undefined") {
+    //   window?.localStorage?.getItem("connectedWallet", imagePaths);
+    //   // window.localStorage.getItem("metadataObjects", metadataObjects);
+    // }
+
   }, []);
 
   const onDeleteFile = (index_num) => {
@@ -171,32 +188,6 @@ const ListCollectionStep2 = () => {
     }
   };
 
-  function upload(path, idx, file) {
-    _progressInfos = [..._progressInfos];
-    UploadService.upload(file, path, (event) => {
-      _progressInfos[idx].percentage = Math.round(
-        (100 * event.loaded) / event.total
-      );
-      setProgressInfos(_progressInfos);
-    })
-      .then((response) => {
-        setMetaData([]);
-        t();
-      })
-      .catch(() => {
-        _progressInfos[idx].percentage = 0;
-        setProgressInfos(_progressInfos);
-      });
-
-    function t() {
-      UploadService.getFiles(connectedWallet + "_" + walletAddress).then(
-        (files) => {
-          setFileInfos(files.data);
-        }
-      );
-    }
-  }
-
   async function onNextStep() {
     console.log(metaFile, "dasd");
     if (!isWebform && metaFile && metadataObjectsFromFile.length > 0) {
@@ -240,25 +231,6 @@ const ListCollectionStep2 = () => {
     }
   }
 
-  function onBackStep() {
-    navigate("/mint");
-  }
-
-  function onRemoveImage(fileName) {
-    const path = connectedWallet + "_" + walletAddress;
-    UploadService.remove(fileName, path)
-      .then((response) => {
-        Toast("success", response.data.message);
-        return UploadService.getFiles(path);
-      })
-      .then((response) => {
-        setFileInfos(response.data);
-      })
-      .catch((e) => {
-        Toast("error", "Remove images failed. " + e.message);
-      });
-  }
-
   const convertMetadataObjects = () => {
     let metadataObjectPropertiesClone = metadataObjects;
     let metadataArr = [];
@@ -277,6 +249,259 @@ const ListCollectionStep2 = () => {
     }
     // console.log(metadataArr, "arr");
     return metadataArr;
+  };
+
+  const onFileInputButton = () => {
+    // console.log("onFileInputButton");
+    hiddenFileInputRef.current.click();
+  };
+
+  const onMetaFileInputButton = () => {
+    metaFileInputRef.current.click();
+  };
+
+  const validateCollectionData = (objs) => {
+    if (objs.length > 0) {
+      for (let index = 0; index < objs.length; index++) {
+        if (
+          !(
+            Object.keys(objs[index]).includes("name") ||
+            Object.keys(objs[index]).includes("Name")
+          ) ||
+          !(
+            Object.keys(objs[index]).includes("price") ||
+            Object.keys(objs[index]).includes("Price")
+          )
+        ) {
+          Toast(
+            "error",
+            "You need to have both name and price properties in the webform"
+          );
+          return false;
+        }
+      }
+
+      var valueArr = objs.map(function (item) {
+        return item.name;
+      });
+      var isDuplicate = valueArr.some(function (item, idx) {
+        return valueArr.indexOf(item) != idx;
+      });
+      // console.log(isDuplicate, "dup");
+      if (isDuplicate) {
+        Toast("error", "You have duplicate names in the webform!");
+        // console.log(isDup)
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      // console.log('no itemsd')
+      Toast("error", "No Metadata Objects Found");
+      return false;
+    }
+  };
+  const mintCollection = async (metadataObjects) => {
+    console.log(metadataObjects, "metadataObjects");
+    const listing_previous = getObjData("listing");
+    console.log(listing_previous, "listing_previous");
+    let banner_image = undefined,
+      feature_image = undefined,
+      logo_image = undefined;
+    //   blob_banner_image = undefined,
+    //   blob_feature_image = undefined,
+    //   blob_logo_image = undefined;
+    if (listing_previous) {
+      banner_image = listing_previous.ipfs_banner_image.path;
+      feature_image = listing_previous.ipfs_feature_image.path;
+      logo_image = listing_previous.ipfs_logo_image.path;
+
+      //   logo_image = listing_previous.logo_image.path;
+      //   blob_banner_image = listing_previous.blob_banner_image;
+      //   blob_feature_image = listing_previous.blob_feature_image;
+      //   blob_logo_image = listing_previous.blob_logo_image;
+    }
+
+    try {
+      let connectedWallet = window.localStorage.getItem("connectedWallet");
+      if (connected) {
+        if (lovelace < 1000000) {
+          Toast(
+            "error",
+            "You do not have enough Ada to complete this transaction"
+          );
+          return;
+        } else {
+          const transferLucid = await Lucid.new(
+            new Blockfrost(blockfrostUrl, blockfrostApiKey),
+
+            blockfrostNetworkName
+          );
+          transferLucid.selectWalletFromSeed(seedPhrase);
+
+          const lucid = await Lucid.new(
+            new Blockfrost(blockfrostUrl, blockfrostApiKey),
+
+            blockfrostNetworkName
+          );
+
+          const api = await window.cardano[String(connectedWallet)].enable();
+          lucid.selectWallet(api);
+
+          // const { paymentCredential } = lucid.utils.getAddressDetails(
+          //   await lucid.wallet.address()
+          // );
+
+          // const mintingPolicy = lucid.utils.nativeScriptFromJson({
+          //   type: "all",
+          //   scripts: [
+          //     { type: "sig", keyHash: paymentCredential?.hash },
+          //     {
+          //       type: "before",
+          //       slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
+          //     },
+          //   ],
+          // });
+
+          // const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
+          const addr = await lucid.wallet.address();
+          const utxos = await lucid.utxosAt(addr);
+          const utxo = utxos[0]; // assign utxo having x amount
+          const tn = fromText("nft");
+          const image = fromText("nft");
+
+          let policyId = "";
+          const nftPolicy = {
+            type: "PlutusV2",
+            script: applyParamsToScript(cborHex, [
+              utxo.txHash,
+              BigInt(utxo.outputIndex),
+              tn,
+              image,
+            ]),
+          };
+
+          policyId = lucid.utils.mintingPolicyToId(nftPolicy);
+          let obj;
+          let assetObj = {};
+          let units = [];
+          let metadataX = {};
+          let prices = [];
+          let lovelace = [];
+          let unit = "";
+          policyId = policyId.replace(/"/g, "");
+
+          console.log(policyId, "policyId");
+          localStorage.setItem("policy_id", policyId);
+
+          setLatestPolicy(policyId);
+
+          console.log({ units }, "uits");
+          console.log({ metadataX }, "metadataX");
+          console.log({ prices }, "prices");
+          let selectedNFTs = [];
+          let arr = [];
+          //   for (let index = 0; index < metadataObjects.length; index++) {
+          //     const element = metadataObjects[index];
+          //     element["unit"] = String(policyId + fromText(element.name));
+          //     element["price"] = Number(prices[index]);
+          //     arr.push(element);
+          //   }
+          for (let index = 0; index < metadataObjects.length; index++) {
+            /**
+             * artist,assetName,fingerprint ,image,isSelling,name,policyId,price,quantity:"1",unit
+
+             */
+            let element = metadataObjects[index];
+            if (logo_image) {
+              element.banner_image = banner_image;
+              element.feature_image = feature_image;
+              element.logo_image = logo_image;
+            }
+            element.price = parseInt(element.price);
+            element.lovelace = parseInt(element.price) * 1000000;
+            // assetObj[String(policyId + fromText(element.name))] = 1n;
+            // obj = { [policyId]: metadataX };
+            let metadata = element;
+            metadataX[metadata.name] = metadata;
+            assetObj[policyId + fromText(metadata.name)] = 1n;
+            obj = { [policyId]: metadataX };
+            prices.push(element.price);
+            lovelace.push(element.price);
+            // lovelace.push(element.price * 10000000);
+            selectedNFTs.push(element);
+            arr.push(metadata);
+            // delete element["price"];
+          }
+          console.log(obj, "obj");
+          console.log(assetObj, "assetObj");
+          const txL = await lucid
+            .newTx()
+            .mintAssets(assetObj, Data.void())
+            .attachMintingPolicy(nftPolicy)
+            .attachMetadata("721", obj)
+            // .payToAddress(addr, assetObj)
+            .payToAddress(addr, assetObj)
+            .collectFrom([utxo])
+            .complete();
+          const signedTxL = await txL.sign().complete();
+          const txHashL = await signedTxL.submit();
+          console.log({ txHashL, txL, signedTxL });
+
+          console.log(arr, "arr");
+          console.log(selectedNFTs, "selectedNFTs");
+          if (txHashL) {
+            // await sellNft(policyId, selectedNFTs);
+            const user_id = window.localStorage.getItem("user_id");
+            // for (let index = 0; index < metadataObjects.length; index++) {
+            //   const element = metadataObjects[index];
+            //   element["unit"] = String(policyId + fromText(element.name));
+            //   element["price"] = Number(prices[index]);
+            //   arr.push(element);
+            // }
+            // // debugger
+            // console.log(selectedNFTs, "selectedNFTs");
+            const data = {
+              metadata: selectedNFTs,
+              prices,
+              user_id: user_id,
+              recipient_address: await lucid.wallet.address(),
+              policy_id: policyId,
+              type: "collection",
+              minting_policy: JSON.stringify(nftPolicy),
+              //   asset_hex_name: unit,
+            };
+            console.log("creating collection in db");
+            const res = await INSTANCE.post("/collection/create", data);
+            console.log({ res });
+            if (res) {
+              window.localStorage.setItem(
+                "listing",
+                JSON.stringify({ ...listing_previous, ...res?.data.data })
+              );
+              dispatch(setStep("step2"));
+              router.push({
+                pathname: "/sell",
+                query: {
+                  type: "add-listing",
+                  actions: "mint",
+                },
+              });
+            }
+          }
+        }
+      } else {
+        alert("error You are Not Connected");
+      }
+    } catch (e) {
+      console.log("error", e);
+      transactionErrorHanlder(e, "mint");
+
+      // console.log(e)
+    }
+  };
+  const viewImagesPaths = () => {
+    console.log(imagePaths, "o");
   };
 
   const convertToJson = () => {
@@ -329,215 +554,49 @@ const ListCollectionStep2 = () => {
       });
   };
 
-  const onFileInputButton = () => {
-    // console.log("onFileInputButton");
-    hiddenFileInputRef.current.click();
-  };
+  function onBackStep() {
+    navigate("/mint");
+  }
 
-  const onMetaFileInputButton = () => {
-    metaFileInputRef.current.click();
-  };
-
-  const viewImagesPaths = () => {
-    console.log(imagePaths, "o");
-  };
-
-  const validateCollectionData = (objs) => {
-    if (objs.length > 0) {
-      for (let index = 0; index < objs.length; index++) {
-        if (
-          !(
-            Object.keys(objs[index]).includes("name") ||
-            Object.keys(objs[index]).includes("Name")
-          ) ||
-          !(
-            Object.keys(objs[index]).includes("price") ||
-            Object.keys(objs[index]).includes("Price")
-          )
-        ) {
-          Toast(
-            "error",
-            "You need to have both name and price properties in the webform"
-          );
-          return false;
-        }
-      }
-
-      var valueArr = objs.map(function (item) {
-        return item.name;
+  function onRemoveImage(fileName) {
+    const path = connectedWallet + "_" + walletAddress;
+    UploadService.remove(fileName, path)
+      .then((response) => {
+        Toast("success", response.data.message);
+        return UploadService.getFiles(path);
+      })
+      .then((response) => {
+        setFileInfos(response.data);
+      })
+      .catch((e) => {
+        Toast("error", "Remove images failed. " + e.message);
       });
-      var isDuplicate = valueArr.some(function (item, idx) {
-        return valueArr.indexOf(item) != idx;
+  }
+  function upload(path, idx, file) {
+    _progressInfos = [..._progressInfos];
+    UploadService.upload(file, path, (event) => {
+      _progressInfos[idx].percentage = Math.round(
+        (100 * event.loaded) / event.total
+      );
+      setProgressInfos(_progressInfos);
+    })
+      .then((response) => {
+        setMetaData([]);
+        t();
+      })
+      .catch(() => {
+        _progressInfos[idx].percentage = 0;
+        setProgressInfos(_progressInfos);
       });
-      // console.log(isDuplicate, "dup");
-      if (isDuplicate) {
-        Toast("error", "You have duplicate names in the webform!");
-        // console.log(isDup)
-        return false;
-      } else {
-        return true;
-      }
-    } else {
-      // console.log('no itemsd')
-      Toast("error", "No Metadata Objects Found");
-      return false;
-    }
-  };
 
-  const mintCollection = async (metadataObjects) => {
-    const listing_previous = getObjData("listing");
-    try {
-      let connectedWallet = window.localStorage.getItem("connectedWallet");
-      if (connected) {
-        if (lovelace < 1000000) {
-          Toast(
-            "error",
-            "You do not have enough Ada to complete this transaction"
-          );
-          return;
-        } else {
-          // const transferLucid = await Lucid.new(
-          //   new Blockfrost(
-          //     "https://cardano-mainnet.blockfrost.io/api/v0",
-          //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-          //   ),
-          //   "Mainnet"
-          // );
-          const transferLucid = await Lucid.new(
-            new Blockfrost(network_url, network_key),
-
-            network_name
-          );
-          transferLucid.selectWalletFromSeed(seedPhraseMainnet);
-
-          // const lucid = await Lucid.new(
-          //   new Blockfrost(
-          //     "https://cardano-mainnet.blockfrost.io/api/v0",
-          //     "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj"
-          //   ),
-          //   "Mainnet"
-          // );
-          const lucid = await Lucid.new(
-            new Blockfrost(network_url, network_key),
-
-            network_name
-          );
-
-          const api = await window.cardano[String(connectedWallet)].enable();
-          lucid.selectWallet(api);
-
-          const { paymentCredential } = lucid.utils.getAddressDetails(
-            await lucid.wallet.address()
-          );
-
-          const mintingPolicy = lucid.utils.nativeScriptFromJson({
-            type: "all",
-            scripts: [
-              { type: "sig", keyHash: paymentCredential?.hash },
-              {
-                type: "before",
-                slot: lucid.utils.unixTimeToSlot(Date.now() + 518400000),
-              },
-            ],
-          });
-
-          const policyId = lucid.utils.mintingPolicyToId(mintingPolicy);
-          let obj,
-            assetObj = {},
-            metadataX = {};
-
-          // console.log(metadataObjects, "metadasd");
-
-          let arr = [];
-          let prices = [];
-          let lovelace = [];
-
-          for (let index = 0; index < metadataObjects.length; index++) {
-            const element = metadataObjects[index];
-            metadataX[element.name] = element;
-            // console.log(metadataX, 'dsadasd')
-            assetObj[String(policyId + fromText(element.name))] = 1n;
-            obj = { [policyId]: metadataX };
-            prices.push(element.price);
-            lovelace.push(element.price * 10000000);
-            // prices.push(element.price * 10000000);
-            delete element["price"];
-            // element["unit"] = String(policyId + fromText(element.name))
-            // arr.push(element)
-          }
-          // console.log(assetObj, 'onjf')
-          // debugger
-
-          const txL = await lucid
-            .newTx()
-            .validTo(Date.now() + 100000)
-            .attachMintingPolicy(mintingPolicy)
-            .mintAssets(assetObj)
-            .payToAddress(await transferLucid.wallet.address(), assetObj)
-            .attachMetadata("721", obj)
-            .complete();
-
-          const signedTxL = await txL.sign().complete();
-          const txHashL = await signedTxL.submit();
-          if (txHashL) {
-            const user_id = window.localStorage.getItem("user_id");
-            for (let index = 0; index < metadataObjects.length; index++) {
-              const element = metadataObjects[index];
-              element["unit"] = String(policyId + fromText(element.name));
-              element["price"] = Number(prices[index]);
-
-              arr.push(element);
-            }
-            // debugger
-            const data = {
-              metadata: arr,
-              prices,
-              user_id: user_id,
-              recipient_address: await lucid.wallet.address(),
-              policy_id: policyId,
-              type: "collection",
-              minting_policy: JSON.stringify(mintingPolicy),
-              // asset_hex_name: unit,
-            };
-            const res = await INSTANCE.post("/collection/create", data);
-            if (res) {
-              window.localStorage.setItem(
-                "listing",
-                JSON.stringify({ ...listing_previous, ...res?.data.data })
-              );
-              dispatch(setStep("step2"));
-              router.push({
-                pathname: "/sell",
-                query: {
-                  type: "add-listing",
-                },
-              });
-            }
-          }
+    function t() {
+      UploadService.getFiles(connectedWallet + "_" + walletAddress).then(
+        (files) => {
+          setFileInfos(files.data);
         }
-      } else {
-        Toast("error", "You are Not Connected");
-      }
-    } catch (e) {
-      console.log("error", e);
-      transactionErrorHanlder(e, "mint");
-      const clientIp = await getClientIp();
-      if (clientIp) {
-        try {
-          const response = await INSTANCE.post(`/log/create`, {
-            error: JSON.stringify(error),
-            ip: clientIp,
-            type: "list-collection",
-          });
-          console.log(response.data);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-      // console.log(e)
+      );
     }
-  };
-
+  }
   return (
     <Step1Styled>
       <ContainerLayout>
@@ -747,12 +806,12 @@ const ListCollectionStep2 = () => {
                 )}
               </div> */}
             </Box>
-            <Box>
+            {/* <Box>
               <Header
                 heading="Add Metadata"
                 desc="Royalty fees may be set up to 15%; However, the lower your royalty fee, the better chance that your NFT(s) will sell. Royalty fees in excess of 10% are not recommended."
               />
-            </Box>
+            </Box> */}
 
             <Grid
               container
@@ -763,7 +822,7 @@ const ListCollectionStep2 = () => {
                 },
               }}
             >
-              <Grid xs={12} md={8} item>
+              {/* <Grid xs={12} md={8} item>
                 <div className="col-9 file-input-wrapper">
                   <div
                     className="file-select-button"
@@ -833,16 +892,12 @@ const ListCollectionStep2 = () => {
                     ref={metaFileInputRef}
                   />
                 </div>
-              </Grid>
-              <Grid item md={4} xs={12}>
-                <Button
-                  className="btn  w_100"
-                  // disabled={!metaFile}
-                  onClick={() => uploadMeta()}
-                >
+              </Grid> */}
+              {/* <Grid item md={4} xs={12}>
+                <Button className="btn  w_100" onClick={() => uploadMeta()}>
                   Upload
                 </Button>
-              </Grid>
+              </Grid> */}
               {/* <Grid item md={2} xs={12}>
                 <Button onClick={viewImagesPaths} className="btn w_100">
                   Verify

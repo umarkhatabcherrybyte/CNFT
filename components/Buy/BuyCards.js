@@ -6,24 +6,13 @@ import NoData from "../Design/NoData";
 import { MycollectionRoute, buyDetailRoute } from "../Routes/constants";
 const cardData = [{}, {}, {}, {}, {}, {}, {}];
 
-const BuyCards = ({ tabValue, buy }) => {
-  return (
-    <BuyCardsStyled>
-      <Grid container spacing={2}>
-        {buy.length > 0 ? (
-          buy.map((card, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-              <NftCard tabValue={tabValue} card={card} />
-            </Grid>
-          ))
-        ) : (
-          <Grid item xs={12}>
-            <NoData />
-          </Grid>
-        )}
-      </Grid>
-    </BuyCardsStyled>
-  );
+const BuyCards = ({ type, uniquePolicies, buy, nfts, policyNFTs, label }) => {
+  // console.log(nfts, "nftsnftsnftsnfts");
+  // console.log(label, "nftsnftsnftsnfts");
+  // console.log({type});
+  console.log("nfts in Buycards", { nfts }, { policyNFTs });
+
+  return <NftCard type={1} card={nfts[0]} />;
 };
 
 export default BuyCards;

@@ -17,12 +17,13 @@ import Heading from "../shared/headings/Heading";
 import { useWallet, useLovelace } from "@meshsdk/react";
 import { INSTANCE } from "../../config/axiosInstance";
 import styled from "styled-components";
-import { getKeyData } from "../../helper/localStorage";
+import { getKeyData } from "../../utils/storageUtils";
 import FullScreenLoader from "../shared/FullScreenLoader";
 import { Toast } from "../shared/Toast";
 import GetAdaPriceService from "/services/get-ada-price.service";
 import useFetchData from "/hooks/adaInfo";
 const ClaimTable = ({ claim }) => {
+  console.log(claim, "claimclaimclaim");
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
   const [isLoading, setIsLoading] = useState(false);

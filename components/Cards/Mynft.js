@@ -8,24 +8,31 @@ import {
   Button,
 } from "@mui/material";
 import styled from "styled-components";
+import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
+
 import { setStep } from "../../redux/listing/ListingActions";
 import { INSTANCE } from "/config/axiosInstance";
 import FullScreenLoader from "../shared/FullScreenLoader";
 import { BlockfrostProvider } from "@meshsdk/core";
-import { useDispatch } from "react-redux";
-import { network_key } from "../../base_network";
+import { useDispatch, useSelector } from "react-redux";
+import { blockfrostApiKey } from "../../config/blockfrost";
+import { useRouter } from "next/router";
+
 const Mynft = ({ card }) => {
-  console.log(card);
-  console.log("Policy if of nft is: ", card.policyId);
+  // console.log(card);
+  // console.log("Policy if of nft is: ", card.policyId);
+  const router = useRouter();
   const dispatch = useDispatch();
+  const instance = useSelector((store) => store.wallet);
+  // console.log(instance, "instanceinstanceinstanceinstance");
   const [metadata, setMetadata] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const user_id = window.localStorage.getItem("user_id");
   const recipientAddress = window.localStorage.getItem("user_address");
   const blockfrostProvider = new BlockfrostProvider(
-    // "mainnetbKUUusjHiU3ZmBEhSUjxf3wgs6kiIssj" //this was the mainnet key
-    network_key // I added the key declared globally but importing in this file
+    blockfrostApiKey // I added the key declared globally but importing in this file
   );
+
   React.useEffect(() => {
     getMetaData();
   }, []);
@@ -38,17 +45,11 @@ const Mynft = ({ card }) => {
     const url = new URL(imgURL);
     var hash = url.pathname.slice(1);
   }
-
   const navigationHanlder = async () => {
-    setIsLoading(true);
-    console.log(
-      "The policy id of this nft is------------------: ",
-      card.policyId
-    );
-    window.localStorage.setItem("policyId", JSON.stringify(card.policyId));
-    window.localStorage.setItem("assetName", JSON.stringify(card.assetName));
-    try {
-      console.log("The policy id of this nft is: ", card.policyId);
+    if (instance) {
+      // console.log("ifffffffffffffffffffffffffffff");
+      setIsLoading(true);
+      window.localStorage.setItem("policyId", JSON.stringify(card.policyId));
       const ipfsHash = metadata?.image.replace("ipfs://", "");
       const data = {
         metadata: [
@@ -69,21 +70,112 @@ const Mynft = ({ card }) => {
         type: "single",
         image_file: ``,
       };
+
       const res = await INSTANCE.post("/collection/create", data);
+
       if (res) {
+        window.localStorage.setItem("listing", JSON.stringify(res?.data.data));
+        window.localStorage.setItem("asset_name", card.assetName);
         setIsLoading(false);
-        const obj = {
-          ...res.data.data,
-          ...data,
-        };
-        window.localStorage.setItem("listing", JSON.stringify(obj));
+        router.push({
+          pathname: "/sell",
+          query: {
+            type: "add-listing",
+            action: "listing",
+          },
+        });
         dispatch(setStep("step2"));
       }
-    } catch (e) {
-      console.log(e);
-      setIsLoading(false);
     }
+    // setIsLoading(true);
+    // console.log(
+    //   "The policy id of this nft is------------------: ",
+    //   card.policyId
+    // );
+    // window.localStorage.setItem("policyId", JSON.stringify(card.policyId));
+    // window.localStorage.setItem("assetName", JSON.stringify(card.assetName));
+    // try {
+    //   console.log("The policy id of this nft is: ", card.policyId);
+    //   const ipfsHash = metadata?.image.replace("ipfs://", "");
+    //   const data = {
+    //     metadata: [
+    //       {
+    //         name: metadata?.name || "",
+    //         asset_quantity: card?.quantity || 1,
+    //         link: metadata?.link || "",
+    //         mediaType: metadata?.mediaType || "",
+    //         artist: metadata?.creator || "",
+    //         description: metadata?.description || "",
+    //         ipfs: ipfsHash || "",
+    //         image: ipfsHash || "",
+    //       },
+    //     ],
+    //     user_id: user_id,
+    //     recipient_address: recipientAddress,
+    //     policy_id: card.policyId,
+    //     type: "single",
+    //     image_file: ``,
+    //   };
+    //   const res = await INSTANCE.post("/collection/create", data);
+    //   if (res) {
+    //     setIsLoading(false);
+    //     const obj = {
+    //       ...res.data.data,
+    //       ...data,
+    //     };
+    //     window.localStorage.setItem("listing", JSON.stringify(obj));
+    //     dispatch(setStep("step2"));
+    //   }
+    // } catch (e) {
+    //   console.log(e);
+    //   setIsLoading(false);
+    // }
   };
+  // const navigationHanlder = async () => {
+  //   setIsLoading(true);
+  //   console.log(
+  //     "The policy id of this nft is------------------: ",
+  //     card.policyId
+  //   );
+  //   window.localStorage.setItem("policyId", JSON.stringify(card.policyId));
+  //   window.localStorage.setItem("assetName", JSON.stringify(card.assetName));
+  //   try {
+  //     console.log("The policy id of this nft is: ", card.policyId);
+  //     const ipfsHash = metadata?.image.replace("ipfs://", "");
+  //     const data = {
+  //       metadata: [
+  //         {
+  //           name: metadata?.name || "",
+  //           asset_quantity: card?.quantity || 1,
+  //           link: metadata?.link || "",
+  //           mediaType: metadata?.mediaType || "",
+  //           artist: metadata?.creator || "",
+  //           description: metadata?.description || "",
+  //           ipfs: ipfsHash || "",
+  //           image: ipfsHash || "",
+  //         },
+  //       ],
+  //       user_id: user_id,
+  //       recipient_address: recipientAddress,
+  //       policy_id: card.policyId,
+  //       type: "single",
+  //       image_file: ``,
+  //     };
+  //     const res = await INSTANCE.post("/collection/create", data);
+  //     if (res) {
+  //       setIsLoading(false);
+  //       const obj = {
+  //         ...res.data.data,
+  //         ...data,
+  //       };
+  //       window.localStorage.setItem("listing", JSON.stringify(obj));
+  //       dispatch(setStep("step2"));
+  //     }
+  //   } catch (e) {
+  //     console.log(e);
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <>
@@ -168,7 +260,7 @@ const Mynft = ({ card }) => {
                 className="bold"
                 sx={{ textTransform: "uppercase" }}
               >
-                {metadata?.policyId}
+                {metadata?.name}
               </Typography>
 
               {/* <Typography

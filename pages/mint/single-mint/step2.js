@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { createTransaction } from "/backend";
 import { CardanoWallet, useWallet } from "@meshsdk/react";
 import styled from "styled-components";
 import {
@@ -19,23 +18,45 @@ import {
 } from "../../../components/Routes/constants";
 import CaptionHeading from "/components/shared/headings/CaptionHeading";
 
-
 const SingleMintStep2 = () => {
   const router = useRouter();
   const { wallet, connected } = useWallet();
   const [rangeValue, setRangeValue] = React.useState(10);
   const [loading, setLoading] = React.useState(false);
 
+  // const [metadata, setMetadata] = React.useState({
+  //   image: `ipfs://${
+  //     typeof window !== "undefined" && window.localStorage.getItem("img")
+  //   }`,
+  //   mediaType: "image/jpg",
+  //   description: "",
+  //   name: "",
+  //   description: "",
+  //   creator: "",
+  //   link: "",
+  // });
+
   const [metadata, setMetadata] = React.useState({
     image: `ipfs://${
       typeof window !== "undefined" && window.localStorage.getItem("img")
     }`,
-    mediaType: "image/jpg",
+    mediaType: `${
+      typeof window !== "undefined" &&
+      window.localStorage.getItem("file_mimeType")
+    }`,
     description: "",
     name: "",
     description: "",
     creator: "",
     link: "",
+    featured_image: `ipfs://${
+      typeof window !== "undefined" &&
+      window.localStorage.getItem("featured_img")
+    }`,
+    featured_type: `${
+      typeof window !== "undefined" &&
+      window.localStorage.getItem("featured_type")
+    }`,
   });
 
   const onInputChange = (e) => {
@@ -47,32 +68,32 @@ const SingleMintStep2 = () => {
     setRangeValue(e.target.value);
   };
 
-  const byteSize = str => new Blob([str]).size;
+  const byteSize = (str) => new Blob([str]).size;
 
   const onNextButton = async () => {
     setLoading(true);
     let img = window.localStorage.getItem("img");
-    if(byteSize(metadata.name)>32){
-      Toast("error", "Name is Too Long")
+    if (byteSize(metadata.name) > 32) {
+      Toast("error", "Name is Too Long");
       setLoading(false);
-      return
-    }
-    else if(byteSize(metadata.description)>64){
+      return;
+    } else if (byteSize(metadata.description) > 64) {
       Toast("error", "Description is Too Long");
       setLoading(false);
-      return
-    }
-    else if(byteSize(metadata.link)>64){
+      return;
+    } else if (byteSize(metadata.link) > 64) {
       Toast("error", "Link is Too Long");
       setLoading(false);
-      return
-    }
-    else if(byteSize(metadata.creator)>64){
+      return;
+    } else if (byteSize(metadata.creator) > 64) {
       Toast("error", "Creator is Too Long");
       setLoading(false);
-      return
-    }
-    else if (!metadata.name || metadata.name === null || metadata.name === "") {
+      return;
+    } else if (
+      !metadata.name ||
+      metadata.name === null ||
+      metadata.name === ""
+    ) {
       Toast("error", "Name is invalid.");
       setLoading(false);
       return;

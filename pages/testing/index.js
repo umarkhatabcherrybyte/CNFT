@@ -2,17 +2,10 @@ import { Box } from "@mui/material";
 import { useAssets, useWallet } from "@meshsdk/react";
 import React, { useEffect, useState } from "react";
 import { BlockfrostProvider } from "@meshsdk/core";
-import { network_key } from "../../base_network";
-import { market } from "../../config";
+import { blockfrostApiKey } from "../../config/blockfrost";
+import { market } from "../../config/marketConfig";
 import Listing from "/components/testing/Listing.jsx";
-import {
-  calculatePolicyHash,
-  decodeAssetName,
-  listProviders,
-  walletValue,
-  callKuberAndSubmit,
-  transformNftImageUrl,
-} from "../../scripts/wallet.js";
+
 // import {
 //   Address,
 //   BaseAddress,
@@ -24,7 +17,7 @@ const Testing = () => {
   const [selectedNFTs, setSelectedNFTs] = useState([]); // Track selected NFTs
   console.log(selectedNFTs, "selectedNFTs");
   const assets = useAssets();
-  const blockfrostProvider = new BlockfrostProvider(network_key);
+  const blockfrostProvider = new BlockfrostProvider(blockfrostApiKey);
   useEffect(() => {
     getAssets();
   }, [assets]);
@@ -40,6 +33,7 @@ const Testing = () => {
 
       const data = await Promise.all(assetMetadataPromises);
       // You can now use the data array containing all the resolved results.
+      console.log("assets are ", data);
       setNfts(data); // Update the state with the final array
     }
   };
@@ -62,68 +56,69 @@ const Testing = () => {
     const api = await window.cardano.nami.enable();
     const res = await connect("Nami");
     setInstance(api);
+    
     // const addresses = await api.getUsedAddresses();
     // console.log(addresses, "addressesaddressesaddresses");
     // console.log(api, "sellNftsellNftsellNft");
   };
-  // const sellNft = async (providerInstance, asset) => {
-  //   console.log(providerInstance, "providerInstance");
-  //   console.log(asset, "asset");
-  //   const addresses = await providerInstance.getUsedAddresses();
-  //   console.log(addresses, "addressesaddressesaddresses");
+  const sellNftSingle = async (providerInstance, asset) => {
+    console.log(providerInstance, "providerInstance");
+    console.log(asset, "asset");
+    const addresses = await providerInstance.getUsedAddresses();
+    console.log(addresses, "addressesaddressesaddresses");
 
-  //   console.log(
-  //     Address.from_bytes(Uint8Array.from(Buffer.from(addresses[0], "hex")))
-  //   );
+    console.log(
+      Address.from_bytes(Uint8Array.from(Buffer.from(addresses[0], "hex")))
+    );
 
-  //   const sellerAddr = BaseAddress.from_address(
-  //     Address.from_bytes(Uint8Array.from(Buffer.from(addresses[0], "hex")))
-  //   );
-  //   console.log("sellerAddr", sellerAddr);
-  //   const sellerPkh = Buffer.from(
-  //     sellerAddr.payment_cred().to_keyhash().to_bytes()
-  //   ).toString("hex");
-  //   const sellerStakeKey = Buffer.from(
-  //     sellerAddr.stake_cred().to_keyhash().to_bytes()
-  //   ).toString("hex");
-  //   const body = {
-  //     selections: await providerInstance.getUtxos(),
-  //     outputs: [
-  //       {
-  //         address: market.address,
-  //         value: `${asset.policyId}.${asset.name}`,
-  //         datum: {
-  //           fields: [
-  //             {
-  //               fields: [
-  //                 { fields: [{ bytes: `${sellerPkh}` }], constructor: 0 }, // pubkeyhash
-  //                 {
-  //                   fields: [
-  //                     {
-  //                       fields: [
-  //                         {
-  //                           fields: [{ bytes: `${sellerStakeKey}` }],
-  //                           constructor: 0,
-  //                         },
-  //                       ],
-  //                       constructor: 0,
-  //                     },
-  //                   ],
-  //                   constructor: 0,
-  //                 }, // stakekeyHash
-  //               ],
-  //               constructor: 0,
-  //             },
-  //             // sellAmount: "",
-  //             { int: Math.round(parseFloat(40) * 1e6) },
-  //           ],
-  //           constructor: 0,
-  //         },
-  //       },
-  //     ],
-  //   };
-  //   callKuberAndSubmit(providerInstance, JSON.stringify(body));
-  // };
+    const sellerAddr = BaseAddress.from_address(
+      Address.from_bytes(Uint8Array.from(Buffer.from(addresses[0], "hex")))
+    );
+    console.log("sellerAddr", sellerAddr);
+    const sellerPkh = Buffer.from(
+      sellerAddr.payment_cred().to_keyhash().to_bytes()
+    ).toString("hex");
+    const sellerStakeKey = Buffer.from(
+      sellerAddr.stake_cred().to_keyhash().to_bytes()
+    ).toString("hex");
+    const body = {
+      selections: await providerInstance.getUtxos(),
+      outputs: [
+        {
+          address: market.address,
+          value: `${asset.policyId}.${asset.name}`,
+          datum: {
+            fields: [
+              {
+                fields: [
+                  { fields: [{ bytes: `${sellerPkh}` }], constructor: 0 }, // pubkeyhash
+                  {
+                    fields: [
+                      {
+                        fields: [
+                          {
+                            fields: [{ bytes: `${sellerStakeKey}` }],
+                            constructor: 0,
+                          },
+                        ],
+                        constructor: 0,
+                      },
+                    ],
+                    constructor: 0,
+                  }, // stakekeyHash
+                ],
+                constructor: 0,
+              },
+              // sellAmount: "",
+              { int: Math.round(parseFloat(40) * 1e6) },
+            ],
+            constructor: 0,
+          },
+        },
+      ],
+    };
+    callKuberAndSubmit(providerInstance, JSON.stringify(body));
+  };
 
   const sellNft = async (providerInstance, selectedNFTs) => {
     console.log(providerInstance, "providerInstance");

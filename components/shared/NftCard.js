@@ -8,18 +8,78 @@ import {
   MycollectionRoute,
   auctionDetailRoute,
 } from "../Routes/constants";
-import { isVideoOrIsAudio } from "../../utils/utils";
-const NftCard = ({ card }) => {
-  const asset_detail = card?.collection_id?.assets[0];
-  const type = card.mint_type === "collection";
-  const sell_model = card.sell_model;
+// import { isVideoOrIsAudio } from "../../utils/utils";
+import { renderLovelace } from "../../services/cardanoService";
+import { fromText } from "lucid-cardano";
+import { useState } from "react";
+import { useEffect } from "react";
+import { getAssetDetail, listMarket } from "../../services/blockfrostService";
+import axios from "axios";
+import { getTxInfo } from "../../services/koiosService";
+import { blockfrostApiKey, blockfrostUrl } from "../../config/blockfrost";
+import { market } from "../../config/marketConfig";
+import { BlockfrostProvider } from "@meshsdk/core";
+const NftCard = ({ onClick, card, type }) => {
+  const [datum, setDatum] = useState(null);
+  console.log("NFT is ", card);
+
   const router = useRouter();
+  // let _datum = card.detail.datum;
+  // console.log("datum is ", _datum);
+
+  let name = card.assetName
+    ? card.assetName
+    : card.asset_name
+    ? card.asset_name
+    : card.name;
+  console.log({ name });
+  let hexName = fromText(name);
   const navigationHanlder = () => {
-    const route = type
-      ? `${MycollectionRoute}/${sell_model}`
-      : `${buyDetailRoute}/0`;
-    router.push(`${route}/${card._id}`);
+    try {
+      if (onClick) {
+        onClick();
+      }
+
+      console.log("navigating....");
+      router.push({
+        pathname: `/buy/${hexName}/${card?.policy}`,
+        query: {
+          // policy: card?.policy,
+        },
+      });
+    } catch (e) {
+      console.log("error in NFt card ", e);
+    }
+
+    // router.push({
+    //   pathname: `/buy/${name}/${card?.policy}`,
+    //   query: {
+    //     datum: card.detail.,
+    //   },
+    // });
   };
+  let cardImage = "https://ipfs.io/ipfs/";
+
+  let imageHash =
+    card.detail.onchain_metadata?.image && type == 0
+      ? card.detail.onchain_metadata.feature_image
+      : card.detail.onchain_metadata?.image?.slice(7);
+
+  if (!imageHash) {
+    imageHash = card.detail._imageUrl;
+  }
+  if (imageHash?.startsWith("http")) {
+    cardImage = imageHash;
+  } else cardImage += imageHash;
+if(imageHash==undefined){
+  cardImage="https://i.pinimg.com/originals/f2/d1/22/f2d122bd112252d193a197e9d9c203d2.jpg"
+}
+  console.log("image is ", cardImage, card);
+
+  // console.log("showing card", card);
+  useEffect(() => {
+    // getNftDatum();
+  }, []);
   return (
     <NftCardStyled>
       <Card
@@ -44,79 +104,56 @@ const NftCard = ({ card }) => {
           <CardMedia
             component="img"
             height="290"
-            image={`${
-              type
-                ? card.feature_image
-                : isVideoOrIsAudio(asset_detail)
-                ? asset_detail?.feature_image
-                : `https://ipfs.io/ipfs/${asset_detail?.ipfs}`
-            }`}
-            alt="green iguana"
-          />
-          {/* <Box
-            sx={{
-              position: "absolute",
-              bottom: "10px",
-              width: "100%",
-              padding: " 0px 12px",
-            }}
-            className="client_detail"
-          >
-            <Box
-              sx={{
-                background: "#00000099",
-                borderRadius: "10px",
-                padding: "7px 0 ",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Box className="img_parent">
-                <img src="/images/client.jfif" className="w_100" />
-              </Box>
-              <Typography
-                variant="caption"
-                className="bold text_white"
-                sx={{ pl: 2 }}
-              >
-                Created by@Julian
-              </Typography>
-            </Box>
-          </Box> */}
-        </Box>
-        <CardContent>
-          <Box className="flex">
-            <Typography
-              gutterBottom
-              variant="body"
-              component="div"
-              className="bold"
-              sx={{ textTransform: "uppercase" }}
-            >
-              {type ? card.name : asset_detail?.asset_name}
-            </Typography>
-            <Typography
-              gutterBottom
-              variant="body"
-              component="div"
-              sx={{ color: "var(--secondary-color)" }}
-              className="bold"
-            >
-              {card?.sell_type_id?.price}
+            // image={`${
+            //   type
+            //     ? card.feature_image
+            //     : isVideoOrIsAudio(asset_detail)
+            //     ? asset_detail?.feature_image
+            //     : `https://ipfs.io/ipfs/${asset_detail?.ipfs}`
+            // }`}
 
+            image={cardImage}
+            alt="nft image"
+          />
+        </Box>
+        {type != 0 && (
+          <CardContent>
+            <Box className="flex">
               <Typography
-                variant="caption"
+                gutterBottom
+                variant="body"
+                component="div"
+                className="bold"
+                sx={{ textTransform: "uppercase" }}
+              >
+                {/* {type ? card.name : asset_detail?.asset_name} */}
+                {card?.detail?.onchain_metadata?.name
+                  ? card?.detail?.onchain_metadata?.name
+                  : card?.detail._name}
+              </Typography>
+              <Typography
+                gutterBottom
+                variant="body"
                 component="div"
                 sx={{ color: "var(--secondary-color)" }}
                 className="bold"
               >
-                {" "}
-                Ada{" "}
+                {card?.detail?.datum
+                  ? card.detail?.datum.fields[1].int / 1000000
+                  : "Free"}
+                {/* {renderLovelace(card.detail?.datum?.fields[1]?.int)} */}
+                <Typography
+                  variant="caption"
+                  component="div"
+                  sx={{ color: "var(--secondary-color)" }}
+                  className="bold"
+                >
+                  {" "}
+                  Ada{" "}
+                </Typography>
               </Typography>
-            </Typography>
-          </Box>
-          {/* <Box className="flex">
+            </Box>
+            {/* <Box className="flex">
             <Box
               sx={{
                 display: "flex",
@@ -140,7 +177,8 @@ const NftCard = ({ card }) => {
               </Box>
             </Box>
           </Box> */}
-        </CardContent>
+          </CardContent>
+        )}
       </Card>
     </NftCardStyled>
   );

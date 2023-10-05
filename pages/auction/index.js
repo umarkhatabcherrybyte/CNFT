@@ -20,7 +20,7 @@ const Auction = () => {
     type: "",
   });
   const [auction, setAuction] = useState([]);
-
+  console.log(auction, "auction");
   useEffect(() => {
     const getData = async () => {
       setIsLoading(true);
@@ -113,9 +113,6 @@ const Auction = () => {
           <TabPanel value="collection">
             {!isLoading && <AuctionTokens auction={auction} />}
           </TabPanel>
-          {/* <TabPanel value="trending">
-            <AuctionTokens />
-          </TabPanel> */}
         </TabContext>
       </ContainerLayout>
     </AuctionStyled>

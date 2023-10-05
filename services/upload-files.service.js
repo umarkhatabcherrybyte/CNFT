@@ -1,10 +1,9 @@
-import http from "../config/apiInstance";
+import { INSTANCE } from "../config/axiosInstance";
 class UploadFilesService {
-
   upload(file, path, onUploadProgress) {
     let formData = new FormData();
     formData.append("file", file, file.name);
-    return http.post("api/collection/upload", formData, {
+    return INSTANCE.post("api/collection/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         path: path,
@@ -15,7 +14,7 @@ class UploadFilesService {
   remove(file, path) {
     const formData = new FormData();
 
-    return http.post("/api/uploadMultiFiles/upload/remove", formData, {
+    return INSTANCE.post("/api/uploadMultiFiles/upload/remove", formData, {
       headers: {
         file: file,
         path: path,
@@ -25,7 +24,7 @@ class UploadFilesService {
   uploadMeta(file, path, onUploadProgress) {
     let formData = new FormData();
     formData.append("file", file);
-    return http.post("/collection/file", formData, {
+    return INSTANCE.post("/collection/file", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         path: path,
@@ -35,7 +34,7 @@ class UploadFilesService {
   }
   downloadMetafile(path) {
     let formData = new FormData();
-    return http.post(
+    return INSTANCE.post(
       "/api/uploadMultiFiles/upload/downloadMetafile",
       formData,
       {
@@ -47,7 +46,7 @@ class UploadFilesService {
     );
   }
   uploadWebExcelMeta(convertedJson, path) {
-    return http.post(
+    return INSTANCE.post(
       "/api/uploadMultiFiles/upload/webExcelMeta",
       convertedJson,
       {
@@ -59,12 +58,11 @@ class UploadFilesService {
   }
   getFiles(path) {
     let formData = new FormData();
-    return http.post("/api/uploadMultiFiles/files", formData, {
+    return INSTANCE.post("/api/uploadMultiFiles/files", formData, {
       headers: {
         path: path,
       },
     });
   }
-
 }
 export default new UploadFilesService();

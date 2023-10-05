@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { Buffer } from "buffer";
-import { listMarket, getAssetDetail, getDatum } from "/scripts/blockfrost"; // Import your required functions/modules
+import {
+  listMarket,
+  getAssetDetail,
+  getDatum,
+} from "../../services/blockfrostService"; // Import your required functions/modules
 import {
   decodeAssetName,
   listProviders,
-  callKuberAndSubmit,
   transformNftImageUrl,
   renderLovelace,
-} from "../../scripts/wallet";
-import * as database from "../../scripts/database";
-import { market } from "/config";
+} from "../../services/cardanoService";
+import { callKuberAndSubmit } from "../../services/kuberService";
+import * as database from "../../services/indexDBService";
+import { market } from "../../config/marketConfig";
 import {
   Address,
   BaseAddress,
   Ed25519KeyHash,
   StakeCredential,
 } from "@emurgo/cardano-serialization-lib-asmjs";
-import { useWalletState, useWalletAction } from "../../scripts/sotre";
 
 const YourReactComponent = ({ instance }) => {
-  const [walletState, setWalletState] = useWalletState();
-  const walletAction = useWalletAction();
-
   const [message, setMessage] = useState("Loading ...");
   const [hasIndexDb, setHasIndexDb] = useState(false);
   const [utxos, setUtxos] = useState([]);

@@ -4,7 +4,7 @@ import { Box, Card, CardMedia, Typography, CardContent } from "@mui/material";
 import { auctionDetailRoute } from "../Routes/constants";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
-import { isVideoOrIsAudio } from "../../utils/utils";
+import { isVideoOrIsAudio } from "../../utils/fileUtlis";
 const DateCountdown = dynamic(() => import("react-date-countdown-timer"), {
   ssr: false,
 });

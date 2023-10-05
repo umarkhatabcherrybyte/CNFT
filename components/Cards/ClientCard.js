@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Card, CardMedia, Typography, CardContent } from "@mui/material";
 import { ArrowForwardIos } from "@mui/icons-material";
-import { isVideoOrIsAudio } from "../../utils/utils";
+import { isVideoOrIsAudio } from "../../utils/fileUtlis";
 import styled from "styled-components";
 import { MycollectionRoute, buyDetailRoute } from "../Routes/constants";
 import { useRouter } from "next/router";

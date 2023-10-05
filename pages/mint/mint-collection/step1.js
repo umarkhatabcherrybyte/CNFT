@@ -3,34 +3,26 @@ import ContainerLayout from "/components/shared/ContainerLayout";
 import Header from "/components/Mint/shared/Header";
 import Layout from "/components/Mint/Layout";
 import styled from "styled-components";
-import VerifyMetaFileService from "/services/verify-metafile.service";
 import UploadService from "/services/upload-files.service";
-import MintService from "/services/mint.service";
 import { Toast } from "/components/shared/Toast";
-import imageCompression from "browser-image-compression";
 import download from "js-file-download";
-import {
-  Delete,
-  DeleteForever,
-  DeleteForeverOutlined,
-} from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
 import ExcelSpreadSheet from "/components/Mint/Mint Collection/ExcelSpreadSheet";
 import { Box, Button, Grid } from "@mui/material";
 import CaptionHeading from "/components/shared/headings/CaptionHeading";
 import LightText from "/components/shared/headings/LightText";
-import Heading from "/components/shared/headings/Heading";
-import { List } from "@mui/icons-material";
-import {
-  mintCollectionStep2,
-  mintRoute,
-  mintCollectionStep3,
-} from "/components/Routes/constants";
+import { mintRoute, mintCollectionStep3 } from "/components/Routes/constants";
 import { useRouter } from "next/router";
 import { create } from "ipfs-http-client";
 import { LoadingButton } from "@mui/lab";
-
+import { handleFileUpload } from "../../../utils/ipfsUtlis";
 const CollectionStep1 = () => {
   const router = useRouter();
+  let _progressInfos = [];
+  const metaFileInputRef = useRef(null);
+  const hiddenFileInputRef = useRef(null);
+  const metaFileLabelRef = useRef(null);
+  const selectedFilesLabelRef = useRef(null);
   const [selectedFiles, setSeletedFiles] = useState([]);
   const [metaFile, setMetaFile] = useState(undefined);
   const [metaData, setMetaData] = useState([]);
@@ -42,16 +34,9 @@ const CollectionStep1 = () => {
   const [isWebform, setIsWebform] = useState(false);
   const [metadataFileUploaded, setMetadataFileUploaded] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-
   const [metadataObjects, setMetadataObjects] = useState([]);
   const [metadataObjectsFromFile, setMetadataObjectsFromFile] = useState([]);
   const [metadataObjectProperties, setMetadataObjectProperties] = useState([]);
-  let _progressInfos = [];
-
-  const metaFileInputRef = useRef(null);
-  const hiddenFileInputRef = useRef(null);
-  const metaFileLabelRef = useRef(null);
-  const selectedFilesLabelRef = useRef(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -130,23 +115,9 @@ const CollectionStep1 = () => {
       setIsUploading(true);
       setImagePaths([]);
       try {
-        const projectId = "2IAoACw6jUsCjy7i38UO6tPzYtX";
-        const projectSecret = "136393a5b7f4e47a9e153a88eb636003";
-        const auth = `Basic ${Buffer.from(
-          `${projectId}:${projectSecret}`
-        ).toString("base64")}`;
-        const client = create({
-          host: "ipfs.infura.io",
-          port: 5001,
-          protocol: "https",
-          headers: {
-            authorization: auth,
-          },
-        });
         let arr = [];
         for (let index = 0; index < selectedFiles.length; index++) {
-          const uploaded_image = await client.add(selectedFiles[index]);
-          // console.log(uploaded_image, selectedFiles[index], "img");
+          const uploaded_image = await handleFileUpload(selectedFiles[index]);
           if (uploaded_image) {
             arr.push({
               path: uploaded_image.path,
@@ -355,7 +326,6 @@ const CollectionStep1 = () => {
   };
 
   const onFileInputButton = () => {
-    console.log("onFileInputButton");
     hiddenFileInputRef.current.click();
   };
 

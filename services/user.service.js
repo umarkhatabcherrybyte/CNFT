@@ -1,8 +1,8 @@
-import http from "../config/apiInstance";
+import { INSTANCE } from "../config/axiosInstance";
 
 class UserService {
   signIn(address, name = "") {
-    return http.post("/user/create", {
+    return INSTANCE.post("/user/create", {
       recipient_address: address,
       name: name,
     });

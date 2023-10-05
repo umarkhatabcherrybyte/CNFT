@@ -8,15 +8,12 @@ import {
   CardMedia,
   Grid,
 } from "@mui/material";
-import * as selectors from "/redux/selectors/Selector";
-import { useSelector } from "react-redux";
 import Slider from "react-slick";
 import { carouselNew } from "../setting/Slider";
-import { ArrowForwardIos } from "@mui/icons-material";
-import { collectionDetailRoute } from "/components/Routes/constants";
 import { useRouter } from "next/router";
 import Heading from "../shared/headings/Heading";
-import { isVideoOrIsAudio } from "../../utils/utils";
+// import { isVideoOrIsAudio } from "../../utils/utils";
+import { renderLovelace } from "../../services/cardanoService";
 
 export function SliderArrow(props) {
   const { className, style, onClick, arrow } = props;
@@ -49,8 +46,6 @@ export function SliderArrow(props) {
 const FeatureTokenSlider = ({ nfts }) => {
   const router = useRouter();
 
-  // const nftsState = useSelector(selectors.nftBreakdownState);
-  // const nfts = nftsState.data ? nftsState.data : [];
   return (
     <FeatureTokenStyled>
       <Box sx={{ py: 4 }}>
@@ -67,27 +62,24 @@ const FeatureTokenSlider = ({ nfts }) => {
                     borderRadius: "20px",
                     border: "solid 1px #ddd",
                     color: "#fff",
-                    // height: {
-                    //   xs: "17rem",
-                    //   md: "21rem",
-                    // },
                     "& .flex": {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
                     },
                   }}
-                  onClick={() => router.push(`buy/0/${nft._id}`)}
+                  onClick={() => router.push(`buy/0/${nft.policy}`)}
                 >
                   <CardMedia
                     component="img"
                     // height="205"
 
-                    image={
-                      !isVideoOrIsAudio(nft?.collection_id?.assets[0])
-                        ? `https://ipfs.io/ipfs/${nft?.collection_id?.assets[0]?.ipfs}`
-                        : nft?.collection_id?.assets[0]?.feature_image
-                    }
+                    image={nft.detail._imageUrl}
+                    // image={
+                    //   !isVideoOrIsAudio(nft?.collection_id?.assets[0])
+                    //     ? `https://ipfs.io/ipfs/${nft?.collection_id?.assets[0]?.ipfs}`
+                    //     : nft?.collection_id?.assets[0]?.feature_image
+                    // }
                     // image={
                     //   !isVideoOrIsAudio(nft?.collection_id?.assets[0])
                     //     ? `https://ipfs.io/ipfs/${nft?.collection_id?.assets[0]?.ipfs}`
@@ -114,7 +106,7 @@ const FeatureTokenSlider = ({ nfts }) => {
                           component="div"
                           className="bold poppin"
                         >
-                          {nft?.collection_id?.assets[0]?.asset_name}
+                          {nft?.detail._name}
                         </Typography>
                       </Grid>
                       <Grid item xs={12} lg={6} justifyContent="end">
@@ -129,9 +121,8 @@ const FeatureTokenSlider = ({ nfts }) => {
                           }}
                           className="bold poppin"
                         >
-                          {nft?.sell_type_id?.price}
+                          {renderLovelace(nft.detail?.datum?.fields[1]?.int)}
                           <Typography
-                            // className="font_12"
                             sx={{
                               fontSize: { xs: "8px", md: "10px" },
                             }}
