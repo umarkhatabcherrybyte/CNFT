@@ -30,7 +30,7 @@ import { callKuberAndSubmit } from "../../services/kuberService";
 import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
 import { market } from "../../config/marketConfig";
 import { useLovelace, useWallet } from "@meshsdk/react";
-import { transferNFT } from "../../services/nftService";
+import { transferAssets, transferNFT } from "../../services/nftService";
 import { transactionErrorHanlder } from "../../utils/errorUtils";
 import { blockfrostApiKey } from "../../config/blockfrost";
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
