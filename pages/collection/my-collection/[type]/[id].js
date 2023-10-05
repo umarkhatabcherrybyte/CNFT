@@ -244,6 +244,7 @@ const MyCollection = () => {
               </Box>
             </Box>
           </Box>
+          {" "}
           <Box sx={{ pt: { md: 2, xs: 3 }, minHeight: "5rem" }}>
             {!isLoading && policyNFTs.length > 0 && (
               <Container maxWidth="xl">
