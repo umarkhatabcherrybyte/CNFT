@@ -25,14 +25,13 @@ const CollectionThumbnail = ({ policy, firstNFT }) => {
     //   let name = fromText(card.assetName ? card.assetName : card.name);
     console.log("showing ollection now..");
     router.push({
-        pathname: `/buy/collection/${policy}`,
-        query: {
-          policy: "add-listing",
-        },
-      });
+      pathname: `/collection/my-collection/Fixed/${policy}`,
+      query: {
+        // policy: "add-listing",
+      },
+    });
     // router.push(`/buy/collection/${policy}`);
   };
-
 
   return (
     <NftCardStyled>
