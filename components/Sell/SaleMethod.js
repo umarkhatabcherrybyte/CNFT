@@ -234,7 +234,7 @@ const SaleMethod = () => {
                   if (res) {
                     setIsLoading(false);
                     Toast("success", "Listed Successfully");
-                    // dispatch(setStep("step1"));
+                    dispatch(setStep("step1"));
                     router.push(auctionRoute);
                   }
                 }
@@ -294,7 +294,7 @@ const SaleMethod = () => {
                     if (res) {
                       setIsLoading(false);
                       Toast("success", "Listed Successfully");
-                      // dispatch(setStep("step1"));
+                      dispatch(setStep("step1"));
                       router.push(auctionRoute);
                     }
                   }
@@ -330,7 +330,7 @@ const SaleMethod = () => {
                 if (res) {
                   setIsLoading(false);
                   Toast("success", "Listed Successfully");
-                  // dispatch(setStep("step1"));
+                  dispatch(setStep("step1"));
                   // router.push(auctionRoute);
                 }
               }
