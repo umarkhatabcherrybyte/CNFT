@@ -163,9 +163,9 @@ const SaleMethod = () => {
 
     let res_ = await callKuberAndSubmit(providerInstance, JSON.stringify(body));
 
-    await delay(10000); // 15 seconds delay
-    setIsLoading(false);
-    dispatch(setStep("step1"));
+    // await delay(10000); // 15 seconds delay
+    // setIsLoading(false);
+    // dispatch(setStep("step1"));
     // insert some notifier here
     console.log(res_);
   };
@@ -192,7 +192,7 @@ const SaleMethod = () => {
                 [listing_data.assets[0].asset_name],
                 price_data.price
               );
-              setIsLoading(false);
+              // setIsLoading(false);
               // router.push("/");
               // Toast("success", "Listed Successfully");
               // dispatch(setStep("step1"));
@@ -235,7 +235,7 @@ const SaleMethod = () => {
                     ...data,
                   });
                   if (res) {
-                    setIsLoading(false);
+                    // setIsLoading(false);
                     // Toast("success", "Listed Successfully");
                     // router.push("/");
                     window.location.href = "/";
@@ -273,7 +273,7 @@ const SaleMethod = () => {
               console.log({ selectedNFTsNames, policyId });
 
               await sellNft(policyId, selectedNFTsNames, price_data.price);
-              Toast("success", "Listed Successfully");
+              // Toast("success", "Listed Successfully");
               // dispatch(setStep("step1"));
               // router.push("/");
               window.location.href = "/";
@@ -302,7 +302,7 @@ const SaleMethod = () => {
                       ...data,
                     });
                     if (res) {
-                      setIsLoading(false);
+                      // setIsLoading(false);
                       // Toast("success", "Listed Successfully");
                       // dispatch(setStep("step1"));
                       // router.push("/");
@@ -341,7 +341,7 @@ const SaleMethod = () => {
                   ...data,
                 });
                 if (res) {
-                  setIsLoading(false);
+                  // setIsLoading(false);
                   // Toast("success", "Listed Successfully");
                   // dispatch(setStep("step1"));
                   // router.push("/");
