@@ -25,8 +25,7 @@ import { useWallet } from "@meshsdk/react";
 import CollectionThumbnail from "../../components/shared/CollectionThumbnail";
 
 const Buy = () => {
-  const { connected } =
-    useWallet();
+  const { connected } = useWallet();
 
   const router = useRouter();
   const [tabValue, setTabValue] = useState("single");
@@ -274,25 +273,48 @@ const Buy = () => {
           {message != "Loading" && (
             <>
               <TabPanel value="single">
-                {uniquePolicies.map((policy) => {
-                  if (uniquePolicyGroups[policy].length == 1) {
-                    console.log("individual nft ", uniquePolicyGroups[policy]);
-                    return (
-                      <BuyCards
-                        type={1}
-                        buy={buy}
-                        nfts={uniquePolicyGroups[policy]}
-                      />
-                    );
-                  }
-                })}
+                {/* 
+                 
+                   <Grid container spacing={2}>
+          {auction.map((data, index) => (
+            <Grid item xs={12} sm={6} md={4} lg={3}>
+              <AuctionCard data={data} index={index} />
+            </Grid>
+          ))}
+        </Grid>
+                 */}
+                <Grid container spacing={2}>
+                  {uniquePolicies.map((policy) => {
+                    if (uniquePolicyGroups[policy].length == 1) {
+                      console.log(
+                        "individual nft ",
+                        uniquePolicyGroups[policy]
+                      );
+                      return (
+                        <Grid item xs={12} sm={6} md={4} lg={3}>
+                          {/* <BuyCards
+                            type={1}
+                            buy={buy}
+                            nfts={uniquePolicyGroups[policy]}
+                          />
+                           */}
+                          <NftCard type={1} card={uniquePolicyGroups[policy][0]} />
+                        </Grid>
+                      );
+                    }
+                  })}
+                </Grid>
 
                 {/* <BuyCards buy={buy} nfts={nfts[0]} /> */}
               </TabPanel>
               <TabPanel value="collection">
                 {uniquePolicies.map((policy) => {
                   if (uniquePolicyGroups[policy].length > 1) {
-                    console.log("NFTs for policy ", policy, uniquePolicyGroups[policy]);
+                    console.log(
+                      "NFTs for policy ",
+                      policy,
+                      uniquePolicyGroups[policy]
+                    );
                     return (
                       <CollectionThumbnail
                         policy={policy}

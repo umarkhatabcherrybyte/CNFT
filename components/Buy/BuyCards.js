@@ -12,17 +12,7 @@ const BuyCards = ({ type, uniquePolicies, buy, nfts, policyNFTs, label }) => {
   // console.log({type});
   console.log("nfts in Buycards", { nfts }, { policyNFTs });
 
-  return (
-    <BuyCardsStyled>
-     (
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={4} lg={3} key={"nft" + Date.now()}>
-            <NftCard type={1} card={nfts[0]} />
-          </Grid>
-        </Grid>
-      )
-    </BuyCardsStyled>
-  );
+  return <NftCard type={1} card={nfts[0]} />;
 };
 
 export default BuyCards;
