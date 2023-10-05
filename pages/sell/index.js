@@ -23,7 +23,7 @@ const Sell = () => {
   const { listing, user } = useSelector((store) => store);
   const { connected } = useWallet();
   const { type } = router.query;
-  const [tabValue, setTabValue] = useState("active");
+  const [tabValue, setTabValue] = useState("list");
   const [activeBids, setActiveBids] = useState([]);
   const [claim, setClaim] = useState([]);
 
