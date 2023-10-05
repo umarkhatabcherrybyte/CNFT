@@ -27,7 +27,7 @@ const CollectionContent = () => {
   // console.log(card, "card1");
   //   let card = policyNFTs[0];
   const router = useRouter();
-  const { index: policy } = router.query;
+  const { policy } = router.query;
   console.log({ policy });
   const [nfts, setNfts] = useState([]);
   //   let _datum = card.detail.datum;
