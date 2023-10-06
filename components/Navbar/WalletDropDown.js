@@ -98,22 +98,39 @@ const WalletDropdown = () => {
       console.log(error, "err");
     }
   };
+  async function connectViaLocalStorage(walletV) {
+    console.log("connecting now ");
+    await connect(walletV.value);
+    const api = await window.cardano[walletV.extension].enable();
+    dispatch(setInstance(api));
+    window.localStorage.setItem("isConnected", JSON.stringify(walletV));
+    setWalletName(walletV.value);
 
+    window.localStorage.setItem("connectedWallet", walletV.extension);
+  }
   const handleWalletClick = async (event, walletV) => {
     if (walletV.extension && window?.cardano[walletV?.extension] != undefined) {
       if (walletV.value === walletName) {
         setWalletName("default");
         disconnect();
+        window.localStorage.setItem("isConnected", null);
       } else {
-        await connect(walletV.value);
-        const api = await window.cardano[walletV.extension].enable();
-        dispatch(setInstance(api));
-        window.localStorage.setItem("connectedWallet", walletV.extension);
+        await connectViaLocalStorage(walletV);
       }
     } else {
       Toast("error", "Please install your wallet");
     }
   };
+
+  useEffect(() => {
+    console.log("checking connected existing");
+    let r = JSON.parse(window.localStorage.getItem("isConnected"));
+    console.log({ r });
+    if (r) {
+      console.log("connecting now ");
+      connectViaLocalStorage(r);
+    }
+  }, []);
 
   return (
     <WalletDropDownStyled>
