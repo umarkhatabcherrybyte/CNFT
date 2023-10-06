@@ -118,8 +118,6 @@ export const transferAssets = async (
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 const sellNft = async (policyId_, selectedNFTsNames) => {
-  // const providerInstance = await window.cardano.nami.enable();
-  // const res = await connect("Nami");
   const blockfrostProvider = new BlockfrostProvider(blockfrostApiKey);
 
   let selectedNFTs = [];

@@ -94,6 +94,8 @@ const BuyDetail = () => {
   }, [id]);
 
   const [asset, setAsset] = useState({});
+  const provider = useSelector((store) => store.wallet);
+
   console.log({ asset });
   useEffect(() => {
     setIsLoading(true);
@@ -101,9 +103,9 @@ const BuyDetail = () => {
   }, [id]);
 
   const buy_utxo = async () => {
-    const api = await window.cardano.nami.enable();
-    const res = await connect("Nami");
-    let provider_ = api;
+    // const api = await window.cardano.nami.enable();
+    // const res = await connect("Nami");
+    let provider_ = provider;
 
     if (notFetchedUtxosCompletely) {
       return 0;

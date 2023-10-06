@@ -51,6 +51,8 @@ const SaleMethod = () => {
   const [totalAmount, setTotalAmount] = useState("");
   const [isForm, setIsForm] = useState(false);
   const [asset, setAsset] = useState([]);
+  const providerInstance = useSelector((store) => store.wallet);
+
   console.log(asset, "assetassetassetassetassetassetassetassetasset");
   const asset_name = localStorage.getItem("asset_name");
   const onPaymentChange = (event, newValue) => {
@@ -58,8 +60,8 @@ const SaleMethod = () => {
   };
   const sellNft = async (policyId, selectedNFTsNames, price) => {
     setIsLoading(true);
-    const providerInstance = await window.cardano.nami.enable();
-    const res = await connect(walletName);
+    // const providerInstance = await window.cardano.nami.enable();
+    // const res = await connect(walletName);
     const blockfrostProvider = new BlockfrostProvider(blockfrostApiKey);
     let selectedNFTs = [];
     let latestAssets = null;

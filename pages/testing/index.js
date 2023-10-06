@@ -45,7 +45,9 @@ const Testing = () => {
   };
   const { wallet, connected, name, connecting, connect, disconnect, error } =
     useWallet();
-  const [instance, setInstance] = useState(null);
+  // const [instance, setInstance] = useState(null);
+  const instance = useSelector((store) => store.wallet);
+
   // useEffect(() => {
   //   if (wallet) {
   //     setInstance(wallet);
@@ -53,9 +55,9 @@ const Testing = () => {
   // }, [wallet]);
   // console.log(instance, "wallet");
   const connectWallet = async () => {
-    const api = await window.cardano.nami.enable();
-    const res = await connect("Nami");
-    setInstance(api);
+    // const api = await window.cardano.nami.enable();
+    // const res = await connect("Nami");
+    // setInstance(api);
     
     // const addresses = await api.getUsedAddresses();
     // console.log(addresses, "addressesaddressesaddresses");
