@@ -38,6 +38,7 @@ import {
 import { useFetchNFTData } from "../../../hooks/useFetchNFTData";
 import { market } from "../../../config/marketConfig";
 import { callKuberAndSubmit } from "../../../services/kuberService";
+import { useSelector } from "react-redux";
 
 const tabData = [
   {

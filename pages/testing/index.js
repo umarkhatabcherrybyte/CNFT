@@ -12,6 +12,7 @@ import Listing from "/components/testing/Listing.jsx";
 //   ScriptPubkey,
 // } from "@emurgo/cardano-serialization-lib-browser";
 import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
+import { useSelector } from "react-redux";
 const Testing = () => {
   const [nfts, setNfts] = useState([]);
   const [selectedNFTs, setSelectedNFTs] = useState([]); // Track selected NFTs
