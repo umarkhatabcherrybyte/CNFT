@@ -27,11 +27,12 @@ const SellTable = ({ activeBids }) => {
     useWallet();
   const [isLoading, setIsLoading] = useState(false);
   const adaInfo = useFetchData(GetAdaPriceService.getPrice, 30000);
-  const onAcceptBid = async (id) => {
+  const onAcceptBid = async (id, auction_id) => {
     setIsLoading(true);
     try {
       const res = await INSTANCE.post("/bid/accept", {
         bid_id: id,
+        auction_id,
       });
       if (res) {
         setIsLoading(false);
@@ -118,7 +119,12 @@ const SellTable = ({ activeBids }) => {
                           <TableCell align="center">
                             <Button
                               className="btn2"
-                              onClick={() => onAcceptBid(row._id)}
+                              onClick={() =>
+                                onAcceptBid(
+                                  row._id,
+                                  row.list_id.sell_type_id._id
+                                )
+                              }
                             >
                               Accept
                             </Button>
