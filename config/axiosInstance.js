@@ -1,8 +1,8 @@
 import axios from "axios";
 
 // export const baseURL = "http://localhost:4001/api";
-// export const baseURL = "https://backend-cnft.thecbt.live/api";
-export const baseURL = "http://172.20.10.2:4001/api";
+export const baseURL = "https://backend-cnft.thecbt.live/api";
+// export const baseURL = "http://172.20.10.2:4001/api";
 
 export const INSTANCE = axios.create({
   baseURL: baseURL,
