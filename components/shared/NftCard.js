@@ -138,7 +138,7 @@ if(imageHash==undefined){
                 sx={{ color: "var(--secondary-color)" }}
                 className="bold"
               >
-                {card?.detail?.datum
+                {card?.detail?.datum && card.detail?.datum.fields && card.detail?.datum.fields[1]
                   ? card.detail?.datum.fields[1].int / 1000000
                   : "Free"}
                 {/* {renderLovelace(card.detail?.datum?.fields[1]?.int)} */}

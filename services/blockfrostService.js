@@ -9,6 +9,7 @@ export function getAssetDetail(asset) {
 }
 
 export function getDatum(hash) {
+  if (!hash) return null;
   return getBlockfrost("/scripts/datum/" + hash);
 }
 

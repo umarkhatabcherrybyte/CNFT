@@ -55,7 +55,7 @@ export function saveUtxos(db, objects) {
       let store = trans.objectStore("utxoContent");
       objects.forEach((x) => {
         console.log("putting", x);
-        store.put(x);
+        // store.put(x);
       });
       trans.commit();
     });

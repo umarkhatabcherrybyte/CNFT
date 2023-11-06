@@ -114,6 +114,7 @@ const Buy = () => {
             console.log("Error in UTXO ", e);
 
             const dataResponse = await getDatum(utxo.data_hash);
+            console.log("datum is ",dataResponse);
             utxo.datum = dataResponse.json_value;
 
             const nftDetail = await getAssetDetail(utxo.nft);
@@ -144,7 +145,7 @@ const Buy = () => {
 
         const lookup = {};
         settledPromises
-          .filter((v) => v.value && v.value.datum)
+          .filter((v) => v.value && v.value.datum && v.value.datum.fields)
           .forEach((x) => {
             lookup[x.value.utxo] = x.value;
           });
@@ -159,12 +160,15 @@ const Buy = () => {
         // Categorize the data into policy groups
         let unique_policies = [];
         validUtxos.forEach((item) => {
+         
+
           const policy = item.policy;
           if (!policyGroups[policy]) {
             policyGroups[policy] = [];
             unique_policies.push(policy);
           }
           policyGroups[policy].push(item);
+       
         });
         setUniquePolicies(unique_policies);
         setUniquePolicyGroups(policyGroups);
@@ -298,6 +302,7 @@ const Buy = () => {
                             nfts={uniquePolicyGroups[policy]}
                           />
                            */}
+                           
                           <NftCard
                             type={1}
                             card={uniquePolicyGroups[policy][0]}
