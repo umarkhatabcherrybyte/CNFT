@@ -196,6 +196,7 @@ const BuyDetail = () => {
         setAsset(asset_);
       } catch (e) {
         console.log(e);
+        setIsLoading(false);
         setAsset({});
       }
     }
