@@ -121,7 +121,7 @@ const FeatureTokenSlider = ({ nfts }) => {
                           }}
                           className="bold poppin"
                         >
-                          {renderLovelace(nft.detail?.datum?.fields[1]?.int)}
+                          {nft.detail?.datum?.fields && renderLovelace(nft.detail?.datum?.fields[1]?.int)}
                           <Typography
                             sx={{
                               fontSize: { xs: "8px", md: "10px" },
