@@ -51,7 +51,7 @@ const SaleMethod = () => {
   const [totalAmount, setTotalAmount] = useState("");
   const [isForm, setIsForm] = useState(false);
   const [asset, setAsset] = useState([]);
-  const providerInstance = useSelector((store) => store.wallet);
+  let providerInstance = useSelector((store) => store.wallet);
 
   console.log(asset, "assetassetassetassetassetassetassetassetasset");
   const asset_name = localStorage.getItem("asset_name");
@@ -103,6 +103,7 @@ const SaleMethod = () => {
     // console.log(providerInstance, "providerInstance");
 
     console.log(selectedNFTs, "selectedNFTs");
+    providerInstance = providerInstance.instance;
 
     const addresses = await providerInstance.getUsedAddresses();
     // console.log(addresses, "addressesaddressesaddresses");

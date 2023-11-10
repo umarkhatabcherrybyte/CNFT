@@ -106,7 +106,7 @@ const BuyDetail = () => {
   const buy_utxo = async () => {
     // const api = await window.cardano.nami.enable();
     // const res = await connect("Nami");
-    let provider_ = provider;
+    let provider_ = provider.instance;
 
     if (notFetchedUtxosCompletely) {
       return 0;
