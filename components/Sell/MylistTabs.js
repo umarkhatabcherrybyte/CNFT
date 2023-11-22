@@ -58,6 +58,7 @@ const MylistTabs = () => {
   const router = useRouter();
   const lovelace = useLovelace();
   const assets = useAssets();
+  console.log("assets are ",assets);
   const { wallet, connected, connecting } = useWallet();
   const [recipientAddress, setRecipientAddress] = useState("");
   // const [lists, setLists] = useState([]);

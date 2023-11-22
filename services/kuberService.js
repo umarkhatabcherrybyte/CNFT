@@ -8,12 +8,16 @@ export async function callKuberAndSubmit(provider, data) {
 
   return fetch(
     // eslint-disable-next-line max-len
-    `${kuberUrlByNetwork}/api/v1/tx`,
+    `https://preprod.kuber.cardanoapi.io/api/v1/tx`,
     {
       mode: "cors",
       method: "POST",
       body: data,
-      headers: new Headers({ "content-type": "application/json" }),
+      headers: {
+        "content-type": "application/json",
+        "api-key":
+          "xtEhYmQkOJ0r5zi5EUXjWZYYzWN6EDEuVowo616tGn804Uxw2GyrZL3VGfQ5Xwda",
+      },
     }
   )
     .catch((e) => {
@@ -25,7 +29,7 @@ export async function callKuberAndSubmit(provider, data) {
       if (res.status === 200) {
         return res.json().then((json) => {
           console.log(json);
-          return signAndSubmit(provider, json.tx).catch((e) => {
+          return signAndSubmit(provider, json.cborHex).catch((e) => {
             if (e.info && e.code) {
               throw Error(`Code : ${e.code} :: \n ${e.info}`);
             } else throw e;

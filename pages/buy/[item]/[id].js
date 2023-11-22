@@ -167,7 +167,15 @@ const BuyDetail = () => {
         ],
       };
       console.log({ request });
-      return callKuberAndSubmit(provider_, JSON.stringify(request));
+      try {
+        await callKuberAndSubmit(provider_, JSON.stringify(request));
+        alert("Transaction will be confirmed in some minutes !");
+        // window.location.href=""
+        router.push("/buy")
+      } catch (e) {
+        alert("Error in purchasing NFT");
+      }
+
       // };
     }
 
@@ -190,6 +198,7 @@ const BuyDetail = () => {
   const getNFTDetail = async () => {
     if (id) {
       try {
+        
         let asset_ = await getAssetDetail(id + item);
 
         setIsLoading(false);

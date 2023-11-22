@@ -5,6 +5,7 @@ export function listMarket() {
 }
 
 export function getAssetDetail(asset) {
+  
   return getBlockfrost("/assets/" + asset);
 }
 

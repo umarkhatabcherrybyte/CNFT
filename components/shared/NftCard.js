@@ -19,9 +19,12 @@ import { getTxInfo } from "../../services/koiosService";
 import { blockfrostApiKey, blockfrostUrl } from "../../config/blockfrost";
 import { market } from "../../config/marketConfig";
 import { BlockfrostProvider } from "@meshsdk/core";
+let demoImage="https://i.pinimg.com/originals/f2/d1/22/f2d122bd112252d193a197e9d9c203d2.jpg"
 const NftCard = ({ onClick, card, type }) => {
   const [datum, setDatum] = useState(null);
-  console.log("NFT is ", card);
+  const [cardImage, setCardImage] = useState(null);
+
+  console.log("NFT card is ", card);
 
   const router = useRouter();
   // let _datum = card.detail.datum;
@@ -58,28 +61,50 @@ const NftCard = ({ onClick, card, type }) => {
     //   },
     // });
   };
-  let cardImage = "https://ipfs.io/ipfs/";
-
-  let imageHash =
-    card.detail.onchain_metadata?.image && type == 0
-      ? card.detail.onchain_metadata.feature_image
-      : card.detail.onchain_metadata?.image?.slice(7);
-
-  if (!imageHash) {
-    imageHash = card.detail._imageUrl;
-  }
-  if (imageHash?.startsWith("http")) {
-    cardImage = imageHash;
-  } else cardImage += imageHash;
-if(imageHash==undefined){
-  cardImage="https://i.pinimg.com/originals/f2/d1/22/f2d122bd112252d193a197e9d9c203d2.jpg"
-}
-  console.log("image is ", cardImage, card);
 
   // console.log("showing card", card);
+  const getNFTDetail = async () => {
+    // if (id) {
+      try {
+        let asset_ = await getAssetDetail(card.policy+fromText(card.assetName));
+        let image=asset_.onchain_metadata.image
+        setCardImage("https://ipfs.io/ipfs/"+image.slice(7))
+console.log("koiaos asset",asset_);
+        // setIsLoading(false);
+        // setAsset(asset_);
+      } catch (e) {
+        console.log(e);
+        // setIsLoading(false);
+        // setAsset({});
+      }
+    // }
+  };
   useEffect(() => {
-    // getNftDatum();
+    let cardImage_ = "https://ipfs.io/ipfs/";
+
+    let imageHash =
+      card.detail.onchain_metadata?.image && type == 0
+        ? card.detail.onchain_metadata.feature_image
+        : card.detail.onchain_metadata?.image?.slice(7);
+
+    if (!imageHash) {
+      imageHash = card.detail._imageUrl;
+    }
+    if (imageHash?.startsWith("http")) {
+      setCardImage(imageHash);
+    } else setCardImage(cardImage_ + imageHash);
+    if (imageHash == undefined) {
+      setCardImage(
+        demoImage
+      );
+    }
   }, []);
+
+  useEffect(()=>{
+if(cardImage==demoImage){
+  getNFTDetail() 
+}
+  },[cardImage])
   return (
     <NftCardStyled>
       <Card
@@ -127,7 +152,7 @@ if(imageHash==undefined){
                 sx={{ textTransform: "uppercase" }}
               >
                 {/* {type ? card.name : asset_detail?.asset_name} */}
-                {card?.detail?.onchain_metadata?.name
+                {card.assetName? card.assetName: card?.detail?.onchain_metadata?.name
                   ? card?.detail?.onchain_metadata?.name
                   : card?.detail._name}
               </Typography>
@@ -138,7 +163,9 @@ if(imageHash==undefined){
                 sx={{ color: "var(--secondary-color)" }}
                 className="bold"
               >
-                {card?.detail?.datum && card.detail?.datum.fields && card.detail?.datum.fields[1]
+                {card?.detail?.datum &&
+                card.detail?.datum.fields &&
+                card.detail?.datum.fields[1]
                   ? card.detail?.datum.fields[1].int / 1000000
                   : "Free"}
                 {/* {renderLovelace(card.detail?.datum?.fields[1]?.int)} */}
