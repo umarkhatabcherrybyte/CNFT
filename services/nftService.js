@@ -4,6 +4,7 @@ import {
   blockfrostApiKey,
   blockfrostNetworkName,
 } from "../config/blockfrost";
+
 import { bankWalletAddress, seedPhrase } from "../config/walletConstants";
 import {
   connectWallet,
@@ -21,28 +22,38 @@ import { Address, BaseAddress } from "@emurgo/cardano-serialization-lib-asmjs";
 import { callKuberAndSubmit } from "../services/kuberService";
 
 export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
+console.log("inside mint nft");
   const lucid = await initializeLucid();
 
   const api = await connectWallet(connectedWallet);
   lucid.selectWallet(api);
+  console.log({api});
   const addr = await getAddressFromLucid(lucid);
   const utxos = await getUtxosForAddress(lucid, addr);
   const utxo = utxos[0];
+  console.log({utxo});
+
   const tn = createTextValue("nft");
   const image = createTextValue("nft");
+  console.log({image});
+
   const { nftPolicy, policyId } = generatePolicyFromSmartContract(
     lucid,
     utxo,
     tn,
     image
   );
+  console.log({nftPolicy});
 
   let metadataX = {};
   let metadata = JSON.parse(window.localStorage.getItem("metadata"));
+  console.log({metadata});
 
   metadataX[metadata.name] = metadata;
   const unit = generateUnit(policyId, metadata.name);
   let obj = { [policyId]: metadataX };
+  console.log({obj});
+
   let tx;
   if (selectedValue == "b") {
     tx = await lucid
@@ -51,10 +62,11 @@ export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
       .attachMetadata("721", obj)
       .attachMintingPolicy(nftPolicy)
       .collectFrom([utxo])
-      .payToAddress(bankWalletAddress, { lovelace: 1000n })
+      // .payToAddress(bankWalletAddress, { lovelace: 1000n })
       .complete();
   }
   if (selectedValue == "c") {
+    console.log("minting now");
     tx = await lucid
       .newTx()
       .mintAssets({ [unit]: 1n }, Data.void())
@@ -62,7 +74,8 @@ export const mintNFT = async (selectedValue, connectedWallet, currentAddr) => {
       .attachMintingPolicy(nftPolicy)
       .collectFrom([utxo])
       .payToAddress(currentAddr, { [unit]: 1n })
-      .payToAddress(bankWalletAddress, { lovelace: 1000000n })
+
+      // .payToAddress(bankWalletAddress, { lovelace: 1000000n })
       .complete();
   }
 

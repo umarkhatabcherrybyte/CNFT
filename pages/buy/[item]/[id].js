@@ -134,7 +134,8 @@ const BuyDetail = () => {
       const stakeKey = StakeCredential.from_keyhash(
         Ed25519KeyHash.from_bytes(Buffer.from(sellerStakeKeyHashHex, "hex"))
       );
-      const sellerAddr = BaseAddress.new(0, vkey, stakeKey);
+      const sellerAddr = BaseAddress.new(1, vkey, stakeKey);
+      console.log("seller is ",sellerAddr);
       let utxos__ = await provider_.getUtxos();
       console.log({ utxos__ });
       // Create constraints for buying
@@ -160,7 +161,9 @@ const BuyDetail = () => {
               .to_address()
               .to_bech32(
                 market.address.startsWith("addr_test") ? "addr_test" : "addr"
-              ),
+              )
+              
+              ,
             value: cost,
             insuffientUtxoAda: "increase",
           },

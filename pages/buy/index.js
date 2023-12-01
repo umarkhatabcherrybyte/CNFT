@@ -111,13 +111,25 @@ const Buy = () => {
             const v = await database.getUtxo(readHandle, utxo.id);
             return v;
           } catch (e) {
-            console.log("Error in UTXO ", e);
+            console.log("Error in UTXO ", e, { utxo });
 
-            const dataResponse = await getDatum(utxo.data_hash);
-            console.log("datum is ",dataResponse);
-            utxo.datum = dataResponse.json_value;
+            if (!utxo.datum) {
+              let dataResponse = await getDatum(utxo.data_hash);
+              console.log("datum is ", dataResponse.json_value);
+              utxo.datum = dataResponse.json_value;
+            }
 
-            const nftDetail = await getAssetDetail(utxo.nft);
+            let policyNFTs = await getAssetDetail(utxo.policy); 
+            // console.log({policyNFTs});
+
+            // policyNFTs= policyNFTs?.filter(
+            //   (item) =>
+            //     item.asset_name_ascii == utxo.assetName ||
+            //     item.assetName == utxo.assetName
+            // );
+            // console.log({policyNFTs});
+            let nftDetail=policyNFTs.data
+            console.log({nftDetail});
 
             if (nftDetail.onchain_metadata) {
               if (nftDetail.onchain_metadata.name) {
@@ -133,10 +145,11 @@ const Buy = () => {
             nftDetail.utxo = utxo.id;
             nftDetail.datum = utxo.datum;
 
-            setTimeout(() => {
-              database.saveUtxos(db, [nftDetail]);
-            });
-            console.log(nftDetail, "nftDetailnftDetailnftDetail");
+            // setTimeout(() => {
+            //   database.saveUtxos(db, [nftDetail]);
+            // });
+            // console.log(nftDetail, "nftDetailnftDetailnftDetail");
+
             return nftDetail;
           }
         });
@@ -160,15 +173,12 @@ const Buy = () => {
         // Categorize the data into policy groups
         let unique_policies = [];
         validUtxos.forEach((item) => {
-         
-
           const policy = item.policy;
           if (!policyGroups[policy]) {
             policyGroups[policy] = [];
             unique_policies.push(policy);
           }
           policyGroups[policy].push(item);
-       
         });
         setUniquePolicies(unique_policies);
         setUniquePolicyGroups(policyGroups);
@@ -302,7 +312,7 @@ const Buy = () => {
                             nfts={uniquePolicyGroups[policy]}
                           />
                            */}
-                           
+
                           <NftCard
                             type={1}
                             card={uniquePolicyGroups[policy][0]}

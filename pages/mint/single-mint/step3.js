@@ -23,6 +23,7 @@ import { useRouter } from "next/router";
 import { INSTANCE } from "/config/axiosInstance";
 import FullScreenLoader from "/components/shared/FullScreenLoader";
 import { transactionErrorHanlder } from "../../../utils/errorUtils";
+import { Login } from "@mui/icons-material";
 const payData = [
   // {
   //   title: "Mint for free and list with us ",
@@ -56,12 +57,15 @@ const SingleMintStep3 = () => {
     try {
       if (!connected) {
         Toast("error", "Please Connect Your Wallet First");
-      } else if (lovelace < 1000000) {
-        Toast(
-          "error",
-          "You do not have enough Ada to complete this transaction"
-        );
-      } else {
+      }
+
+      // else if (lovelace < 1000000) {
+      //   Toast(
+      //     "error",
+      //     "You do not have enough Ada to complete this transaction"
+      //   );
+      // }
+      else {
         let connectedWallet = window.localStorage.getItem("connectedWallet");
         if (selectedValue == undefined || selectedValue == null) {
           Toast("error", "Please Select an Option for Minting");
@@ -69,12 +73,14 @@ const SingleMintStep3 = () => {
           setIsLoading(true);
           if (selectedValue == "a") {
           } else if (selectedValue == "b" || selectedValue == "c") {
+            console.log("calling mint");
             const txHash = await mintNFT(
               selectedValue,
               connectedWallet,
               currentAddr
             );
             if (txHash) {
+              console.log("tx has ", txHash);
               Toast("success", "Minted Successfully");
               router.push("/mint");
               setIsLoading(false);
@@ -106,7 +112,7 @@ const SingleMintStep3 = () => {
         }
       }
     } catch (error) {
-      transactionErrorHanlder(error, "mint");
+      // transactionErrorHanlder(error, "mint");
       setIsLoading(false);
     }
   };
